@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Escape Room Generator</title>
+</head>
+<body>
+    <h1>Escape Room Generator</h1>
+    <div class="gameDiv hidden">
+        <div class="flex-column">
+            <canvas id="gameWindow"></canvas>
+            <button id="exitGame">Quit</button>
+        </div>
+    </div>
+    <div class="startGameDiv">
+        <div class="flex-column">
+            <form action="">
+                <div>
+                    <label for="players">Number of players</label>
+                    <input type="number" min="1" max="8" name="players" id="players" placeholder="1">
+                </div>
+                <div>
+                    <label for="easy">Easy</label>
+                    <input type="radio" name="difficulty" id="easy" checked>
+                </div>
+                <div>
+                    <label for="normal">Normal</label>
+                    <input type="radio" name="difficulty" id="normal">
+                </div>
+                <div>
+                    <label for="hard">Hard</label>
+                    <input type="radio" name="difficulty" id="hard">
+                </div>
+                <div>
+                    <label for="extreme">Extreme</label>
+                    <input type="radio" name="difficulty" id="extreme">
+                </div>
+                <button id="startGame">Start</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script src="index.ts"></script>
+</html>
