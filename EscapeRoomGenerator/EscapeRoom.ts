@@ -34,6 +34,7 @@ function generateRooms(nr_of_rooms: number, slots_in_room: number) {
         let i = rooms.length
         rooms.push(new_room);
         visited.add(`${pos[0]},${pos[1]}`);
+        
         if (entrance_i) {
             let entrance = rooms[entrance_i-1]
             if (entrance.x < new_room.x) {
