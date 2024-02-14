@@ -21,5 +21,27 @@ export class Room {
         this.down = null;
     }
 }
+enum PuzzleTypes{
+    MATH,
+    MASTERMIND,
+    ANAGRAMS
+}
+interface Puzzle{
+    id: string;
+    tag: PuzzleTypes;
+    question: string;
+    solution: string;
+}
+
+export class MathPuzzle implements Puzzle{
+    id: string;
+    tag: PuzzleTypes.MATH;
+    question: string;
+    solution: string;
+    isDone: boolean;
+    async generate(et: number | undefined): Promise<string>{
+        return "2+2";
+    }
+}
 
 export type point = [number, number]
