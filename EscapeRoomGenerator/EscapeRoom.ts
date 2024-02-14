@@ -20,13 +20,13 @@ function generateRooms(nr_of_rooms: number, slots_in_room: number) {
     }
 
     let visited = new Set();
-    let available_slots: [number | null, point][] = [[null, [0,0]]];
+    let possible_locations: [number | null, point][] = [[null, [0,0]]];
     let rooms: Room[] = [];
 
     while (rooms.length < nr_of_rooms) {
-        let pos_i = getRandomInt(0, available_slots.length);
-        let [entrance_i, pos] = available_slots[pos_i];
-        available_slots.splice(pos_i, 1);
+        let pos_i = getRandomInt(0, possible_locations.length);
+        let [entrance_i, pos] = possible_locations[pos_i];
+        possible_locations.splice(pos_i, 1);
 
         if (visited.has(`${pos[0]},${pos[1]}`)) continue;
 
@@ -55,7 +55,7 @@ function generateRooms(nr_of_rooms: number, slots_in_room: number) {
         }
 
         around(pos).forEach((pos) => {
-            available_slots.push([i, pos]);
+            possible_locations.push([i, pos]);
         })
     }
 
