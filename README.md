@@ -2,9 +2,9 @@
 
 ## Backend
 - Install Node (https://nodejs.org/en)
-- Run 'npm install' inside '/EscapeRoomGenerator'
+- Run 'npm install' inside '/EscapeRoomGenerator' to install necessary packages
 - Run 'npx ts-node server.ts' to start the backend
 
 ## Frontend
-- Open 'index.html' in a browser
-- Run 'npm start' inside '/frontend' after starting the server from the third steps above
+- Run 'npm install' inside '/frontend' to install necessary packages
+- Run 'npm start' inside '/frontend' to start the frontend
