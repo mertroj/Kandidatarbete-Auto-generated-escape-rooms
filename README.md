@@ -7,3 +7,4 @@
 
 ## Frontend
 - Open 'index.html' in a browser
+- Run 'npm start' inside '/frontend' after starting the server from the third steps above
