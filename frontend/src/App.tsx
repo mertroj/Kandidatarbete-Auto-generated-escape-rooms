@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import axios from 'axios';
+import axios from 'axios'; //import this and use it whenever you want to make a request to the backend
 import MathPuzzle from './MathPuzzle';
 
 function App() {
