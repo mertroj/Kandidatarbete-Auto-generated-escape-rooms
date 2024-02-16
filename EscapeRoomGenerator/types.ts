@@ -27,21 +27,38 @@ enum PuzzleTypes{
     ANAGRAMS
 }
 interface Puzzle{
-    id: string;
+    id: number;
     tag: PuzzleTypes;
     question: string;
     solution: string;
 }
+class PuzzleInfo{
+    time: number;
+    question: string;
+    constructor(t: number, q: string){
+        this.time = t;
+        this.question = q;
+    }
+}
 
 export class MathPuzzle implements Puzzle{
-    id: string;
+    id: number;
     tag: PuzzleTypes.MATH;
     question: string;
     solution: string;
-    isDone: boolean;
-    async generate(et: number | undefined): Promise<string>{
-        return "2+2";
+    async generate(): Promise<PuzzleInfo>{
+        return new PuzzleInfo(1, this.question);
     }
+    getSolution(): string{
+        return this.solution;
+    }
+    constructor(){
+        this.id = Number(new Date());
+        this.tag = PuzzleTypes.MATH;
+        this.question = "What is 2+2?";
+        this.solution = "4";
+    }
+
 }
 
 export type point = [number, number]

@@ -24,7 +24,7 @@ function App() {
       </header>
     </div>
     */
-    <MathPuzzle estimatedTime={5}/>
+    <MathPuzzle/>
   );
 }
 

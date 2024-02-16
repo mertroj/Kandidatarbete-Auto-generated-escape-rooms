@@ -1,30 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
 
-const MathPuzzle = ({estimatedTime}: {estimatedTime: number})=> {
-    const [puzzle, setPuzzle] = useState<string | null>(null);
+export interface MathPuzzleProps {
+    estimatedTime: number;
+    puzzleQuestion: string;
+}
+export interface SubmittedAnswer{
+    isCorrect: boolean;
+}
+
+function MathPuzzle () {
+    const [puzzleQuestion, setPuzzleQuestion] = useState<string | null>(null);
+    const [estimatedTime, setTime] = useState<number>(0);
+    const [answer, setAnswer] = useState<string | null>(null);
+
+    async function fetchPuzzle() {
+        try {
+            const response = await axios.get<MathPuzzleProps>(
+                `http://localhost:8080/puzzleService/info`
+            );
+            setPuzzleQuestion(response.data.puzzleQuestion);
+            setTime(response.data.estimatedTime);
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     useEffect(() => {
-        async function fetchPuzzle() {
-            try {
-                const response = await axios.get<string>(
-                    `http://localhost:8080/generatePuzzle?estimatedTime=${estimatedTime}`
-                );
-                setPuzzle(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
         fetchPuzzle();
-    }, []); // Array empty => Fetch puzzle once
+    }, []);
+
+    if (puzzleQuestion === null || estimatedTime === 0) {
+        return <h1>Loading...</h1>;
+    }
 
     return (
-    <div>
-        <h1>You have approx. {puzzle}</h1>
-        <p>{puzzle}</p>
-    </div>
+        <div>
+            <h1>You have approx. {estimatedTime}</h1>
+            <span>
+                {puzzleQuestion}
+                <form onSubmit={async e => {
+                    e.preventDefault();
+                    const response = await axios.post<SubmittedAnswer>(`http://localhost:8080/puzzleService/checkAnswer`, {answer: answer});
+                    if (response.data.isCorrect) {
+                        alert('Correct!');
+                    } else {   
+                        alert('Incorrect!');
+                    }
+                }}>
+                    <input name="answer" type="text" onChange={e => setAnswer(e.target.value)}/>
+                </form>
+            </span>
+        </div>
     );
 }
+
 export default MathPuzzle;
