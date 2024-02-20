@@ -33,44 +33,5 @@ export class Room {
         this.slots = new Array(slots).fill(null)
     }
 }
-enum PuzzleTypes{
-    MATH,
-    MASTERMIND,
-    ANAGRAMS
-}
-interface Puzzle{
-    id: number;
-    tag: PuzzleTypes;
-    question: string;
-    solution: string;
-}
-class PuzzleInfo{
-    time: number;
-    question: string;
-    constructor(t: number, q: string){
-        this.time = t;
-        this.question = q;
-    }
-}
-
-export class MathPuzzle implements Puzzle{
-    id: number;
-    tag: PuzzleTypes.MATH;
-    question: string;
-    solution: string;
-    async generate(): Promise<PuzzleInfo>{
-        return new PuzzleInfo(1, this.question);
-    }
-    getSolution(): string{
-        return this.solution;
-    }
-    constructor(){
-        this.id = Number(new Date());
-        this.tag = PuzzleTypes.MATH;
-        this.question = "What is 2+2?";
-        this.solution = "4";
-    }
-
-}
 
 export type point = [number, number]

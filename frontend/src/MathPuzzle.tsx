@@ -37,16 +37,20 @@ function MathPuzzle () {
 
     return (
         <div>
-            <h1>You have approx. {estimatedTime}</h1>
+            <h1>You have approx. {estimatedTime} minutes</h1>
             <span>
                 {puzzleQuestion}
                 <form onSubmit={async e => {
                     e.preventDefault();
-                    const response = await axios.post<SubmittedAnswer>(`http://localhost:8080/puzzleService/checkAnswer`, {answer: answer});
-                    if (response.data.isCorrect) {
-                        alert('Correct!');
-                    } else {   
-                        alert('Incorrect!');
+                    try{
+                        const response = await axios.post<SubmittedAnswer>(`http://localhost:8080/puzzleService/checkAnswer`, {answer: answer});
+                        if (response.data.isCorrect) {
+                            alert('Correct!');
+                        } else {   
+                            alert('Incorrect!');
+                        }
+                    } catch (error) {
+                        console.error(error);
                     }
                 }}>
                     <input name="answer" type="text" onChange={e => setAnswer(e.target.value)}/>
