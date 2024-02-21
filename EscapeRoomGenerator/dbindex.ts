@@ -1,6 +1,6 @@
 import {Database}from './db'
 
-interface Room {
+interface Puzzle {
     question: string;
     solution: string;
     hint: string;
@@ -10,7 +10,7 @@ interface Room {
   
   interface Tag {
     puzzleType: string;
-    rooms: Room[]
+    puzzles: Puzzle[]
   }
 
   interface Puzzles {
@@ -21,15 +21,16 @@ interface Room {
     tags: []
   }
 
-  const db = new Database<Puzzles>('./rooms.json', initial)
+  const db = new Database<Puzzles>('./puzzles.json', initial)
 
   /* usage of the database
   db.update({
     tags:  [{
-        type: Anagram
-        rooms: [{
+        PuzzleType: Anagram
+        puzzles: [{
             question: flavourtext describing the puzzle and including the question,
             solution: solution to the puzzle,
+            hint: a hint for the puzzles,
             et: 20,
             difficulty: easy
         }]
