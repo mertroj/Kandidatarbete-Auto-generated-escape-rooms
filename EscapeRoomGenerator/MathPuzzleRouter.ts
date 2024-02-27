@@ -22,3 +22,9 @@ MathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
     console.log(submittedAnswer, puzzle.getSolution(), isCorrect);
     res.status(200).send({isCorrect});
 });
+
+MathPuzzleRouter.get("/hint", async (req: Request, res: Response) => {
+    const hint: string = puzzle.getHint();
+    console.log(hint);
+    res.status(200).send({hint});
+});

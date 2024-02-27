@@ -29,15 +29,32 @@ export class PuzzleInfo{
 export class MathPuzzle{
     id: number;
     puzzle: OperatorMathPuzzle | LettersMathPuzzle;
+    private hint: string = '';
     generate(): PuzzleInfo{
         return this.puzzle.generate();
-    };
+    }
     getSolution(): string{
         return this.puzzle.getSolution();
-    };
+    }
+    getHint(): string{
+        const newHint: string = this.puzzle.getHint();
+        if(newHint !== 'No more hints.'){
+            this.appendHint(newHint);
+        }
+        return this.hint;
+    }
+    private appendHint(hint: string): void{
+        this.hint += '|' + hint;
+    }
     constructor(){
         this.id = Number(new Date());
-        this.puzzle = new LettersMathPuzzle();
+        const puzzleChoice: Number = getRandomInt(0, 1);
+        if(puzzleChoice === 0){
+            this.puzzle = new LettersMathPuzzle();
+        }
+        else{
+            this.puzzle = new OperatorMathPuzzle();
+        }
     }
 }
 
@@ -45,6 +62,7 @@ class LettersMathPuzzle{
     private letters: string[] = shuffleArray(("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split(''));
     private question: string;
     private answer: number;
+    private hintLevel: number = 2;
     constructor(){
         this.answer = Math.floor((Math.random() * 9000) + 1001);
         this.question = this.init();
@@ -54,6 +72,15 @@ class LettersMathPuzzle{
     }
     generate(): PuzzleInfo {
         return new PuzzleInfo(5, this.question);
+    }
+    getHint(): string{
+        if(this.hintLevel >= 0){
+            const number: String = this.getSolution()[this.hintLevel];
+            const letter: String = this.letters[Number(this.getSolution()[this.hintLevel])];
+            this.hintLevel--;
+            return 'The letter ' + letter + ' is ' + number + '.';
+        }
+        return 'No more hints.';
     }
     
     private init(): string {
@@ -68,10 +95,10 @@ class LettersMathPuzzle{
         
         answerLetters = mapNumbersToLetters(this.getSolution(), this.letters);
         sliceLetters = mapNumbersToLetters(answerSlice, this.letters);
-        //answerLetters = answerLetters.slice(0, -1) + (this.answer%10).toString();
+        answerLetters = answerLetters.slice(0, -1) + (this.answer%10).toString();
 
         //should randomize the operation as well
-        return `What is the mapping of ${answerLetters} to numbers so that the equation ${answerLetters} - ${remainder} = ${sliceLetters} is satisfied?`;
+        return `What is the mapping of each letter in ${answerLetters} to numbers so that the equation ${answerLetters} - ${remainder} = ${sliceLetters} is satisfied?`;
     }
     private checkValidity(remainder: number): boolean {
         if(remainder <= 0){
@@ -95,6 +122,7 @@ class OperatorMathPuzzle{
     private operators: string[];
     private usedOperators: string[];
     private question: string;
+    private hintLevel : number = 0; //hintLevel 0-2 since we have three operations (numbered 0, 1, and 2)
 
     constructor() {
         this.numbers = [];
@@ -112,14 +140,23 @@ class OperatorMathPuzzle{
     generate(): PuzzleInfo {
         return new PuzzleInfo(2, this.question);
     }
+    getHint(): string{
+        if(this.hintLevel <= 2){
+            const hint: string = 'The next operations is ' + this.usedOperators[this.hintLevel];
+            this.hintLevel++;
+            return hint;
+        }else{
+            return 'No more hints.'
+        }
+    }
 
     private init(): void {
         for (let i = 0; i < 4; i++) {
-            this.numbers.push(getRandomInt(1, 100));
+            this.numbers.push(getRandomInt(1, 50));
         }
     }
     private formQuestion(result: number): string {
-        return `What is the sequence of operators used in the following operation ("not (not wrong)" to "not wrong"): ${this.numbers[0]} □ ${this.numbers[1]} □ ${this.numbers[2]} □ ${this.numbers[3]} = ${result}?`;
+        return `What is the sequence of operators used in the following operation (use left to right order of operation): ${this.numbers[0]} □ ${this.numbers[1]} □ ${this.numbers[2]} □ ${this.numbers[3]} = ${result}?`;
     }
 
     private applyOperations(): number {
