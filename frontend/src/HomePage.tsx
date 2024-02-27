@@ -1,9 +1,9 @@
 import { Button, Container, Row, Col, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {CSSProperties} from "react";
+import React, {CSSProperties} from "react";
 
 
-function HomePage() {
+function HomePage({children}: { children: React.ReactNode } ) {
     return (
         <div>
             <Row>
@@ -66,6 +66,7 @@ function HomePage() {
                     </Dropdown>
                 </Col>
             </Row>
+            {children}
 
         </div>
     );

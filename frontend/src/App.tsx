@@ -20,7 +20,6 @@ function Page2() {
 function App() {
     const [currentPage, setCurrentPage] = useState('HomePage');
 
-    // Function to handle page change
     const handlePageChange = (page: string) => {
         setCurrentPage(page);
     };
@@ -28,7 +27,11 @@ function App() {
     // Render the appropriate page based on currentPage state
     let pageContent;
     if (currentPage === 'HomePage') {
-        pageContent = <HomePage />;
+        const navigation =
+            <Row className='fixed-bottom d-flex justify-content-center'>
+                <Button className='w-50 100vh mb-5' onClick={() => handlePageChange('PuzzleStart')}>Start</Button>
+            </Row>;
+        pageContent = <HomePage children={navigation} />;
     } else if (currentPage === 'PuzzleStart') {
         pageContent = <PuzzleStart />;
     }
@@ -39,10 +42,6 @@ function App() {
             <nav>
             </nav>
             {pageContent}
-            <Row className='fixed-bottom d-flex justify-content-center'>
-                <Button className='w-50 100vh mb-5' onClick={() => handlePageChange('PuzzleStart')}>Start</Button>
-            </Row>
-
         </Container>
     );
 }
