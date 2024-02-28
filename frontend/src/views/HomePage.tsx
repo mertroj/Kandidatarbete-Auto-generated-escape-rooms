@@ -1,9 +1,11 @@
 import { Button, Container, Row, Col, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, {CSSProperties} from "react";
+import React, {CSSProperties, useEffect, useState} from "react";
+import Hinting from '../components/Hinting/hinting';
 
 
 function HomePage({children}: { children: React.ReactNode } ) {
+    
     return (
         <div>
             <Row>
@@ -67,6 +69,9 @@ function HomePage({children}: { children: React.ReactNode } ) {
                 </Col>
             </Row>
             {children}
+
+            
+            <Hinting  />
 
         </div>
     );

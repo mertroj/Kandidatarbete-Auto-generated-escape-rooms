@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
-import HomePage from "./HomePage";
+import HomePage from "./views/HomePage";
 import {Button, Container, Row} from "react-bootstrap";
-import PuzzleStart from "./PuzzleStart"; //import this and use it whenever you want to make a request to the backend
+import PuzzleStart from "./views/PuzzleStart"; //import this and use it whenever you want to make a request to the backend
 
 // Component for Page 1
 function Page1() {
@@ -39,7 +39,7 @@ function App() {
 
 
     return (
-        <Container className='text-center mt-5 min-vh-100 justify-content-center'>
+        <Container className='text-center mt-5 justify-content-center'>
             <nav>
             </nav>
             {pageContent}
