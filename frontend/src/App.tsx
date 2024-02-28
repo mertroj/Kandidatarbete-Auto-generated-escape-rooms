@@ -18,6 +18,7 @@ function Page2() {
 
 // Main App component
 function App() {
+
     const [currentPage, setCurrentPage] = useState('HomePage');
 
     const handlePageChange = (page: string) => {
