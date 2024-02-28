@@ -1,8 +1,10 @@
-class Anagram {
-    private anagramQuestion: string;
-    private anagramAnswers: string[];
+export class Anagram {
+    private anagramQuestion: string = '';
+    private anagramAnswers: string[] = [];
+    private readonly estimatedTime: number;
 
     constructor(estimatedTime: number) {
+        this.estimatedTime = estimatedTime;
         let difficulty: string;
         if (estimatedTime >= 1 && estimatedTime <= 3) {
             difficulty = "easy";
@@ -13,11 +15,10 @@ class Anagram {
         }
         this.generateRandomAnagram(difficulty);
     }
-
-    private async loadJSON(): Promise<any> {
-        const response = await fetch('anagrams_tree.json');
-        return await response.json();
+    private async loadJSON(): Promise<any> { // TODO: remove any with a proper type
+        return require('./anagrams.json');
     }
+
 
     private async generateRandomAnagram(difficulty: string): Promise<void> {
         const difficultyRanges: { [key: string]: [number, number] } = {
@@ -31,7 +32,7 @@ class Anagram {
 
         const randomLength = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
 
-        const anagrams = anagramsData[randomLength];
+        const anagrams = anagramsData[randomLength.toString()];
 
         if (anagrams) {
             const randomIndex = Math.floor(Math.random() * anagrams.length);
@@ -44,6 +45,9 @@ class Anagram {
         }
     }
 
+    getEstimatedTime(): number {
+        return this.estimatedTime;
+    }
     getQuestion(): string {
         return this.anagramQuestion;
     }

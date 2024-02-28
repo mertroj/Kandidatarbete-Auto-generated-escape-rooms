@@ -7,7 +7,7 @@ import Hint from './HintComponent/hint';
 
 interface AnagramProps {
     estimatedTime: number;
-    puzzleQuestion: string;
+    anagramQuestion: string;
     description: string;
 }
 interface SubmittedAnswer{
@@ -27,9 +27,9 @@ function AnagramComponent () {
     async function fetchAnagram() {
         try {
             const response = await axios.get<AnagramProps>(
-                `http://localhost:8080/anagramService/info`
+                `http://localhost:8080/placeholder/info`
             );
-            setAnagramQuestion(response.data.puzzleQuestion);
+            setAnagramQuestion(response.data.anagramQuestion);
             setTime(response.data.estimatedTime);
 
         } catch (error) {
@@ -48,7 +48,7 @@ function AnagramComponent () {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post<SubmittedAnswer>(`http://localhost:8080/anagramService/checkAnswer`, {answer: answer});
+            const response = await axios.post<SubmittedAnswer>(`http://localhost:8080/placeholder/checkAnswer`, {answer: answer});
             if (response.data.isCorrect) {
                 alert('Correct!');
             } else {
@@ -60,7 +60,7 @@ function AnagramComponent () {
     }
     async function handleHintClick() {
         try{
-            const response = await axios.get<NewHint>(`http://localhost:8080/anagramService/hint`);
+            const response = await axios.get<NewHint>(`http://localhost:8080/placeholder/hint`);
             setHint(response.data.hint);
         } catch (error) {
             console.error(error);

@@ -1,4 +1,5 @@
 import { MathPuzzle, PuzzleInfo } from "./MathPuzzles";
+// @ts-ignore
 import express, { Request, Response } from "express";
 
 const puzzle = new MathPuzzle();

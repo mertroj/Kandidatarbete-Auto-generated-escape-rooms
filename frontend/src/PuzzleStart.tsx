@@ -1,5 +1,6 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
+import Anagram from "./Anagram";
 
 interface Room {
     room: string;
@@ -26,7 +27,7 @@ function PuzzleStart() {
 
     return (
         <div>
-            {room}
+            <Anagram/>
         </div>
     );
 }

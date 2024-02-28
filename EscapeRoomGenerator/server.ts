@@ -1,7 +1,10 @@
+// @ts-ignore
 import express, { Express, Request, Response } from "express";
 import { EscapeRoom } from "./types";
+// @ts-ignore
 import cors from "cors";
 import { MathPuzzleRouter } from "./MathPuzzleRouter";
+import { AnagramRouter } from "./AnagramRouter";
 
 
 const app: Express = express();
@@ -9,6 +12,7 @@ const port: number = 8080;
 app.use(express.json());
 app.use(cors());
 app.use('/puzzleService', MathPuzzleRouter);
+app.use('/placeholder', AnagramRouter); // TODO: change placeholder
 
 const games: Map<string, EscapeRoom> = new Map();
 
