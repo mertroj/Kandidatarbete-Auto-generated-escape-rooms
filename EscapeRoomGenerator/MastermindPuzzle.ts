@@ -23,12 +23,12 @@ export class MastermindPuzzle {
         return this.solution.toString();
     }
     getHint(): string{
-        if(this.hintLevel == 0){
-            return this.hints[this.hintLevel] + this.getSolution();
-        }
-        if(this.hintLevel >= 0){
+        if(this.hintLevel > 0){
             this.hintLevel--;
             return this.hints[this.hintLevel + 1];
+        }
+        else if(this.hintLevel == 0){
+            return this.hints[this.hintLevel] + this.getSolution();
         }
         return 'No more hints.';
     }
