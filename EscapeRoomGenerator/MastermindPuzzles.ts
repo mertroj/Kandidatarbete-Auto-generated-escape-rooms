@@ -19,8 +19,8 @@ export class MastermindPuzzle {
         this.id = Number(new Date());
         this.solution = generateNumbers();
     }
-    getSolution(): string{
-        return this.solution.toString();
+    getSolution(): Number[]{
+        return this.solution;
     }
     getHint(): string{
         if(this.hintLevel > 0){
