@@ -1,35 +1,19 @@
 .hint-window {
     position: absolute;
-    width: 400px;
-    height: 600px;
-    top: 20px;
-    right: -410px;
+    background: rgb(240, 240, 240);
     border-radius: 10px 0 0 10px;
-    background: rgb(200, 200, 200);
-    box-shadow: 0px 0px 10px rgb(100, 100, 100);
+    box-shadow: 0px 0px 10px rgb(150, 150, 150);
+    width: 400px;
+    height: auto;
+    top: 32px;
+    right: -400px;
     padding: 16px;
+    transition: right 0.5s;
 }
 
 .hint-button {
     position: absolute;
     bottom: 0;
     right: 0;
-    z-index: 1031;
-}
-
-.hints-slide-in {
-    right: 0;
-    animation: slide-in ease-in-out 0.5s;
-}
-@keyframes slide-in {
-    from {right: -410px;}
-    to {right: 0;}
-}
-
-.hints-slide-out {
-    animation: slide-out ease-in-out 0.5s;
-}
-@keyframes slide-out {
-    from {right: 0;}
-    to {right: -410px;}
+    z-index: 9999;
 }
