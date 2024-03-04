@@ -8,8 +8,9 @@ export const AnagramRouter = express.Router(); // Define AnagramRouter
 AnagramRouter.get("/info", async (req: Request, res: Response) => {
     const anagramQuestion: string = anagram.getQuestion(); // Get question from Anagram instance
     const estimatedTime: number = anagram.getEstimatedTime(); // Get estimated time from Anagram instance
+    const description: string = anagram.getDescription(); // Get description from Anagram instance
     console.log(anagramQuestion, estimatedTime);
-    res.status(200).send({ puzzleQuestion: anagramQuestion, estimatedTime }); // Send response
+    res.status(200).send({ puzzleQuestion: anagramQuestion, estimatedTime, description }); // Send response
 });
 
 AnagramRouter.post("/checkAnswer", async (req: Request, res: Response) => {

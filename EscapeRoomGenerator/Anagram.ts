@@ -2,6 +2,7 @@ export class Anagram {
     private anagramQuestion: string = '';
     private anagramAnswers: string[] = [];
     private readonly estimatedTime: number;
+    description: string = '';
 
     constructor(estimatedTime: number) {
         this.estimatedTime = estimatedTime;
@@ -38,11 +39,15 @@ export class Anagram {
             const randomIndex = Math.floor(Math.random() * anagrams.length);
             const randomAnagram = anagrams[randomIndex];
 
-            this.anagramQuestion = `Random Anagram of length ${randomLength}: ${randomAnagram[0]}`;
+            this.anagramQuestion = `${randomAnagram[0]}`; // change in the future if necessary
             this.anagramAnswers = randomAnagram.slice(1);
         } else {
             throw new Error(`No anagrams found for length ${randomLength}.`);
         }
+        this.description = // TODO: add a better description in the future
+            'Find the hidden word' +
+            '\n' +
+            '\n' + ': ' + this.anagramQuestion;
     }
 
     getEstimatedTime(): number {
@@ -50,6 +55,9 @@ export class Anagram {
     }
     getQuestion(): string {
         return this.anagramQuestion;
+    }
+    getDescription(): string {
+        return this.description;
     }
 
     getHint(): string {

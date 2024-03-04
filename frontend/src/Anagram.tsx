@@ -31,6 +31,7 @@ function AnagramComponent () {
             );
             setAnagramQuestion(response.data.anagramQuestion);
             setTime(response.data.estimatedTime);
+            setDescription(response.data.description);
 
         } catch (error) {
             console.error(error);
@@ -75,6 +76,7 @@ function AnagramComponent () {
                 children=
                     {
                         <Container className='text-center d-flex flex-column min-vh-100'>
+                            {description}
                             <Row className='mb-3 justify-content-center'>
                                 {anagramQuestion}
                             </Row>
