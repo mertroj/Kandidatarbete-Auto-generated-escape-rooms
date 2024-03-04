@@ -4,10 +4,10 @@ function getRandomInt(min: number, max: number) : number {
     return Math.floor(Math.random() * (max-min)) + min;
 }
 
-function generateEscapeRoom(players: number, difficulty: number) : EscapeRoom {
+export function generateEscapeRoom(players: number, difficulty: number) : EscapeRoom {
     let er = new EscapeRoom();
-    let nr_of_rooms = 1;
-    let slots_in_room = 5;
+    let nr_of_rooms = players+difficulty;
+    let slots_in_room = 5+difficulty;
     er.rooms = generateRooms(nr_of_rooms, slots_in_room);
     er.rooms[0].is_unlocked = true
     return er;
@@ -88,7 +88,7 @@ function printEscapeRoom(er: EscapeRoom){
 }
 
 
-let er = generateEscapeRoom(3, 1);
-console.log(er);
-console.log(er.rooms[0].slots)
-printEscapeRoom(er);
+// let er = generateEscapeRoom(3, 1);
+// console.log(er);
+// console.log(er.rooms[0].slots)
+// printEscapeRoom(er);

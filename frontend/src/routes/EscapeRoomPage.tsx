@@ -1,6 +1,7 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import Anagram from "./Anagram";
+import Hinting from "../components/Hinting/hinting";
 
 interface Room {
     room: string;
@@ -22,12 +23,19 @@ function PuzzleStart() {
         fetchPuzzle();
     }, []);
 
-    if(room === null) return (<div>Loading...</div>);
+    // if(room === null) return (<div>Loading...</div>);
 
+    const [hintsList, setHintsList] = useState(['Hint 1','Hint 2'])
+
+    const addHint = (hint: string) => {
+        setHintsList([hint].concat(hintsList))
+    }
 
     return (
         <div>
-            <Anagram/>
+            {room}
+
+            <Hinting hintsList={hintsList} />
         </div>
     );
 }
