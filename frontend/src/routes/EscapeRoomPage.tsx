@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
-import Anagram from "./Anagram";
+import Anagram from "../components/Anagram";
 import Hinting from "../components/Hinting/hinting";
 
 interface Room {
