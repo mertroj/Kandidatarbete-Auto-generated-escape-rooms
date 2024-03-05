@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import Navbar from './components/Navbar';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import reportWebVitals from './reportWebVitals';
+import './index.css';
 import HomePage from './routes/HomePage';
 import PuzzleStart from './routes/EscapeRoomPage';
-import Navbar from './components/Navbar';
 
 const router = createBrowserRouter([
   {

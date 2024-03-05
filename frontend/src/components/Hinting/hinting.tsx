@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Button, Container, Row, Col, Form } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './hinting.css'
 
 
 
 
-function Hinting () {
-    let [showHints, setShowHints] = useState(false)
+function Hinting ({hintsList} : {hintsList : string[]}) {
+    const [showHints, setShowHints] = useState(false)
+    const [hintNodes, setHintNodes] = useState<JSX.Element[]>([])
 
     const showHintsClick = () => {
         setShowHints(!showHints)
@@ -25,14 +24,12 @@ function Hinting () {
                 <h2>Hints list:</h2>
                 <div className='hint-container overflow-y-scroll'>
                     {hintNodes}
-                    {showHints}
                 </div>
             </div>
 
             <button onClick={showHintsClick} className='hint-button'>
             {showHints ? "Hide" : 'Show'} Hints 
             </button>
-
         </div>
     );
 }
