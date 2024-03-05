@@ -28,7 +28,7 @@ app.get('/creategame', (req: Request, res: Response) => {
   }
 });
 
-app.get('/fetchgame', (req: Request, res: Response) => {
+app.get('/escaperoom', (req: Request, res: Response) => {
   let gameId = String(req.query.gameId)
   let er: EscapeRoom = getEscapeRoom(gameId);
   res.send(er);
