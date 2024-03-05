@@ -1,35 +1,54 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
+import Anagram from "../components/Anagram";
+import Hinting from "../components/Hinting/hinting";
+import MathPuzzle from "../components/MathPuzzle";
+import { useParams } from "react-router-dom";
 
+interface EscapeRoom {
+    id: string;
+    rooms: Room[]
+}
 interface Room {
-    room: string;
+    id: string;
+    x: number;
+    y: number;
+    left: number | null;
+    right: number | null;
+    up: number | null;
+    down: number | null;
+    is_unlocked: boolean;
+    slots: any[]
 }
 
-function PuzzleStart() {
-    const [room, setRoom] = useState<string | null>(null);
-    async function fetchPuzzle() {
-        try {
-            const response = await axios.get<Room>('http://localhost:8080/'); // fix here if necessary
-            setRoom(response.data.room);
-        }
-        catch (error) {
-            console.error(error);
-        }
+function EscapeRoomPage() {
+    const [hintsList, setHintsList] = useState<string[]>([])
+    const {gameId} = useParams()
+    const [escapeRoom, setEscapeRoom] = useState<EscapeRoom | null>(null)
+    
+    const addHint = (hint: string) => {
+        setHintsList([hint].concat(hintsList))
     }
 
-    useEffect(() => {
-        fetchPuzzle();
-    }, []);
 
-    if(room === null) return (<div>Loading...</div>);
-
-
+    axios.get<EscapeRoom>('http://localhost:8080/fetchgame/?gameId=' + gameId).then((response) => {
+        setEscapeRoom(response.data);
+    }).catch((error) => {
+        console.error(error);
+    });
+    
+    
+    if(escapeRoom === null) return (<div>Loading...</div>);
     return (
         <div>
-            {room}
+            {/* <Anagram addHint={addHint} />
+            <MathPuzzle addHint={addHint} /> */}
+
+            <Hinting hintsList={hintsList} />
+            <p className="fixed-bottom fixed-left">Game ID: {gameId}</p>
         </div>
     );
 }
 
 
-export default PuzzleStart;
+export default EscapeRoomPage;

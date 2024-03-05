@@ -3,7 +3,6 @@ import axios from 'axios';
 import Popup from './PopupComponent/Popup';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Hint from './HintComponent/hint';
 
 interface MathPuzzleProps {
     estimatedTime: number;
@@ -17,12 +16,11 @@ interface NewHint{
     hint: string; 
 }
 
-function MathPuzzle () {
+function MathPuzzle ({addHint}: {addHint : Function}) {
     const [puzzleQuestion, setPuzzleQuestion] = useState<string | null>(null);
     const [estimatedTime, setTime] = useState<number>(0);
     const [answer, setAnswer] = useState<string | null>(null);
     const [description, setDescription] = useState<string | null>(null);
-    const [hint, setHint] = useState<string>('');
 
     async function fetchPuzzle() {
         try {
@@ -61,9 +59,9 @@ function MathPuzzle () {
     async function handleHintClick() {
         try{
             const response = await axios.get<NewHint>(`http://localhost:8080/puzzleService/hint`);
-            setHint(response.data.hint);
+            addHint(response.data.hint);
         } catch (error) {
-            console.error(error);{/*  */}
+            console.error(error);
         }
     }
 
@@ -83,9 +81,6 @@ function MathPuzzle () {
                                 TODO: Add description to the puzzle
                                 {description}
                             */}
-                        </Row>
-                        <Row className='mb-3 justify-content-center'>
-                            <Hint hint={hint}/>
                         </Row>
                         <Row>
                             <Col>

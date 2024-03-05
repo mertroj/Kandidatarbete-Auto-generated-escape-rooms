@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './popup.css';
 import {Navbar,Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
