@@ -1,3 +1,4 @@
+// @ts-ignore
 import express, { Express, Request, Response } from "express";
 import  { EscapeRoom, createEscapeRoom, getEscapeRoom  } from './models/EscapeRoom'
 import cors from "cors";
@@ -11,6 +12,7 @@ const port: number = 8080;
 app.use(express.json());
 app.use(cors());
 app.use('/puzzleService', MathPuzzleRouter);
+app.use('/placeholder', AnagramRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
   let players = parseInt(String(req.query.players))
