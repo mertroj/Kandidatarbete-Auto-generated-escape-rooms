@@ -41,9 +41,6 @@ function EscapeRoomPage() {
     if(escapeRoom === null) return (<div>Loading...</div>);
     return (
         <div>
-            {/* <Anagram addHint={addHint} />
-            <MathPuzzle addHint={addHint} /> */}
-
             <Hinting hintsList={hintsList} />
             <p className="fixed-bottom fixed-left">Game ID: {gameId}</p>
         </div>

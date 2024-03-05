@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getRandomInt, point } from '../helpers';
+import { getRandomInt, point } from './Helpers';
 import { Anagram } from './Anagram';
 import { MathPuzzle } from './MathPuzzles';
 

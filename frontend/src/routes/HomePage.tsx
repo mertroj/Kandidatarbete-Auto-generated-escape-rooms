@@ -83,10 +83,6 @@ function HomePage() {
                 </div>
                 <button className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</button>
             </form>
-            <div className={'mt-5' + (gameCode === '' ? ' d-none' : '')}>
-                <h4>Your gamecode is: {gameCode}</h4>
-                <button onClick={joinGame}>Join Game</button>
-            </div>
             <div className='fixed-bottom mb-5'>
                 <input type="text" placeholder='Enter gamecode here' onChange={(e) => joinGameTextChange(e)}/>
                 <button onClick={joinGame}>Join game</button>
