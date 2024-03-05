@@ -19,17 +19,11 @@ function Hinting ({hintsList} : {hintsList : string[]}) {
     }, [hintsList])
 
     return (
-        <div>
-            <div className={'hint-window d-flex flex-column text-center h-50'} style={{right: showHints ? '0' : '-400px'}}>
-                <h2>Hints list:</h2>
-                <div className='hint-container overflow-y-scroll'>
-                    {hintNodes}
-                </div>
+        <div className={'hint-window d-flex flex-column text-center vh-100'} style={{right: showHints ? '0' : '-400px'}}>
+            <h2>Hints list:</h2>
+            <div className='hint-container overflow-y-scroll'>
+                {hintNodes}
             </div>
-
-            <button onClick={showHintsClick} className='hint-button'>
-            {showHints ? "Hide" : 'Show'} Hints 
-            </button>
         </div>
     );
 }
