@@ -25,7 +25,10 @@ export function createEscapeRoom(players: number, difficulty: number) : EscapeRo
     return er;
 }
 
-export function getEscapeRoom(gameId: string) : EscapeRoom {
+export function getEscapeRoom(gameId: string) : EscapeRoom | null {
+    if (roomIds[gameId] === undefined) {
+        return null
+    }
     return {
         id: gameId, 
         rooms: roomIds[gameId]

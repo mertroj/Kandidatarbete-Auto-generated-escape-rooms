@@ -23,6 +23,7 @@ function EscapeRoomPage() {
             console.log(response.data)
         }).catch((error) => {
             console.error(error)
+            window.location.pathname = '/'
         })
     }
 
@@ -48,10 +49,15 @@ function EscapeRoomPage() {
             <div className="w-100 d-flex flex-column justify-content-between mh-100">
                 <Navbar/>
                 {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
+
                 {currentRoom?.left ? <button onClick={moveLeft} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button> : null}
+
                 {currentRoom?.right ? <button onClick={moveRight} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button> : null}
+
                 {currentRoom?.up ? <button onClick={moveUp} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button> : null}
+
                 {currentRoom?.down ? <button onClick={moveDown} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button> : null}
+                
                 <p className="w-100">Game ID: {gameId}</p>
             </div>
 

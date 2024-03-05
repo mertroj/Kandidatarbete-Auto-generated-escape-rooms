@@ -30,8 +30,12 @@ app.get('/creategame', (req: Request, res: Response) => {
 
 app.get('/escaperoom', (req: Request, res: Response) => {
   let gameId = String(req.query.gameId)
-  let er: EscapeRoom = getEscapeRoom(gameId);
-  res.send(er);
+  let er = getEscapeRoom(gameId);
+  if (er == null) {
+    res.status(400).send("The entered game id does not exist")
+  } else {
+    res.send(er);
+  }
 });
 
 app.listen(port, () => {
