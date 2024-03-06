@@ -1,4 +1,4 @@
-import { Anagram } from "./Anagram"; // Import Anagram module
+import { Anagram } from "../models/Anagram"; // Import Anagram module
 // @ts-ignore
 import express, { Request, Response } from "express";
 

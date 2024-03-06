@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import './index.css';
@@ -12,7 +13,7 @@ const router = createBrowserRouter([
     element: <HomePage/>,
   },
   {
-    path: "/escaperoom/",
+    path: "/escaperoom/:gameId",
     element: <PuzzleStart/>
   },
 ]);

@@ -1,3 +1,5 @@
+const anagramsData = require('../anagrams.json')
+
 export class Anagram {
     private anagramQuestion: string = '';
     private anagramAnswers: string[] = [];
@@ -16,9 +18,6 @@ export class Anagram {
         }
         this.generateRandomAnagram(difficulty);
     }
-    private async loadJSON(): Promise<any> { // TODO: remove any with a proper type
-        return require('./anagrams.json');
-    }
 
 
     private async generateRandomAnagram(difficulty: string): Promise<void> {
@@ -28,8 +27,6 @@ export class Anagram {
             "hard": [7, 8]
         };
         const [minLength, maxLength] = difficultyRanges[difficulty];
-
-        const anagramsData = await this.loadJSON();
 
         const randomLength = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
 

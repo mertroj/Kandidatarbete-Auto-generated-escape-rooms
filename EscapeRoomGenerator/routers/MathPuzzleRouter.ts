@@ -1,4 +1,4 @@
-import { MathPuzzle, PuzzleInfo } from "./MathPuzzles";
+import { MathPuzzle, PuzzleInfo } from "../models/MathPuzzles";
 // @ts-ignore
 import express, { Request, Response } from "express";
 
@@ -19,7 +19,7 @@ MathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
         res.status(400).send("No answer provided");
         return;
     }
-    const isCorrect: boolean = await submittedAnswer === puzzle.getSolution();
+    const isCorrect: boolean = submittedAnswer === puzzle.getSolution();
     console.log(submittedAnswer, puzzle.getSolution(), isCorrect);
     res.status(200).send({isCorrect});
 });

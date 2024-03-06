@@ -14,21 +14,16 @@ function Hinting ({hintsList} : {hintsList : string[]}) {
     }
 
     useEffect(() => {
-        setHintNodes(hintsList.map(hint => <p>{hint}</p>))
+        let i = 0;
+        setHintNodes(hintsList.map(hint => <p key={i++}>{hint}</p>))
     }, [hintsList])
 
     return (
-        <div>
-            <div className={'hint-window d-flex flex-column text-center h-50' + (showHints ? ' hints-slide-in' : '')} style={{right: showHints ? '-400px' : 0}}>
-                <h2>Hints list:</h2>
-                <div className='hint-container overflow-y-scroll'>
-                    {hintNodes}
-                </div>
+        <div className={'hint-window d-flex flex-column text-center vh-100'} style={{right: showHints ? '0' : '-400px'}}>
+            <h2>Hints list:</h2>
+            <div className='hint-container overflow-y-scroll'>
+                {hintNodes}
             </div>
-
-            <button onClick={showHintsClick} className='hint-button'>
-                Hints
-            </button>
         </div>
     );
 }
