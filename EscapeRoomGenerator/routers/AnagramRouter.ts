@@ -1,31 +1,39 @@
-import { Anagram } from "../models/Anagram"; // Import Anagram module
-// @ts-ignore
+import { getAnagram, getHint, testAnswer } from "../models/Anagram";
 import express, { Request, Response } from "express";
 
-const anagram = new Anagram(5); // Create an instance of Anagram
-export const AnagramRouter = express.Router(); // Define AnagramRouter
+export const AnagramRouter = express.Router();
 
 AnagramRouter.get("/info", async (req: Request, res: Response) => {
-    const anagramQuestion: string = anagram.getQuestion(); // Get question from Anagram instance
-    const estimatedTime: number = anagram.getEstimatedTime(); // Get estimated time from Anagram instance
-    const description: string = anagram.getDescription(); // Get description from Anagram instance
-    console.log(anagramQuestion, estimatedTime);
-    res.status(200).send({ puzzleQuestion: anagramQuestion, estimatedTime, description }); // Send response
+    const puzzleId = String(req.query.puzzleId)
+    const anagram = getAnagram(puzzleId)
+    if (anagram === undefined) {
+        res.status(400).send("The puzzleId parameter is missing or invalid")
+        return
+    }
+    res.send(anagram);
 });
 
-AnagramRouter.post("/checkAnswer", async (req: Request, res: Response) => {
-    const submittedAnswer: string | undefined = req.body.answer as string | undefined;
-    if (!submittedAnswer) {
+AnagramRouter.post("/testAnswer", async (req: Request, res: Response) => {
+    const puzzleId = String(req.body.puzzleId)
+    const anagram = getAnagram(puzzleId)
+    const submittedAnswer: string  = String(req.body.answer);
+    if (anagram === undefined) {
+        res.status(400).send("The puzzleId parameter is missing or invalid")
+        return
+    } else if (submittedAnswer === '') {
         res.status(400).send("No answer provided");
         return;
     }
-    const isCorrect: boolean = anagram.checkAnswer(submittedAnswer); // Check submitted answer
-    console.log(submittedAnswer, anagram.checkAnswer(submittedAnswer), isCorrect);
-    res.status(200).send({ isCorrect }); // Send response
+    const isCorrect: boolean = testAnswer(anagram, submittedAnswer);
+    res.send(isCorrect);
 });
 
 AnagramRouter.get("/hint", async (req: Request, res: Response) => {
-    const hint: string = anagram.getHint(); // Get hint from Anagram instance
-    console.log(hint);
-    res.status(200).send({ hint }); // Send response
+    const puzzleId = String(req.query.puzzleId)
+    const anagram = getAnagram(puzzleId)
+    if (anagram === undefined) {
+        res.status(400).send("The puzzleId parameter is missing or invalid")
+        return
+    }
+    res.send(getHint(anagram));
 });

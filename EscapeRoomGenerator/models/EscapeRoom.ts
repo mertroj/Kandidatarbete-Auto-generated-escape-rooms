@@ -35,6 +35,4 @@ export function getEscapeRoom(gameId: string) : EscapeRoom | null {
                     .map((roomId) => getRoom(roomId))
                     .filter((room) => room.is_unlocked)
     }
-    
 }
-

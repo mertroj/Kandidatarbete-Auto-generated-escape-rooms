@@ -15,7 +15,7 @@ interface NewHint{
     hint: string; 
 }
 
-function MathPuzzle ({addHint}: {addHint : Function}) {
+function MathPuzzle ({addHint, puzzle}: {addHint : Function, puzzle: Object}) {
     const [puzzleQuestion, setPuzzleQuestion] = useState<string>();
     const [estimatedTime, setTime] = useState<number>(0);
     const [answer, setAnswer] = useState<string>();
@@ -44,7 +44,7 @@ function MathPuzzle ({addHint}: {addHint : Function}) {
         }
     }
     
-    async function handleHintClick() {
+    async function getHint() {
         try{
             const response = await axios.get<NewHint>(`http://localhost:8080/puzzleService/hint`);
             addHint(response.data.hint);
@@ -70,13 +70,15 @@ function MathPuzzle ({addHint}: {addHint : Function}) {
                     {description}
                 </Row>
             */}
-            <form action="" onSubmit={handleSubmit}>
-                <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
-                <button className='w-100' type='submit'>Test answer</button>
-                <button className="w-100" onClick={async() => handleHintClick()}>
+            <div>
+                <form action="" onSubmit={handleSubmit}>
+                    <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
+                    <button className='w-100' type='submit'>Test answer</button>
+                </form>
+                <button className="w-100" onClick={async() => getHint()}>
                     Get a hint
                 </button>
-            </form>
+            </div>
         </div>
         
     );

@@ -12,9 +12,9 @@ function RoomComponent ({room, addHint}: {room: Room, addHint: Function}) {
     useEffect(() => {
         let nodes = room.slots.map((puzzle) => {
             if (puzzle.puzzle) {
-                return <MathPuzzle addHint={addHint} />
-            } else if (puzzle.anagramQuestion) {
-                return <Anagram addHint={addHint} />
+                return <MathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} />
+            } else if (puzzle.type === 'anagram') {
+                return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} />
             } else {
                 return <p>Invalid puzzle</p>
             }
