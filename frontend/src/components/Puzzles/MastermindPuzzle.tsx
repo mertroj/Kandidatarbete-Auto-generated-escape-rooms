@@ -70,7 +70,7 @@ function MastermindPuzzle ({addHint}: {addHint : Function}) {
         fetchMastermind();
     }, []);
 
-    if (mastermindQuestion === null || estimatedTime === 0 /* || description === null */) {
+    if (mastermindQuestion === null || estimatedTime === 0  || description === null ) {
         return <h1>Loading...</h1>;
     }
 
