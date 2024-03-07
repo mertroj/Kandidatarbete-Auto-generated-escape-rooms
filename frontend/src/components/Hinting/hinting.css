@@ -1,0 +1,6 @@
+.hint-window {
+    background: rgb(240, 240, 240);
+    width: 400px;
+    padding: 16px;
+    box-shadow: 0px 0px 10px rgb(150, 150, 150);
+}
