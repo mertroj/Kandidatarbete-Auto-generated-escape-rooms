@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getRandomInt, point } from './Helpers';
 import { Anagram } from './Anagram';
 import { MathPuzzle } from './MathPuzzles';
+import { MastermindPuzzle } from './MastermindPuzzles';
 
 
 export class Room {
@@ -24,7 +25,7 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = [new Anagram(5), new MathPuzzle()];
+        this.slots = [new Anagram(5), new MathPuzzle(), new MastermindPuzzle()];
         rooms[this.id] = this;
     }
 }

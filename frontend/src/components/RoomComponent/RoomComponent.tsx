@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Room } from '../../interfaces';
 import Anagram from "../Puzzles/Anagram";
 import MathPuzzle from "../Puzzles/MathPuzzle";
+import MastermindPuzzle from '../Puzzles/MastermindPuzzle';
 import './RoomComponent.css'
 import { useEffect, useState } from 'react';
 
@@ -15,7 +16,9 @@ function RoomComponent ({room, addHint}: {room: Room, addHint: Function}) {
                 return <MathPuzzle addHint={addHint} />
             } else if (puzzle.anagramQuestion) {
                 return <Anagram addHint={addHint} />
-            } else {
+            } else if(puzzle.mastermindQuestion){
+                return <MastermindPuzzle addHint={addHint}/>
+            }else {
                 return <p>Invalid puzzle</p>
             }
         })

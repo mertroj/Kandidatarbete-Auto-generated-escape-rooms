@@ -1,5 +1,5 @@
 function generateNumbers(){ //Generate an array of 3 random numbers
-    let numbers = Number[3];
+    let numbers : Number[] = new Array(3);
     for(let i = 0; i < 3; i++){
         numbers[i] = Math.floor(Math.random() * 9)
     }
@@ -9,7 +9,7 @@ function generateNumbers(){ //Generate an array of 3 random numbers
 export class MastermindPuzzle {
     id: number;
     eTime: number = 6;
-    question: string = 'Figure out the 3 digit combination';
+    mastermindQuestion: string = '';
     private hints: string[] = ['The solution is: ', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
                             'After each guess some numbers change colours, maybe that means something'];
@@ -18,6 +18,7 @@ export class MastermindPuzzle {
     constructor(){
         this.id = Number(new Date());
         this.solution = generateNumbers();
+        this.mastermindQuestion = 'Figure out the 3 digit combination';
     }
     getSolution(): Number[]{
         return this.solution;
@@ -31,5 +32,8 @@ export class MastermindPuzzle {
             return this.hints[this.hintLevel] + this.getSolution();
         }
         return 'No more hints.';
+    }
+    getDescription(): string {
+        return this.mastermindQuestion;
     }
 }

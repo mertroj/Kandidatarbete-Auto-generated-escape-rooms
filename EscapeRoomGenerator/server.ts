@@ -4,6 +4,7 @@ import  { EscapeRoom, createEscapeRoom, getEscapeRoom  } from './models/EscapeRo
 import cors from "cors";
 import { MathPuzzleRouter } from "./routers/MathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
+import { MastermindPuzzleRouter } from "./routers/MastermindPuzzleRouter";
 
 
 const app: Express = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/puzzleService', MathPuzzleRouter);
 app.use('/placeholder', AnagramRouter); // TODO: change placeholder
+app.use('/mastermindService', MastermindPuzzleRouter)
 
 app.get('/creategame', (req: Request, res: Response) => {
   let players = parseInt(String(req.query.players))
