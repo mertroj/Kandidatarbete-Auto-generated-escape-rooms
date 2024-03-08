@@ -1,61 +1,116 @@
 import {Graph} from "graphlib";
 
-function DivergingTree(nodeAmount: number) {
+export function DivergingTree(nodeAmount: number): Graph {
     const MAX_NODES_ROW: number = 4;
     const MIN_NODES_ROW: number = 2;
     const maxConvergingNodes: number = Math.floor(nodeAmount / 11) + 1;
 
+    let currentConvergingNodes: number = 0;
     let divergingTree = new Graph();
-    let temporaryBox: string[];
-    let rowNodeDifference: number;
-    let randomRowNodeAmount: number;
+    let previousRow: string[] = [];
+    let newRow: string[] = [];
+    let rowNodeDifference: number = 0;
+    let randomRowNodeAmount: number = 0;
+    let endNode: string  = "";
 
-    for (let i = 0; i < nodeAmount; i++) {
-        // if first row generate end node and connect them to 3 child nodes
-        if (i === 0) {
-            // Create the end node
-            divergingTree.setNode(i.toString(), true);
-            for (let j: number = 1; j <=2; j++) {
-                divergingTree.setNode((i+j).toString(), false);
-                divergingTree.setEdge((i+j).toString(), i.toString());
-                temporaryBox.push((i+j).toString());
+    let lastRow: boolean = false;
+    let nodesMade: number = 0;
+
+    if (nodeAmount < 3) {
+        console.log("Not enough nodes to make a diverging-tree");
+        return divergingTree;
+    }
+
+    while (nodesMade < nodeAmount) {
+        // if first node Generate end node and connect them to 2 child nodes
+        if (nodesMade === 0) {
+            let endNode = nodesMade.toString();
+            divergingTree.setNode(endNode, true);
+            currentConvergingNodes++;
+            nodesMade++;
+            for (let j: number = 1; j <= 2; j++) {
+                let newNode = nodesMade.toString();
+                divergingTree.setNode(newNode, false);
+                divergingTree.setEdge(newNode, endNode);
+                newRow.push(newNode);
+                nodesMade++;
             }
-            i = 2;
-
+            continue
         }
+
+        previousRow = newRow;
+        newRow = [];
 
         // randomly generate amount of nodes in a row
-        if (nodeAmount - i < MAX_NODES_ROW) {
-            let randomRowNodeAmount = Math.floor(Math.random() * (MAX_NODES_ROW - MIN_NODES_ROW + 1) + MIN_NODES_ROW);
-        }
-        else if (nodeAmount - i < MIN_NODES_ROW){
-            let randomRowNodeAmount = nodeAmount - i;
+        if (nodeAmount - nodesMade > MAX_NODES_ROW) {
+            randomRowNodeAmount = Math.floor(Math.random() * (MAX_NODES_ROW - MIN_NODES_ROW + 1) + MIN_NODES_ROW);
         }
         else {
-            let randomRowNodeAmount = Math.floor(Math.random() * (nodeAmount - i - MIN_NODES_ROW + 1) + MIN_NODES_ROW);
+            randomRowNodeAmount = Math.floor(Math.random() * (nodeAmount - nodesMade - MIN_NODES_ROW + 1) + MIN_NODES_ROW);
+        }
+        if (nodeAmount - nodesMade - randomRowNodeAmount < MIN_NODES_ROW) {
+            randomRowNodeAmount += nodeAmount - nodesMade - randomRowNodeAmount;
         }
 
-        rowNodeDifference = temporaryBox.length - randomRowNodeAmount;
-        if (rowNodeDifference > 0) {
-                divergingTree.setNode(temporaryBox[0], true);
+        if (nodesMade !== 0 && randomRowNodeAmount > 0) {
+            for (let j: number = 0; j < randomRowNodeAmount; j++) {
+                let newNode = (nodesMade).toString();
+                divergingTree.setNode(newNode, false);
+
+                console.log("made node " + nodesMade+ " here")
+                nodesMade++;
+                newRow.push(newNode);
+            }
         }
 
-        for (let j: number = 0; j < randomRowNodeAmount; j++) {
-            let currentNode = (i+j+1).toString()
-            divergingTree.setNode(currentNode, false);
-            divergingTree.setEdge(currentNode, temporaryBox[j]);
-        }  // TODO: byt till while loop som itterar över temporaryBox och ser till att om inga fler noder finns i temporary box så kopplar de till end node
+        if (nodesMade >= nodeAmount - MAX_NODES_ROW) {
+            lastRow = true;
+        }
 
-        // connect the new rows nodes to previous rows nodes, connecting one overflow node to the converging node otherwise to end node
-        // also check if second to last row to make an additional converging node if above a certain amount of total nodes
+        rowNodeDifference = previousRow.length - randomRowNodeAmount;
+        if ((rowNodeDifference> 0 || lastRow) && currentConvergingNodes < maxConvergingNodes) {
+            divergingTree.setNode(previousRow[0], true); // overwriting a node
+            currentConvergingNodes++;
+        }
 
-
-        // om du nått max convergingnodes koppla istället till endnode
-
-
-        // TODO: clear temporaryBox
+        let j: number = 0;
+        while (previousRow.length > 0) {
+            if (divergingTree.node(previousRow[0]) === true) {
+                divergingTree.setEdge(newRow[j], previousRow[0]);
+                j++;
+            }
+            const previousNode = previousRow.shift();
+            if (previousNode !== undefined) { // added because compiler is dog
+                divergingTree.setEdge(newRow[j], previousNode);
+            }
+            j++;
+        }
+        // Connect the remaining nodes to the end node
+        while (j < randomRowNodeAmount) {
+            divergingTree.setEdge(newRow[j], endNode);
+            j++;
+            console.log("stuck here b")
+        }
     }
-    
-    
+
+    // Connect the start node to the first row
+    let startNode = "startNode";
+    divergingTree.setNode(startNode, false)
+    for (let i: number = 0; i < newRow.length; i++) {
+        divergingTree.setEdge(startNode, newRow[i]);
+        console.log("stuck here a")
+    }
+
+
+    if (nodesMade !== nodeAmount) {
+        console.log(nodesMade + "nodesMade")
+        console.log(nodeAmount + "nodeAmount")
+        console.log("Error: Something went wrong!");
+        return divergingTree;
+    }
+
     return divergingTree;
 }
+
+let graph = DivergingTree(10);
+console.log(graph.nodes());
