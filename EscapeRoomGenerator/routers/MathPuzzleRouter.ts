@@ -19,8 +19,7 @@ MathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
         res.status(400).send("No answer provided");
         return;
     }
-    const isCorrect: boolean = submittedAnswer === puzzle.getSolution();
-    console.log(submittedAnswer, puzzle.getSolution(), isCorrect);
+    const isCorrect: boolean = puzzle.checkSolution(req.body.answer as string);
     res.status(200).send({isCorrect});
 });
 

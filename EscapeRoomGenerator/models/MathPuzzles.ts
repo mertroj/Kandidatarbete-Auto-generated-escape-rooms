@@ -8,6 +8,9 @@ function shuffleArray(array: any[]): any[] {
 function mapNumbersToLetters(numbers: string, letters: string[]): string {
     return numbers.split('').map(num => letters[Number(num)]).join('');
 }
+function mapLettersToNumbers(letters: string[], word: string): number {
+    return Number(word.split('').map(letter => letters.indexOf(letter)).join(''));
+}
 function generateOperation(array: any[]): string {
     return array[Math.floor(Math.random() * array.length)];
 }
@@ -33,8 +36,8 @@ export class MathPuzzle{
     generate(): PuzzleInfo{
         return this.puzzle.generate();
     }
-    getSolution(): string{
-        return this.puzzle.getSolution();
+    checkSolution(submittedAnswer: string): boolean{
+        return this.puzzle.checkSolution(submittedAnswer);
     }
     getHint(): string{
         const newHint: string = this.puzzle.getHint();
@@ -61,44 +64,58 @@ export class MathPuzzle{
 class LettersMathPuzzle{
     private letters: string[] = shuffleArray(("ABCDEFGHIJKLMNOPQRSTUVWXYZ").split(''));
     private question: string;
+    private answers: string[];
+    private questionVars: string[];
     private answer: number;
     private hintLevel: number = 2;
     constructor(){
         this.answer = Math.floor((Math.random() * 9000) + 1001);
-        this.question = this.init();
+        this.questionVars = this.init();
+        const lettersWithHint = this.questionVars[0].slice(0, -1) + (this.answer%10).toString();
+        this.question = `What is the mapping of each letter in ${this.questionVars[0]} to numbers so that the equation ${lettersWithHint} - ${this.questionVars[1]} = ${this.questionVars[2]} is satisfied?`;
+        this.answers = this.generateAllMappings(
+            this.questionVars[0], 
+            this.questionVars[2], 
+            Number(this.questionVars[1]), 
+            this.questionVars[0][3], 
+            this.answer%10
+        );
     }
-    getSolution(): string{
-        return this.answer.toString();
+    checkSolution(submittedAnswer: string): boolean{
+        console.log('submitted answer: ' + submittedAnswer);
+        console.log('possible answers: ' + this.answers);
+        return this.answers.includes(submittedAnswer);
     }
     generate(): PuzzleInfo {
         return new PuzzleInfo(5, this.question);
     }
     getHint(): string{
         if(this.hintLevel >= 0){
-            const number: String = this.getSolution()[this.hintLevel];
-            const letter: String = this.letters[Number(this.getSolution()[this.hintLevel])];
+            const number: String = this.answer.toString()[this.hintLevel];
+            const letter: String = this.letters[Number(this.answer.toString()[this.hintLevel])];
             this.hintLevel--;
             return 'The letter ' + letter + ' is ' + number + '.';
         }
         return 'No more hints.';
     }
     
-    private init(): string {
+    private init(): string[] {
         let answerSlice: string;
         let remainder: number;
         let answerLetters: string;
         let sliceLetters: string; 
         do {
-            answerSlice = shuffleArray(this.getSolution().split("")).join(""); //shuffle the same four digits as the answer.
+            answerSlice = shuffleArray(this.answer.toString().split("")).join(""); //shuffle the same four digits as the answer.
             remainder = this.answer - Number(answerSlice);
         } while(!this.checkValidity(remainder)); //valid if shuffled number is less than the answer
         
-        answerLetters = mapNumbersToLetters(this.getSolution(), this.letters);
+        answerLetters = mapNumbersToLetters(this.answer.toString(), this.letters);
         sliceLetters = mapNumbersToLetters(answerSlice, this.letters);
-        answerLetters = answerLetters.slice(0, -1) + (this.answer%10).toString();
+        //answerLetters = answerLetters.slice(0, -1) + (this.answer%10).toString();
 
         //should randomize the operation as well
-        return `What is the mapping of each letter in ${answerLetters} to numbers so that the equation ${answerLetters} - ${remainder} = ${sliceLetters} is satisfied?`;
+        //return `What is the mapping of each letter in ${answerLetters} to numbers so that the equation ${answerLetters} - ${remainder} = ${sliceLetters} is satisfied?`;
+        return[answerLetters, remainder.toString(), sliceLetters];
     }
     private checkValidity(remainder: number): boolean {
         if(remainder <= 0){
@@ -107,15 +124,59 @@ class LettersMathPuzzle{
         return true;
     }
 
-    //TODO: possible recursive function to validate a unique answer for the equation
-    //private validateEquation(): boolean {
-        //1. map the first 3 letters to random unique numbers and mark the used numbers as "used"
+    private generateAllMappings(original: string, shuffled: string, remainder: number, givenLetter: string, givenDigit: number): string[] {
+        let allMappings: string[] = [];
+        let originalLetters = original.split('');
+        let allPermutations: number[][] = this.generatePermutations(10, originalLetters.length);
+
+        // Filter out permutations that do not map the given letter to the given digit
+        allPermutations = allPermutations.filter(
+            permutation => 
+            permutation[permutation.length-1] === givenDigit &&
+            mapNumbersToLetters(permutation[permutation.length-1].toString(), this.letters) === givenLetter
+        );
+        // For each permutation, create a mapping and check if it satisfies the equation
+        for (let permutation of allPermutations) {
+            let mapping = new Map<string, number>();
+            for (let i = 0; i < originalLetters.length; i++) {
+                mapping.set(originalLetters[i], permutation[i]);
+            }
+            if (this.checkMapping(original, shuffled, remainder, mapping)) {
+                // Convert the mapping to a string of numbers in the same order as the original letters
+                let mappingString = originalLetters.map(letter => mapping.get(letter)).join('');
+                allMappings.push(mappingString);
+            }
+        }
+        //allMappings.push(this.answer.toString());
+        return [...new Set(allMappings)];
+    }
     
-        //2. test the validity of the equation for each digit for the final number (recursively maybe)
-        //3. if the equation is valid, add 1 to possible solutions
-            //if the possible solutions > 1, return false
-        //4. if the equation is invalid, recursively move back and change the second last number and repeat from step 2.
-    //}
+    private generatePermutations(n: number, r: number): number[][] {
+        // Generate all numbers from 0 to n-1
+        let numbers = Array.from({length: n}, (_, i) => i);
+    
+        // Generate all permutations of these numbers of length r
+        let permutations: number[][] = [];
+        this.generatePermutationsHelper(numbers, [], r, permutations);
+        //console.log('Permutations' + permutations);
+        return permutations;
+    }
+    
+    private generatePermutationsHelper(numbers: number[], current: number[], r: number, permutations: number[][]) {
+        if (current.length === r) {
+            permutations.push(current);
+        } else {
+            for (let i = 0; i < numbers.length; i++) {
+                this.generatePermutationsHelper(numbers.filter((_, index) => index !== i), current.concat(numbers[i]), r, permutations);
+            }
+        }
+    }
+    
+    private checkMapping(original: string, shuffled: string, remainder: number, mapping: Map<string, number>): boolean {
+        let originalMapped = parseInt(original.split('').map(letter => mapping.get(letter)).join(''));
+        let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
+        return originalMapped - remainder === shuffledMapped;
+    }
 }
 class OperatorMathPuzzle{
     private numbers: number[];
@@ -133,8 +194,8 @@ class OperatorMathPuzzle{
         this.question = this.formQuestion(result);
     }
 
-    getSolution(): string{
-        return this.usedOperators.join('');
+    checkSolution(submittedAnswer: string): boolean{
+        return this.usedOperators.join('') === submittedAnswer;
     }
 
     generate(): PuzzleInfo {
@@ -188,4 +249,3 @@ class OperatorMathPuzzle{
         return result;
     }
 }
-
