@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@types/graphlib": "^2.1.12",
     "@types/uuid": "^9.0.8",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
