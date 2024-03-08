@@ -19,6 +19,9 @@ function getRandomInt(min: number, max: number): number {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+function removeDuplicates(array: any[]): any[] {
+    return [...new Set(array)];
+}
 
 export class PuzzleInfo{
     time: number;
@@ -111,10 +114,7 @@ class LettersMathPuzzle{
         
         answerLetters = mapNumbersToLetters(this.answer.toString(), this.letters);
         sliceLetters = mapNumbersToLetters(answerSlice, this.letters);
-        //answerLetters = answerLetters.slice(0, -1) + (this.answer%10).toString();
-
-        //should randomize the operation as well
-        //return `What is the mapping of each letter in ${answerLetters} to numbers so that the equation ${answerLetters} - ${remainder} = ${sliceLetters} is satisfied?`;
+        
         return[answerLetters, remainder.toString(), sliceLetters];
     }
     private checkValidity(remainder: number): boolean {
@@ -129,36 +129,31 @@ class LettersMathPuzzle{
         let originalLetters = original.split('');
         let allPermutations: number[][] = this.generatePermutations(10, originalLetters.length);
 
-        // Filter out permutations that do not map the given letter to the given digit
+        // Filter out permutations that do not satisfy the given helping digit
         allPermutations = allPermutations.filter(
             permutation => 
             permutation[permutation.length-1] === givenDigit &&
             mapNumbersToLetters(permutation[permutation.length-1].toString(), this.letters) === givenLetter
         );
-        // For each permutation, create a mapping and check if it satisfies the equation
+
         for (let permutation of allPermutations) {
             let mapping = new Map<string, number>();
             for (let i = 0; i < originalLetters.length; i++) {
                 mapping.set(originalLetters[i], permutation[i]);
             }
             if (this.checkMapping(original, shuffled, remainder, mapping)) {
-                // Convert the mapping to a string of numbers in the same order as the original letters
                 let mappingString = originalLetters.map(letter => mapping.get(letter)).join('');
                 allMappings.push(mappingString);
             }
         }
-        //allMappings.push(this.answer.toString());
-        return [...new Set(allMappings)];
+        return removeDuplicates(allMappings);
     }
     
     private generatePermutations(n: number, r: number): number[][] {
-        // Generate all numbers from 0 to n-1
         let numbers = Array.from({length: n}, (_, i) => i);
-    
-        // Generate all permutations of these numbers of length r
         let permutations: number[][] = [];
+
         this.generatePermutationsHelper(numbers, [], r, permutations);
-        //console.log('Permutations' + permutations);
         return permutations;
     }
     
