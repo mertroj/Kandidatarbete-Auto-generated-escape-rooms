@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomChoice, randomIntRange } from './Helpers'
+import { choice, randomIntRange } from './Helpers'
 import { Puzzle } from './Puzzle';
 
 
@@ -51,7 +51,7 @@ export class OperatorMathPuzzle implements Puzzle{
         let answer: string = ''
         let expression: string = numbers[0].toString();
         for (let i = 1; i < 4; i++) {
-            operator = randomChoice(['+', '-', '*']);
+            operator = choice(['+', '-', '*']);
             answer += operator;
             expression += operator;
             expression += numbers[i].toString();

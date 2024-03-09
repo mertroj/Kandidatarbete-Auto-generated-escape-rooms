@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { point, randomIntRange } from './Helpers';
+import { point, randomIntRange, repeat, frequencies } from './Helpers';
 import { Anagram } from './Anagram';
 import { LettersMathPuzzle } from './LettersMathPuzzle';
 import { OperatorMathPuzzle } from './OperatorMathPuzzle';
@@ -26,7 +26,13 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = [new Anagram(5), new LettersMathPuzzle(), new OperatorMathPuzzle()];
+        this.slots = repeat(5, () => {
+            return frequencies<() => Puzzle>([
+                [1, () => new Anagram(5)], 
+                [1, () => new LettersMathPuzzle()], 
+                [1, () => new OperatorMathPuzzle()]
+            ])()
+        });
         rooms[this.id] = this;
     }
 }
