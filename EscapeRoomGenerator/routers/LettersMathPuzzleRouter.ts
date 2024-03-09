@@ -16,10 +16,10 @@ LettersMathPuzzleRouter.get("/info", async (req: Request, res: Response) => {
 LettersMathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
     const puzzleId = String(req.body.puzzleId)
     const puzzle = LettersMathPuzzle.get(puzzleId)
-    const submittedAnswer: number  = Number(req.body.answer);
+    const submittedAnswer  = String(req.body.answer);
     if (puzzle === undefined) {
         res.status(400).send("The puzzleId parameter is missing or invalid")
-    } else if (Number.isNaN(submittedAnswer)) {
+    } else if (submittedAnswer === '') {
         res.status(400).send("No answer provided");
     } else {
         res.send(puzzle.checkAnswer(submittedAnswer));
