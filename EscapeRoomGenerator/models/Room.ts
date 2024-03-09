@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getRandomIntRange, point } from './Helpers';
-import { createAnagram } from './Anagram';
-import { MathPuzzle } from './MathPuzzles';
+import { point, randomIntRange } from './Helpers';
+import { Anagram } from './Anagram';
+import { LettersMathPuzzle } from './LettersMathPuzzle';
+import { OperatorMathPuzzle } from './OperatorMathPuzzle';
 
 
 export class Room {
@@ -24,7 +25,7 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = [createAnagram(5), new MathPuzzle()];
+        this.slots = [new Anagram(5), new LettersMathPuzzle(), new OperatorMathPuzzle()];
         rooms[this.id] = this;
     }
 }
@@ -41,7 +42,7 @@ export function createRooms(nr_of_rooms: number, slots_in_room: number): Room[] 
     let rooms: Room[] = [];
 
     while (rooms.length < nr_of_rooms) {
-        let pos_i = getRandomIntRange(0, possible_locations.length);
+        let pos_i = randomIntRange(0, possible_locations.length);
         let [pos] = possible_locations.splice(pos_i, 1);
 
         if (visited.has(`${pos[0]},${pos[1]}`)) continue;

@@ -2,8 +2,9 @@
 import express, { Express, Request, Response } from "express";
 import  { EscapeRoom, createEscapeRoom, getEscapeRoom  } from './models/EscapeRoom'
 import cors from "cors";
-import { MathPuzzleRouter } from "./routers/MathPuzzleRouter";
+import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
+import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 
 
 const app: Express = express();
@@ -11,12 +12,15 @@ const port: number = 8080;
 
 app.use(express.json());
 app.use(cors());
-app.use('/puzzleService', MathPuzzleRouter);
-app.use('/anagrams', AnagramRouter); // TODO: change placeholder
+app.use('/lettersMathPuzzle', LettersMathPuzzleRouter);
+app.use('/operatorMathPuzzle', OperatorMathPuzzleRouter);
+app.use('/anagram', AnagramRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players))
     let difficulty = parseInt(String(req.query.difficulty))
+
+    console.log("Creating an escape room")
 
     if (Number.isNaN(players)) {
         res.status(400).send("The player query parameter is missing or invalid")
@@ -26,6 +30,7 @@ app.get('/creategame', (req: Request, res: Response) => {
         let er: EscapeRoom = createEscapeRoom(players, difficulty);
         res.send(er.id);
     }
+    console.log("Finished")
 });
 
 app.get('/escaperoom', (req: Request, res: Response) => {
