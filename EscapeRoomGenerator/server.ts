@@ -1,6 +1,6 @@
 // @ts-ignore
 import express, { Express, Request, Response } from "express";
-import  { EscapeRoom, createEscapeRoom, getEscapeRoom  } from './models/EscapeRoom'
+import  { EscapeRoom } from './models/EscapeRoom'
 import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
@@ -27,7 +27,7 @@ app.get('/creategame', (req: Request, res: Response) => {
     } else if (Number.isNaN(difficulty)) {
         res.status(400).send("The difficulty query parameter is missing or invalid")
     } else {
-        let er: EscapeRoom = createEscapeRoom(players, difficulty);
+        let er: EscapeRoom = new EscapeRoom(players, difficulty);
         res.send(er.id);
     }
     console.log("Finished")
@@ -35,7 +35,7 @@ app.get('/creategame', (req: Request, res: Response) => {
 
 app.get('/escaperoom', (req: Request, res: Response) => {
     let gameId = String(req.query.gameId)
-    let er = getEscapeRoom(gameId);
+    let er = EscapeRoom.get(gameId);
     if (er == null) {
         res.status(400).send("The entered game id does not exist")
     } else {
