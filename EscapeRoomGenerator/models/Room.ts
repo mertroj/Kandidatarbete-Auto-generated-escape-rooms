@@ -3,6 +3,7 @@ import { point, randomIntRange } from './Helpers';
 import { Anagram } from './Anagram';
 import { LettersMathPuzzle } from './LettersMathPuzzle';
 import { OperatorMathPuzzle } from './OperatorMathPuzzle';
+import { Puzzle } from './Puzzle';
 
 
 export class Room {
@@ -14,7 +15,7 @@ export class Room {
     up: string;
     down: string;
     is_unlocked: boolean;
-    slots: any[];
+    slots: Puzzle[];
 
     constructor(x: number, y: number, slots: number) {
         this.id = uuidv4();

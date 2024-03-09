@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomInt, randomIntRange } from './Helpers'
+import { Puzzle } from './Puzzle';
 
 const anagramsData = require('../anagrams.json')
 
-export class Anagram {
+export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}
 
-    private type: string = 'anagram';
-    private description: string = 'Find the hidden word';
-
-    private id: string = uuidv4();
-    private question: string;
-    private hintLevel: number = 0;
-    private solved: boolean = false;
+    id: string = uuidv4();
+    type: string = 'anagram';
+    question: string;
+    description: string = 'Find the hidden word';
+    hintLevel: number = 0;
+    solved: boolean = false;
 
     constructor(estimatedTime: number) {
         this.question = this.getQuestion(estimatedTime);

@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomChoice, randomIntRange } from './Helpers'
+import { Puzzle } from './Puzzle';
 
 
-export class OperatorMathPuzzle{
+export class OperatorMathPuzzle implements Puzzle{
     private static puzzles: {[key:string]: [OperatorMathPuzzle, string]} = {}
-
-    private type: string = "operatorMathPuzzle"
-    private description: string = "What is the sequence of operators used in the following expression?"
     
-    private id: string = uuidv4();
-    private question: string;
-    private hintLevel : number = 0;
+    id: string = uuidv4();
+    type: string = "operatorMathPuzzle"
+    question: string;
+    description: string = "What is the sequence of operators used in the following expression?"
+    hintLevel : number = 0;
     solved: boolean = false;
 
     constructor() {

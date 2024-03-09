@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange } from './Helpers';
+import { Puzzle } from './Puzzle';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-export class LettersMathPuzzle{
+export class LettersMathPuzzle implements Puzzle{
     private static puzzles: {[key: string]: [LettersMathPuzzle, string, number]} = {}
 
-    private type: string = "lettersMathPuzzle";
-    private description: string = `What is the mapping of each letter to numbers so that the equation is satisfied?`;
-
-    private id: string = uuidv4();
-    private question: string;
-    private hintLevel: number = 0;
-    private solved: boolean = false;
+    id: string = uuidv4();
+    type: string = "lettersMathPuzzle";
+    question: string;
+    description: string = `What is the mapping of each letter to numbers so that the equation is satisfied?`;
+    hintLevel: number = 0;
+    solved: boolean = false;
 
     constructor(){
         let [question, letters, answer] = this.init();
@@ -61,8 +61,8 @@ export class LettersMathPuzzle{
         return 'No more hints.';
     }
 
-    checkAnswer(answer: number): boolean {
-        let res: boolean = answer === this.getAnswer();
+    checkAnswer(answer: string): boolean {
+        let res: boolean = parseInt(answer) === this.getAnswer();
         if (!this.solved) this.solved = res
         return res
     }
