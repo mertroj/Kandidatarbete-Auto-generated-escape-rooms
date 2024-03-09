@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Room, createRooms, getRoom } from './Room';
+import { Room } from './Room';
 
 
 export class EscapeRoom {
     private static escapeRooms: {[key: string]: EscapeRoom} = {}
-    private static roomIds: {[key: string]: string[]} = {}
 
     id: string;
     rooms: Room[];
@@ -14,20 +13,18 @@ export class EscapeRoom {
         let nr_of_rooms = players+difficulty;
         let slots_in_room = 5+difficulty;
         this.id = uuidv4();
-        this.rooms = createRooms(nr_of_rooms, slots_in_room)
+        this.rooms = Room.createRooms(nr_of_rooms, slots_in_room)
         this.rooms[0].is_unlocked = true
         EscapeRoom.escapeRooms[this.id] = this
-        EscapeRoom.roomIds[this.id] = this.rooms.map((room) => room.id)
     }
 
     static get(gameId: string) : EscapeRoom | null {
-        if (EscapeRoom.roomIds[gameId] === undefined) {
+        if (EscapeRoom.escapeRooms[gameId] === undefined) {
             return null
         }
         return {
             id: gameId, 
-            rooms: EscapeRoom.roomIds[gameId]
-                        .map((roomId) => getRoom(roomId))
+            rooms: EscapeRoom.escapeRooms[gameId].rooms
                         .filter((room) => room.is_unlocked)
         }
     }

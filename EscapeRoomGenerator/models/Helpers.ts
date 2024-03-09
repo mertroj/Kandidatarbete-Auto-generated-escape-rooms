@@ -1,5 +1,9 @@
 export type point = [number, number]
 
+export function around(pos: point): point[]  {
+    let [x, y] = pos;
+    return [[x+1,y],[x-1,y],[x,y+1],[x,y-1]];
+}
 
 export function randomInt(max: number) : number {
     return Math.floor(Math.random() * max);
