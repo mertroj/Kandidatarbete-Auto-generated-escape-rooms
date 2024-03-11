@@ -5,13 +5,16 @@ import { EscapeRoom, Room } from "../interfaces"
 import Hinting from "../components/Hinting/hinting";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
 import Navbar from '../components/Navbar/Navbar';
+import {Row} from "react-bootstrap";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
     const [hintsList, setHintsList] = useState<string[]>([])
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
     const [currentRoom, setCurrentRoom] = useState<Room>()
-    
+    const resultScreenUrl = `/escaperoom/${gameId}/result`;
+
+
     function addHint(hint: string) {
         setHintsList([...hintsList, hint])
     }
@@ -62,6 +65,12 @@ function EscapeRoomPage() {
                 </div> : null}
                 
                 <p className="w-100">Game ID: {gameId}</p>
+
+                <Row>
+                    {/* Using the constructed URL */}
+                    <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
+                </Row>
+
             </div>
 
             <Hinting hintsList={hintsList} />

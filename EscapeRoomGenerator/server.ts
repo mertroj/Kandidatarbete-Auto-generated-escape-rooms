@@ -5,6 +5,8 @@ import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
+import {TimerRouter} from "./routers/TimerRouter";
+import {Timer} from "./models/Timer";
 
 
 const app: Express = express();
@@ -15,11 +17,13 @@ app.use(cors());
 app.use('/lettersMathPuzzle', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzle', OperatorMathPuzzleRouter);
 app.use('/anagram', AnagramRouter); // TODO: change placeholder
+app.use('/timer', TimerRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players))
     let difficulty = parseInt(String(req.query.difficulty))
 
+    Timer.getInstance().reset();
     console.log("Creating an escape room")
 
     if (Number.isNaN(players)) {
@@ -30,6 +34,7 @@ app.get('/creategame', (req: Request, res: Response) => {
         let er: EscapeRoom = new EscapeRoom(players, difficulty);
         res.send(er.id);
     }
+    Timer.getInstance().start();
     console.log("Finished")
 });
 

@@ -50,10 +50,10 @@ function HomePage() {
             </Row>
             <form className='d-flex justify-content-center flex-column align-items-center' onSubmit={e => startEscapeRoom(e)}>
                 <div className='w-100 d-flex justify-content-around'>
-                    <select 
-                        name="players" 
-                        id="players" 
-                        required 
+                    <select
+                        name="players"
+                        id="players"
+                        required
                     >
                         <option value="" hidden>Amount of Players</option>
                         <option value="1">1 player</option>
@@ -61,20 +61,20 @@ function HomePage() {
                         <option value="3">3 players</option>
                         <option value="4">4 players</option>
                     </select>
-                    <select 
-                        name="difficulty" 
-                        id="difficulty" 
-                        required 
+                    <select
+                        name="difficulty"
+                        id="difficulty"
+                        required
                     >
                         <option value="" hidden>Difficulty</option>
                         <option value="1">Easy</option>
                         <option value="2">Medium</option>
                         <option value="3">Hard</option>
                     </select>
-                    <select 
-                        name="theme" 
-                        id="theme" 
-                        required 
+                    <select
+                        name="theme"
+                        id="theme"
+                        required
                     >
                         <option value="" hidden>Theme</option>
                         <option value="magical_workshop">Magical workshop</option>
