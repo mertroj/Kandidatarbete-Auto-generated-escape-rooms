@@ -7,20 +7,19 @@ import RoomComponent from "../components/RoomComponent/RoomComponent";
 import Navbar from '../components/Navbar/Navbar';
 
 function EscapeRoomPage() {
-    const [hintsList, setHintsList] = useState<string[]>([])
     const {gameId} = useParams()
+    const [hintsList, setHintsList] = useState<string[]>([])
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
     const [currentRoom, setCurrentRoom] = useState<Room>()
     
     function addHint(hint: string) {
-        setHintsList([hint].concat(hintsList))
+        setHintsList([...hintsList, hint])
     }
 
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
             setEscapeRoom(response.data);
             setCurrentRoom(response.data.rooms[0])
-            console.log(response.data)
         }).catch((error) => {
             console.error(error)
             window.location.pathname = '/'
@@ -50,13 +49,17 @@ function EscapeRoomPage() {
                 <Navbar/>
                 {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
 
-                {currentRoom?.left ? <button onClick={moveLeft} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button> : null}
+                {currentRoom && escapeRoom ? <div className="d-flex justify-content-center">
 
-                {currentRoom?.right ? <button onClick={moveRight} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button> : null}
+                    {currentRoom.left ? <button onClick={moveLeft} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button> : null}
 
-                {currentRoom?.up ? <button onClick={moveUp} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button> : null}
+                    {currentRoom.right ? <button onClick={moveRight} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button> : null}
 
-                {currentRoom?.down ? <button onClick={moveDown} disabled={!escapeRoom?.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button> : null}
+                    {currentRoom.up ? <button onClick={moveUp} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button> : null}
+
+                    {currentRoom.down ? <button onClick={moveDown} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button> : null}
+
+                </div> : null}
                 
                 <p className="w-100">Game ID: {gameId}</p>
             </div>

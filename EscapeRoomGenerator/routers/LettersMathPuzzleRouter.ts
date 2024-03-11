@@ -1,11 +1,11 @@
-import { Anagram } from "../models/Anagram";
+import { LettersMathPuzzle } from "../models/LettersMathPuzzle";
 import express, { Request, Response } from "express";
 
-export const AnagramRouter = express.Router();
+export const LettersMathPuzzleRouter = express.Router();
 
-AnagramRouter.get("/info", async (req: Request, res: Response) => {
+LettersMathPuzzleRouter.get("/info", async (req: Request, res: Response) => {
     const puzzleId = String(req.query.puzzleId)
-    const puzzle = Anagram.get(puzzleId)
+    const puzzle = LettersMathPuzzle.get(puzzleId)
     if (puzzle === undefined) {
         res.status(400).send("The puzzleId parameter is missing or invalid")
         return
@@ -13,10 +13,10 @@ AnagramRouter.get("/info", async (req: Request, res: Response) => {
     res.send(puzzle);
 });
 
-AnagramRouter.post("/checkAnswer", async (req: Request, res: Response) => {
+LettersMathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
     const puzzleId = String(req.body.puzzleId)
-    const puzzle = Anagram.get(puzzleId)
-    const submittedAnswer: string  = String(req.body.answer);
+    const puzzle = LettersMathPuzzle.get(puzzleId)
+    const submittedAnswer  = String(req.body.answer);
     if (puzzle === undefined) {
         res.status(400).send("The puzzleId parameter is missing or invalid")
     } else if (submittedAnswer === '') {
@@ -26,9 +26,9 @@ AnagramRouter.post("/checkAnswer", async (req: Request, res: Response) => {
     }
 });
 
-AnagramRouter.get("/hint", async (req: Request, res: Response) => {
+LettersMathPuzzleRouter.get("/hint", async (req: Request, res: Response) => {
     const puzzleId = String(req.query.puzzleId)
-    const puzzle = Anagram.get(puzzleId)
+    const puzzle = LettersMathPuzzle.get(puzzleId)
     if (puzzle === undefined) {
         res.status(400).send("The puzzleId parameter is missing or invalid")
         return
