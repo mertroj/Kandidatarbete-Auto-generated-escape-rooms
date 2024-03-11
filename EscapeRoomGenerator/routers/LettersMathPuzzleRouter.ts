@@ -7,7 +7,7 @@ LettersMathPuzzleRouter.get("/info", async (req: Request, res: Response) => {
     const puzzleId = String(req.query.puzzleId)
     const puzzle = LettersMathPuzzle.get(puzzleId)
     if (puzzle === undefined) {
-        res.status(400).send("The puzzleId parameter is missing or invalid")
+        res.status(404).send("The puzzleId parameter is missing or invalid")
         return
     }
     res.send(puzzle);
@@ -30,7 +30,7 @@ LettersMathPuzzleRouter.get("/hint", async (req: Request, res: Response) => {
     const puzzleId = String(req.query.puzzleId)
     const puzzle = LettersMathPuzzle.get(puzzleId)
     if (puzzle === undefined) {
-        res.status(400).send("The puzzleId parameter is missing or invalid")
+        res.status(404).send("The puzzleId parameter is missing or invalid")
         return
     }
     res.send(puzzle.getHint());

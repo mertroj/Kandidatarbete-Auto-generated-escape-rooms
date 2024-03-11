@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomIntRange } from './Helpers';
+import { randomIntRange, removeDuplicates } from './Helpers';
 import { Puzzle } from './Puzzle';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -10,34 +10,46 @@ export class LettersMathPuzzle implements Puzzle{
     id: string = uuidv4();
     type: string = "lettersMathPuzzle";
     question: string;
-    description: string = `What is the mapping of each letter to numbers so that the equation is satisfied?`;
+    description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
+    answers: string[];
 
     constructor(){
-        let [question, letters, answer] = this.init();
+        let [question, letters, answer, shuffledAnswer] = this.init();
         this.question = question;
-        LettersMathPuzzle.puzzles[this.id] = [this, letters, answer]
+        this.answers = this.generateAllMappings(
+            mapNumbersToLetters(answer.toString(), letters.split('')), //expected answer
+            mapNumbersToLetters(shuffledAnswer.toString(), letters.split('')), //shuffled answer
+            answer-shuffledAnswer, //remainder
+            letters[answer%10],
+            answer%10,
+            letters.split('')
+        );
+        console.log(this.answers);
+        LettersMathPuzzle.puzzles[this.id] = [this, letters, answer];
     }
 
-    private init(): [string, string, number] {
+    private init(): [string, string, number, number] {
         let answerSlice: string;
         let remainder: number;
+        let firstTerm: number;
         let letters = shuffleArray((allLetters).split(''));
-        let firstTerm = randomIntRange(1001, 10000);
         do {
+            firstTerm = randomIntRange(1001, 10000);
             answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same four digits as the answer.
             remainder = firstTerm - Number(answerSlice);
-        } while(remainder <= 0); //valid if shuffled number is less than the answer
+        } while(!this.checkTermsValidity(remainder, firstTerm, Number(answerSlice))); //valid if shuffled number is less than the answer
         
         let firstTermLetters = mapNumbersToLetters(firstTerm.toString(), letters);
         let answerLetters = mapNumbersToLetters(answerSlice, letters);
         firstTermLetters = firstTermLetters.slice(0, -1) + (firstTerm%10).toString();
 
-        //should randomize the operation as well
+        //TODO: Randomize the operation as well
         let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`
-
-        return [question, letters.join(''), firstTerm-remainder]
+        console.log(question)
+        console.log([question, letters.join(''), firstTerm-remainder, firstTerm])
+        return [question, letters.join(''), firstTerm-remainder, firstTerm]
     }
 
     static get(puzzleId: string): LettersMathPuzzle {
@@ -52,6 +64,10 @@ export class LettersMathPuzzle implements Puzzle{
         return LettersMathPuzzle.puzzles[this.id][2]
     }
 
+    private checkTermsValidity(remainder: number, firstTerm: number, firstTermsShuffled: number): boolean {
+        return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
+    }
+
     getHint(): string{
         if(this.hintLevel < 3){
             const number: string = this.getAnswer().toString()[this.hintLevel++];
@@ -62,20 +78,59 @@ export class LettersMathPuzzle implements Puzzle{
     }
 
     checkAnswer(answer: string): boolean {
-        let res: boolean = parseInt(answer) === this.getAnswer();
+        let res = this.answers.includes(answer);
         if (!this.solved) this.solved = res
         return res
     }
 
-    //TODO: possible recursive function to validate a unique answer for the equation
-    //private validateEquation(): boolean {
-        //1. map the first 3 letters to random unique numbers and mark the used numbers as "used"
+    private generateAllMappings(original: string, shuffled: string, remainder: number, givenLetter: string, givenDigit: number, letters: string[]): string[] {
+        let allMappings: string[] = [];
+        let originalLetters = original.split('');
+        let allPermutations: number[][] = this.generatePermutations(10, originalLetters.length);
+
+        // Filter out permutations that do not satisfy the given helping digit
+        allPermutations = allPermutations.filter(
+            permutation => 
+            permutation[permutation.length-1] === givenDigit &&
+            mapNumbersToLetters(permutation[permutation.length-1].toString(), letters) === givenLetter
+        );
+
+        for (let permutation of allPermutations) {
+            let mapping = new Map<string, number>();
+            for (let i = 0; i < originalLetters.length; i++) {
+                mapping.set(originalLetters[i], permutation[i]);
+            }
+            if (this.checkMapping(original, shuffled, remainder, mapping)) {
+                let mappingString = originalLetters.map(letter => mapping.get(letter)).join('');
+                allMappings.push(mappingString);
+            }
+        }
+        return removeDuplicates(allMappings);
+    }
     
-        //2. test the validity of the equation for each digit for the final number (recursively maybe)
-        //3. if the equation is valid, add 1 to possible solutions
-            //if the possible solutions > 1, return false
-        //4. if the equation is invalid, recursively move back and change the second last number and repeat from step 2.
-    //}
+    private generatePermutations(n: number, r: number): number[][] {
+        let numbers = Array.from({length: n}, (_, i) => i);
+        let permutations: number[][] = [];
+
+        this.generatePermutationsHelper(numbers, [], r, permutations);
+        return permutations;
+    }
+    
+    private generatePermutationsHelper(numbers: number[], current: number[], r: number, permutations: number[][]) {
+        if (current.length === r) {
+            permutations.push(current);
+        } else {
+            for (let i = 0; i < numbers.length; i++) {
+                this.generatePermutationsHelper(numbers.filter((_, index) => index !== i), current.concat(numbers[i]), r, permutations);
+            }
+        }
+    }
+    
+    private checkMapping(original: string, shuffled: string, remainder: number, mapping: Map<string, number>): boolean {
+        let originalMapped = parseInt(original.split('').map(letter => mapping.get(letter)).join(''));
+        let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
+        return originalMapped - remainder === shuffledMapped;
+    }
 }
 
 function shuffleArray(array: any[]): any[] {
@@ -88,4 +143,12 @@ function shuffleArray(array: any[]): any[] {
 
 function mapNumbersToLetters(numbers: string, letters: string[]): string {
     return numbers.split('').map(num => letters[Number(num)]).join('');
+}
+
+function mapLettersToNumbers(letters: string[], word: string): number {
+    return Number(word.split('').map(letter => letters.indexOf(letter)).join(''));
+}
+
+function hasRepeats (str: string): boolean {
+    return /(.).*\1/.test(str);
 }
