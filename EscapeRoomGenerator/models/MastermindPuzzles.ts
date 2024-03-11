@@ -1,3 +1,6 @@
+import { Puzzle } from "./Puzzle";
+import { v4 as uuidv4 } from 'uuid';
+
 function generateNumbers(){ //Generate an array of 3 random numbers
     let numbers : Number[] = new Array(3);
     for(let i = 0; i < 3; i++){
@@ -6,20 +9,38 @@ function generateNumbers(){ //Generate an array of 3 random numbers
     return numbers;
 }
 
+function stringToNumberArray(string: string): Number[]{
+    let numbers : Number[] = new Array(3);
+    for(let i = 0; i < string.length; i++){
+        numbers[i] = +string.charAt(i);
+    }
+    return numbers;
+}
+
 export class MastermindPuzzle {
-    id: number;
-    eTime: number = 6;
-    mastermindQuestion: string = '';
+    private static puzzles: {[key: string]: MastermindPuzzle} = {}
+
+    id: string = uuidv4();
+    type: string = 'mastermind';
+    question: string;
+    description: string = 'Figure out the 3 digit combination';
+    hintLevel: number = 2;
+    solved: boolean = false;
     private hints: string[] = ['The solution is: ', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
                             'After each guess some numbers change colours, maybe that means something'];
     solution: Number[];
-    private hintLevel: number = 2;
+    
     constructor(){
-        this.id = Number(new Date());
         this.solution = generateNumbers();
-        this.mastermindQuestion = 'Figure out the 3 digit combination';
+        MastermindPuzzle.puzzles[this.id] = this
     }
+
+    static get(puzzleId: string): MastermindPuzzle {
+        return MastermindPuzzle.puzzles[puzzleId]
+    }
+
+
     getSolution(): Number[]{
         return this.solution;
     }
@@ -34,6 +55,23 @@ export class MastermindPuzzle {
         return 'No more hints.';
     }
     getDescription(): string {
-        return this.mastermindQuestion;
+        return this.question;
     }
-}
+
+    checkAnswer(answer: string): Number[]{
+        let bools: Number[] = new Array(this.getSolution.length);
+        let numAns = stringToNumberArray(answer);
+
+        for(let i = 0; i < this.getSolution.length; i++){
+            bools[i] = 2; //Base value 2 for incorrect
+            if(numAns[i] == this.getSolution[i]) //If correct set 0
+                bools[i] = 0;
+            else
+                for(let j = 0; j < this.getSolution.length; j++){
+                    if(numAns[i] == this.getSolution[j]) //if somewhere is correct set 1
+                        bools[i] = 1; 
+                    }
+            }
+        return bools;
+        }
+    }

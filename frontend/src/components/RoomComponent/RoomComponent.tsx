@@ -23,6 +23,9 @@ function RoomComponent ({room, addHint}: {room: Room, addHint: Function}) {
             if (puzzle.type === 'operatorMathPuzzle') 
                 return <OperatorMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} />
 
+            if (puzzle.type === 'mastermindPuzzle')
+                return <MastermindPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle}/>
+
             return <p>Invalid puzzle</p>
         })
         setPuzzles(nodes)
