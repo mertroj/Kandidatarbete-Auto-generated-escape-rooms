@@ -1,5 +1,16 @@
 import {Graph} from "graphlib";
 
+/**
+ * Generates a diverging tree graph with a specified number of nodes.
+ *
+ * The diverging tree is constructed by creating a tree structure where each node
+ * has multiple child nodes in the row below, and some nodes converge to a single
+ * node in the row above. The start node is connected to the first row, and the
+ * last row nodes are connected to an end node.
+ *
+ * @param {number} nodeAmount - The total number of nodes in the diverging tree.
+ * @returns {graph} A Graph object representing the generated diverging tree.
+ */
 export function DivergingTree(nodeAmount: number): Graph {
     const MAX_NODES_ROW: number = 4;
     const MIN_NODES_ROW: number = 2;
@@ -11,7 +22,7 @@ export function DivergingTree(nodeAmount: number): Graph {
     let newRow: string[] = [];
     let rowNodeDifference: number = 0;
     let randomRowNodeAmount: number = 0;
-    let endNode: string  = "";
+    let endNode: string = "";
 
     let lastRow: boolean = false;
     let nodesMade: number = 0;
@@ -24,7 +35,7 @@ export function DivergingTree(nodeAmount: number): Graph {
     while (nodesMade < nodeAmount) {
         // if first node Generate end node and connect them to 2 child nodes
         if (nodesMade === 0) {
-            let endNode = nodesMade.toString();
+            endNode = nodesMade.toString();
             divergingTree.setNode(endNode, true);
             currentConvergingNodes++;
             nodesMade++;
@@ -32,6 +43,7 @@ export function DivergingTree(nodeAmount: number): Graph {
                 let newNode = nodesMade.toString();
                 divergingTree.setNode(newNode, false);
                 divergingTree.setEdge(newNode, endNode);
+                console.log("made edge between " + newNode + " and " + endNode)
                 newRow.push(newNode);
                 nodesMade++;
             }
@@ -39,6 +51,7 @@ export function DivergingTree(nodeAmount: number): Graph {
         }
 
         previousRow = newRow;
+        console.log("previousRow: " + previousRow)
         newRow = [];
 
         // randomly generate amount of nodes in a row
@@ -56,8 +69,6 @@ export function DivergingTree(nodeAmount: number): Graph {
             for (let j: number = 0; j < randomRowNodeAmount; j++) {
                 let newNode = (nodesMade).toString();
                 divergingTree.setNode(newNode, false);
-
-                console.log("made node " + nodesMade+ " here")
                 nodesMade++;
                 newRow.push(newNode);
             }
@@ -68,7 +79,7 @@ export function DivergingTree(nodeAmount: number): Graph {
         }
 
         rowNodeDifference = previousRow.length - randomRowNodeAmount;
-        if ((rowNodeDifference> 0 || lastRow) && currentConvergingNodes < maxConvergingNodes) {
+        if ((rowNodeDifference > 0 || lastRow) && currentConvergingNodes < maxConvergingNodes) {
             divergingTree.setNode(previousRow[0], true); // overwriting a node
             currentConvergingNodes++;
         }
@@ -77,19 +88,26 @@ export function DivergingTree(nodeAmount: number): Graph {
         while (previousRow.length > 0) {
             if (divergingTree.node(previousRow[0]) === true) {
                 divergingTree.setEdge(newRow[j], previousRow[0]);
+                console.log("made edge between " + newRow[j] + " and " + previousRow[0])
+                console.log("place a")
                 j++;
             }
             const previousNode = previousRow.shift();
-            if (previousNode !== undefined) { // added because compiler is dog
-                divergingTree.setEdge(newRow[j], previousNode);
+            if (previousNode !== '') {
+                if (previousNode !== undefined && newRow[j] !== undefined) { // added because compiler is dog
+                    divergingTree.setEdge(newRow[j], previousNode);
+                    console.log("made edge between " + newRow[j] + " and " + previousNode)
+                    console.log("place b")
+                }
             }
             j++;
         }
         // Connect the remaining nodes to the end node
         while (j < randomRowNodeAmount) {
             divergingTree.setEdge(newRow[j], endNode);
+            console.log("made edge between " + newRow[j] + " and " + endNode)
+            console.log("place c")
             j++;
-            console.log("stuck here b")
         }
     }
 
@@ -98,7 +116,7 @@ export function DivergingTree(nodeAmount: number): Graph {
     divergingTree.setNode(startNode, false)
     for (let i: number = 0; i < newRow.length; i++) {
         divergingTree.setEdge(startNode, newRow[i]);
-        console.log("stuck here a")
+        console.log("made edge between " + startNode + " and " + newRow[i])
     }
 
 
@@ -111,6 +129,3 @@ export function DivergingTree(nodeAmount: number): Graph {
 
     return divergingTree;
 }
-
-let graph = DivergingTree(10);
-console.log(graph.nodes());
