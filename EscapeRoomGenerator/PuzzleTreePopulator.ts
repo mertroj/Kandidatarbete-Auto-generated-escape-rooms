@@ -1,5 +1,6 @@
 import {Edge, Graph} from "graphlib";
 import { createAnagramPuzzle, createMathPuzzle } from "./PuzzleFactory";
+import { DivergingTree } from "./DivergingTree";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
@@ -36,8 +37,8 @@ function puzzleTreePopulator(estimatedTime: number, difficulty: Difficulty): Gra
             }
         }
     }
-    let graph: Graph = new Graph(/*puzzleBox.length*/); //To be replaced with a function that return a correct graph
-    if(puzzleBox.length !== graph.nodeCount()+1){
+    let graph: Graph = DivergingTree(puzzleBox.length) //To be replaced with a function that return a correct graph
+    if(puzzleBox.length !== graph.nodeCount()-1){
         throw new Error("Diverging tree does not have as many nodes as required");
     }
     let nodes = graph.nodes();
@@ -111,3 +112,5 @@ export interface Puzzle {
     et: number;
     difficulty: string;
 }
+
+//console.log(puzzleTreePopulator(100, Difficulty.EASY));

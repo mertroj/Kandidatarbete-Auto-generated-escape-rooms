@@ -43,7 +43,6 @@ export function DivergingTree(nodeAmount: number): Graph {
                 let newNode = nodesMade.toString();
                 divergingTree.setNode(newNode, false);
                 divergingTree.setEdge(newNode, endNode);
-                console.log("made edge between " + newNode + " and " + endNode)
                 newRow.push(newNode);
                 nodesMade++;
             }
@@ -51,7 +50,6 @@ export function DivergingTree(nodeAmount: number): Graph {
         }
 
         previousRow = newRow;
-        console.log("previousRow: " + previousRow)
         newRow = [];
 
         // randomly generate amount of nodes in a row
@@ -88,16 +86,12 @@ export function DivergingTree(nodeAmount: number): Graph {
         while (previousRow.length > 0) {
             if (divergingTree.node(previousRow[0]) === true) {
                 divergingTree.setEdge(newRow[j], previousRow[0]);
-                console.log("made edge between " + newRow[j] + " and " + previousRow[0])
-                console.log("place a")
                 j++;
             }
             const previousNode = previousRow.shift();
             if (previousNode !== '') {
                 if (previousNode !== undefined && newRow[j] !== undefined) { // added because compiler is dog
                     divergingTree.setEdge(newRow[j], previousNode);
-                    console.log("made edge between " + newRow[j] + " and " + previousNode)
-                    console.log("place b")
                 }
             }
             j++;
@@ -105,8 +99,6 @@ export function DivergingTree(nodeAmount: number): Graph {
         // Connect the remaining nodes to the end node
         while (j < randomRowNodeAmount) {
             divergingTree.setEdge(newRow[j], endNode);
-            console.log("made edge between " + newRow[j] + " and " + endNode)
-            console.log("place c")
             j++;
         }
     }
@@ -116,7 +108,6 @@ export function DivergingTree(nodeAmount: number): Graph {
     divergingTree.setNode(startNode, false)
     for (let i: number = 0; i < newRow.length; i++) {
         divergingTree.setEdge(startNode, newRow[i]);
-        console.log("made edge between " + startNode + " and " + newRow[i])
     }
 
 
