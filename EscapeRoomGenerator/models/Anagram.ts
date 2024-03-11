@@ -1,86 +1,81 @@
+import { v4 as uuidv4 } from 'uuid';
+import { randomInt, randomIntRange } from './Helpers'
+import { Puzzle } from './Puzzle';
+
 const anagramsData = require('../anagrams.json')
 
-export class Anagram {
-    private anagramQuestion: string = '';
-    private anagramAnswers: string[] = [];
-    private readonly estimatedTime: number;
-    description: string = '';
+export class Anagram implements Puzzle {
+    private static puzzles: {[key: string]: Anagram} = {}
+
+    id: string = uuidv4();
+    type: string = 'anagram';
+    question: string;
+    description: string = 'Find the hidden word';
+    hintLevel: number = 0;
+    solved: boolean = false;
 
     constructor(estimatedTime: number) {
-        this.estimatedTime = estimatedTime;
-        let difficulty: string;
-        if (estimatedTime >= 1 && estimatedTime <= 3) {
-            difficulty = "easy";
-        } else if (estimatedTime >= 4 && estimatedTime <= 7) {
-            difficulty = "medium";
-        } else {
-            difficulty = "hard";
-        }
-        this.generateRandomAnagram(difficulty);
+        this.question = this.getQuestion(estimatedTime);
+        Anagram.puzzles[this.id] = this
     }
 
-
-    private async generateRandomAnagram(difficulty: string): Promise<void> {
-        const difficultyRanges: { [key: string]: [number, number] } = {
-            "easy": [3, 4],
-            "medium": [5, 6],
-            "hard": [7, 8]
-        };
-        const [minLength, maxLength] = difficultyRanges[difficulty];
-
-        const randomLength = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
-
-        const anagrams = anagramsData[randomLength.toString()];
-
-        if (anagrams) {
-            const randomIndex = Math.floor(Math.random() * anagrams.length);
-            const randomAnagram = anagrams[randomIndex];
-
-            this.anagramQuestion = `${randomAnagram[0]}`; // change in the future if necessary
-            this.anagramAnswers = randomAnagram.slice(1);
-        } else {
-            throw new Error(`No anagrams found for length ${randomLength}.`);
-        }
-        this.description = // TODO: add a better description in the future
-            'Find the hidden word' +
-            '\n' +
-            '\n' + ': ' + this.anagramQuestion;
+    static get(puzzleId: string): Anagram {
+        return Anagram.puzzles[puzzleId]
     }
 
-    getEstimatedTime(): number {
-        return this.estimatedTime;
-    }
-    getQuestion(): string {
-        return this.anagramQuestion;
-    }
-    getDescription(): string {
-        return this.description;
+    private getAnswers(): string {
+        return anagramsData[`${this.question.length}`].find((a: string[]) => a[0] == this.question)[1]
     }
 
     getHint(): string {
-        if (this.anagramAnswers.length > 0) {
-            const firstLetter = this.anagramAnswers[0][0];
-            return `I know the first letter is ${firstLetter.toUpperCase()}, but what's the rest?`;
-        } else {
-            return '';
+        const answers = this.getAnswers()
+    
+        if (this.hintLevel === this.question.length) {
+            return 'Bro..... you got the whole word already, what you doing with your life even?'
         }
+        if (!answers.length) return '';
+    
+        const hint = `I know the ${this.hintLevel == 0 ? 'first' : 'next'} letter is ${answers[this.hintLevel]}, but what's the rest?`;
+        this.hintLevel++;
+    
+        return hint
+    }
+    
+    checkAnswer(answer: string): boolean {
+        const answers = this.getAnswers()
+        const answerLowerCase = answer.toLowerCase();
+    
+        let res: boolean;
+        if (answers.includes(';')) {
+            res = !!answers
+                        .split(';')
+                        .map(subAnswer => subAnswer.trim())
+                        .find((subAnswer) => subAnswer === answerLowerCase)
+        } else {
+            res = answers.toLowerCase() === answerLowerCase;
+        }
+        if (!this.solved) this.solved = res
+        return res
     }
 
-    checkAnswer(userInput: string): boolean {
-        const userInputLowercase = userInput.toLowerCase();
-
-        // Check if there's a semicolon in the correct answer
-        if (this.anagramAnswers[0].includes(';')) {
-            const subAnswers = this.anagramAnswers[0].split(';').map(subAnswer => subAnswer.trim());
-            for (const subAnswer of subAnswers) {
-                if (subAnswer === userInputLowercase) {
-                    return true;
-                }
-            }
-            return false;
+    getQuestion(estimatedTime: number): string {
+        let minLength: number;
+        let maxLength: number;
+        if (estimatedTime >= 1 && estimatedTime <= 3) {
+            [minLength, maxLength] = [3, 4];
+        } else if (estimatedTime >= 4 && estimatedTime <= 7) {
+            [minLength, maxLength] = [5, 6];
         } else {
-            return this.anagramAnswers[0].toLowerCase() === userInputLowercase;
+            [minLength, maxLength] = [7, 8];
         }
+        const randomLength = randomIntRange(minLength, maxLength+1);
+        const possibleAnagrams = anagramsData[randomLength.toString()];
+    
+        if (!possibleAnagrams) {
+            throw new Error(`No anagrams found for length ${randomLength}.`);
+        }
+    
+        const anagramData = possibleAnagrams[randomInt(possibleAnagrams.length)];
+        return anagramData[0]
     }
-
 }

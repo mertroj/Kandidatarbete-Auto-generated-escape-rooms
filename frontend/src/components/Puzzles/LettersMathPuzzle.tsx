@@ -4,21 +4,22 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 
 
-function AnagramComponent ({addHint, puzzle}: {addHint : Function, puzzle: any}) {
+function LettersMathPuzzle ({addHint, puzzle}: {addHint : Function, puzzle: any}) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
+            const response = await axios.post(`http://localhost:8080/lettersMathPuzzle/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             alert(response.data ? 'Correct!' : 'Incorrect!');
         } catch (error) {
             console.error(error);
         }
     }
+    
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
+            const response = await axios.get(`http://localhost:8080/lettersMathPuzzle/hint/?puzzleId=${puzzle.id}`);
             addHint(response.data);
         } catch (error) {
             console.error(error);
@@ -43,7 +44,8 @@ function AnagramComponent ({addHint, puzzle}: {addHint : Function, puzzle: any})
                 </button>
             </div>
         </div>
+        
     );
 }
 
-export default AnagramComponent;
+export default LettersMathPuzzle;
