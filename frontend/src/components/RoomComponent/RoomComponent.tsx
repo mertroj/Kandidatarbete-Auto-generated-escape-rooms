@@ -1,8 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Room } from '../../interfaces';
 import Anagram from "../Puzzles/Anagram";
-import MathPuzzle from "../Puzzles/MathPuzzle";
 import MastermindPuzzle from '../Puzzles/MastermindPuzzle';
+import LettersMathPuzzle from "../Puzzles/LettersMathPuzzle";
+import OperatorMathPuzzle from "../Puzzles/OperatorMathPuzzle";
 import './RoomComponent.css'
 import { useEffect, useState } from 'react';
 
@@ -11,16 +12,18 @@ function RoomComponent ({room, addHint}: {room: Room, addHint: Function}) {
     const [puzzles, setPuzzles] = useState<JSX.Element[]>();
 
     useEffect(() => {
+        console.log(room.slots)
         let nodes = room.slots.map((puzzle) => {
-            if (puzzle.puzzle) {
-                return <MathPuzzle addHint={addHint} />
-            } else if (puzzle.anagramQuestion) {
-                return <Anagram addHint={addHint} />
-            } else if(puzzle.mastermindQuestion){
-                return <MastermindPuzzle addHint={addHint}/>
-            }else {
-                return <p>Invalid puzzle</p>
-            }
+            if (puzzle.type === 'anagram')
+                return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} />
+            
+            if (puzzle.type === 'lettersMathPuzzle')
+                return <LettersMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} />
+
+            if (puzzle.type === 'operatorMathPuzzle') 
+                return <OperatorMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} />
+
+            return <p>Invalid puzzle</p>
         })
         setPuzzles(nodes)
     }, [room])

@@ -13,7 +13,6 @@ function HomePage() {
         const formData = new FormData(form);
         const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme')
         axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
-            console.log(res)
             window.location.pathname = '/escaperoom/' + res.data
         }).catch((error) => {
             console.error(error)

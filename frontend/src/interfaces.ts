@@ -14,3 +14,7 @@ export interface Room {
     is_unlocked: boolean;
     slots: any[]
 }
+
+export interface NewHint{
+    hint: string;
+}

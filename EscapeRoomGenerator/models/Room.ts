@@ -1,11 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getRandomInt, point } from './Helpers';
+import { point, randomIntRange, repeat, frequencies, around } from './Helpers';
 import { Anagram } from './Anagram';
-import { MathPuzzle } from './MathPuzzles';
 import { MastermindPuzzle } from './MastermindPuzzles';
+import { LettersMathPuzzle } from './LettersMathPuzzle';
+import { OperatorMathPuzzle } from './OperatorMathPuzzle';
+import { Puzzle } from './Puzzle';
 
 
 export class Room {
+    private static rooms : {[Key: string]: Room} = {};
+
     id: string;
     x: number;
     y: number;
@@ -14,7 +18,7 @@ export class Room {
     up: string;
     down: string;
     is_unlocked: boolean;
-    slots: any[];
+    slots: Puzzle[];
 
     constructor(x: number, y: number, slots: number) {
         this.id = uuidv4();
@@ -25,36 +29,40 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = [new Anagram(5), new MathPuzzle(), new MastermindPuzzle()];
-        rooms[this.id] = this;
+        this.slots = repeat(5, () => {
+            return frequencies<() => Puzzle>([
+                [1, () => new Anagram(5)], 
+                [1, () => new LettersMathPuzzle()], 
+                [1, () => new OperatorMathPuzzle()]
+            ])()
+        });
+        Room.rooms[this.id] = this;
     }
-}
-const rooms : {[Key: string]: Room} = {};
 
-function around(pos: point): point[]  {
-    let [x, y] = pos;
-    return [[x+1,y],[x-1,y],[x,y+1],[x,y-1]];
-}
-
-export function createRooms(nr_of_rooms: number, slots_in_room: number): Room[] {
-    let visited = new Set();
-    let possible_locations: point[] = [[0,0]];
-    let rooms: Room[] = [];
-
-    while (rooms.length < nr_of_rooms) {
-        let pos_i = getRandomInt(0, possible_locations.length);
-        let [pos] = possible_locations.splice(pos_i, 1);
-
-        if (visited.has(`${pos[0]},${pos[1]}`)) continue;
-
-        rooms.push(new Room(...pos, slots_in_room));
-        visited.add(`${pos[0]},${pos[1]}`);
-
-        around(pos).forEach((pos) => {
-            possible_locations.push(pos);
-        })
+    static get(roomId: string): Room {
+        return Room.rooms[roomId]
     }
-    return connectRooms(rooms);
+
+    static createRooms(nr_of_rooms: number, slots_in_room: number): Room[] {
+        let visited = new Set();
+        let possible_locations: point[] = [[0,0]];
+        let rooms: Room[] = [];
+    
+        while (rooms.length < nr_of_rooms) {
+            let pos_i = randomIntRange(0, possible_locations.length);
+            let [pos] = possible_locations.splice(pos_i, 1);
+    
+            if (visited.has(`${pos[0]},${pos[1]}`)) continue;
+    
+            rooms.push(new Room(...pos, slots_in_room));
+            visited.add(`${pos[0]},${pos[1]}`);
+    
+            around(pos).forEach((pos) => {
+                possible_locations.push(pos);
+            })
+        }
+        return connectRooms(rooms);
+    }
 }
 
 function connectRooms(rooms: Room[]): Room[] {
@@ -73,8 +81,4 @@ function connectRooms(rooms: Room[]): Room[] {
         if (r) room.down = r.id
     })
     return rooms
-}
-
-export function getRoom(roomId: string): Room {
-    return rooms[roomId]
 }
