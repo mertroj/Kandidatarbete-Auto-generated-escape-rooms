@@ -5,7 +5,7 @@ import { Puzzle } from './Puzzle';
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Puzzle{
-    private static puzzles: {[key: string]: [LettersMathPuzzle, string, number]} = {}
+    private static puzzles: {[key: string]: [LettersMathPuzzle, string, string[]]} = {}
 
     id: string = uuidv4();
     type: string = "lettersMathPuzzle";
@@ -13,28 +13,26 @@ export class LettersMathPuzzle implements Puzzle{
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
-    answers: string[];
 
     constructor(){
         let [question, letters, answer, shuffledAnswer] = this.init();
         this.question = question;
-        this.answers = this.generateAllMappings(
-            mapNumbersToLetters(answer.toString(), letters.split('')), //expected answer
-            mapNumbersToLetters(shuffledAnswer.toString(), letters.split('')), //shuffled answer
+        let answers = this.generateAllMappings(
+            mapNumbersToLetters(answer.toString(), letters), //expected answer
+            mapNumbersToLetters(shuffledAnswer.toString(), letters), //shuffled answer
             answer-shuffledAnswer, //remainder
             letters[answer%10],
             answer%10,
-            letters.split('')
+            letters
         );
-        console.log(this.answers);
-        LettersMathPuzzle.puzzles[this.id] = [this, letters, answer];
+        LettersMathPuzzle.puzzles[this.id] = [this, letters, answers];
     }
 
     private init(): [string, string, number, number] {
         let answerSlice: string;
         let remainder: number;
         let firstTerm: number;
-        let letters = shuffleArray((allLetters).split(''));
+        let letters: string = shuffleArray<string>((allLetters).split('')).join('');
         do {
             firstTerm = randomIntRange(1001, 10000);
             answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same four digits as the answer.
@@ -47,9 +45,7 @@ export class LettersMathPuzzle implements Puzzle{
 
         //TODO: Randomize the operation as well
         let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`
-        console.log(question)
-        console.log([question, letters.join(''), firstTerm-remainder, firstTerm])
-        return [question, letters.join(''), firstTerm-remainder, firstTerm]
+        return [question, letters, firstTerm-remainder, firstTerm]
     }
 
     static get(puzzleId: string): LettersMathPuzzle {
@@ -60,7 +56,7 @@ export class LettersMathPuzzle implements Puzzle{
         return LettersMathPuzzle.puzzles[this.id][1]
     }
 
-    private getAnswer():number {
+    private getAnswers():string[] {
         return LettersMathPuzzle.puzzles[this.id][2]
     }
 
@@ -70,20 +66,20 @@ export class LettersMathPuzzle implements Puzzle{
 
     getHint(): string{
         if(this.hintLevel < 3){
-            const number: string = this.getAnswer().toString()[this.hintLevel++];
-            const letter: string = this.getLetters().charAt(Number(number));
+            const number: string = this.getAnswers()[0][this.hintLevel++];
+            const letter: string = this.getLetters()[Number(number)];
             return 'The letter ' + letter + ' is ' + number + '.';
         }
         return 'No more hints.';
     }
 
     checkAnswer(answer: string): boolean {
-        let res = this.answers.includes(answer);
+        let res = this.getAnswers().includes(answer);
         if (!this.solved) this.solved = res
         return res
     }
 
-    private generateAllMappings(original: string, shuffled: string, remainder: number, givenLetter: string, givenDigit: number, letters: string[]): string[] {
+    private generateAllMappings(original: string, shuffled: string, remainder: number, givenLetter: string, givenDigit: number, letters: string): string[] {
         let allMappings: string[] = [];
         let originalLetters = original.split('');
         let allPermutations: number[][] = this.generatePermutations(10, originalLetters.length);
@@ -133,7 +129,7 @@ export class LettersMathPuzzle implements Puzzle{
     }
 }
 
-function shuffleArray(array: any[]): any[] {
+function shuffleArray<t>(array: t[]): t[] {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
@@ -141,7 +137,7 @@ function shuffleArray(array: any[]): any[] {
     return array;
 }
 
-function mapNumbersToLetters(numbers: string, letters: string[]): string {
+function mapNumbersToLetters(numbers: string, letters: string): string {
     return numbers.split('').map(num => letters[Number(num)]).join('');
 }
 
