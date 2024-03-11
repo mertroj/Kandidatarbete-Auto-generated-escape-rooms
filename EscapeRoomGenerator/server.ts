@@ -12,9 +12,9 @@ const port: number = 8080;
 
 app.use(express.json());
 app.use(cors());
-app.use('/lettersMathPuzzle', LettersMathPuzzleRouter);
-app.use('/operatorMathPuzzle', OperatorMathPuzzleRouter);
-app.use('/anagram', AnagramRouter); // TODO: change placeholder
+app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
+app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
+app.use('/anagrams', AnagramRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players))
