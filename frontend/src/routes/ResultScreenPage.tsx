@@ -3,37 +3,51 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {EscapeRoom, Room} from "../interfaces";
-import {useParams} from "react-router-dom";
+import {useParams, Link} from 'react-router-dom';
 
 function ResultScreenPage() {
     const {gameId} = useParams();
     const [hintUsed, setHintUsed] = useState<number>(0);
-    const [formattedTimeTaken, setFormattedTimeTaken] = useState<string>('00:00:00'); // Initialize with default value
+    const [formattedTimeTaken, setFormattedTimeTaken] = useState<string>('00:00:00');
 
-    interface Puzzle {
-        id: string;
+    interface PuzzleProps {
         hintLevel: number;
     }
-    const timeTaken: number = 0;
+    interface TimerProps{
+        elapsedTime: number;
+    }
 
-    const fetchData = async () => {
+    async function fetchTimeTaken() {
+        try {
+            const storedTimeTaken = sessionStorage.getItem('timeTaken');
+    
+            if (storedTimeTaken) {
+                setFormattedTimeTaken(storedTimeTaken);
+            } else {
+                const response = await axios.get<TimerProps>('http://localhost:8080/timer/elapsedTime');
+                await axios.put('http://localhost:8080/timer/pauseTimer');
+                const time: string = formatMilliseconds(response.data.elapsedTime);
+                setFormattedTimeTaken(time);
+                sessionStorage.setItem('timeTaken', time);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    const fetchEscapeRoom = async () => {
         try {
             const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
-            const responseTimer = await axios.get<any>('http://localhost:8080/timer/elapsedTime');
-            await axios.get<number>('http://localhost:8080/timer/pauseTimer');
 
             const rooms: Room[] = response.data.rooms;
-            const timeTaken: number = responseTimer.data.elapsedTime;
 
             setHintUsed(0);
             rooms.forEach((room) => {
-                room.slots.forEach((slot: Puzzle) => {
+                room.slots.forEach((slot: PuzzleProps) => {
                     setHintUsed(prevHintUsed => prevHintUsed + slot.hintLevel);
                 });
             });
 
-            const formattedTime = formatMilliseconds(timeTaken);
-            setFormattedTimeTaken(formattedTime); // Update the state with formatted time
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -53,7 +67,21 @@ function ResultScreenPage() {
     }
 
     useEffect(() => {
-        fetchData();
+        //Add current page to the history stack
+        const unblock = window.history.pushState(null, "", window.location.href);
+
+        //When navigating back, add current page to the history stack again
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+        };
+
+        fetchEscapeRoom();
+        fetchTimeTaken();
+
+        //When done with the page, remove the back navigation listnere/preventer
+        return () => {
+            window.onpopstate = null;
+        };
     }, []);
 
 
@@ -68,7 +96,7 @@ function ResultScreenPage() {
                 <p>Hints Used: {hintUsed}</p>
             </Row>
             <Row>
-                <a href="/">Back to Home Page</a>
+                <Link to="/" onClick={() => sessionStorage.removeItem('timeTaken')}>Back to Home Page</Link>
             </Row>
         </div>
     );
