@@ -5,7 +5,7 @@ import { Puzzle } from './Puzzle';
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Puzzle{
-    private static puzzles: {[key: string]: [LettersMathPuzzle, string, string[]]} = {}
+    private static puzzles: {[key: string]: [LettersMathPuzzle, string, number]} = {}
 
     id: string = uuidv4();
     type: string = "lettersMathPuzzle";
@@ -13,11 +13,12 @@ export class LettersMathPuzzle implements Puzzle{
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
+    private answers: string[];
 
     constructor(){
         let [question, letters, answer, shuffledAnswer] = this.init();
         this.question = question;
-        let answers = this.generateAllMappings(
+        this.answers = this.generateAllMappings(
             mapNumbersToLetters(answer.toString(), letters), //expected answer
             mapNumbersToLetters(shuffledAnswer.toString(), letters), //shuffled answer
             answer-shuffledAnswer, //remainder
@@ -25,7 +26,7 @@ export class LettersMathPuzzle implements Puzzle{
             answer%10,
             letters
         );
-        LettersMathPuzzle.puzzles[this.id] = [this, letters, answers];
+        LettersMathPuzzle.puzzles[this.id] = [this, letters, answer];
     }
 
     private init(): [string, string, number, number] {
@@ -52,11 +53,11 @@ export class LettersMathPuzzle implements Puzzle{
         return LettersMathPuzzle.puzzles[puzzleId][0]
     }
 
-    private getLetters():string {
+    private getLetters(): string {
         return LettersMathPuzzle.puzzles[this.id][1]
     }
 
-    private getAnswers():string[] {
+    private getAnswer(): number {
         return LettersMathPuzzle.puzzles[this.id][2]
     }
 
@@ -65,16 +66,16 @@ export class LettersMathPuzzle implements Puzzle{
     }
 
     getHint(): string{
-        if(this.hintLevel < 3){
-            const number: string = this.getAnswers()[0][this.hintLevel++];
-            const letter: string = this.getLetters()[Number(number)];
-            return 'The letter ' + letter + ' is ' + number + '.';
+        if(this.hintLevel < 4){
+            const number: string = this.getAnswer().toString()[this.hintLevel++];
+            const letter: string = this.getLetters().charAt(Number(number));
+            return 'The letter ' + letter + ' is ' + number;
         }
         return 'No more hints.';
     }
 
     checkAnswer(answer: string): boolean {
-        let res = this.getAnswers().includes(answer);
+        let res = this.answers.includes(answer);
         if (!this.solved) this.solved = res
         return res
     }
