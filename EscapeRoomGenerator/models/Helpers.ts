@@ -30,6 +30,6 @@ export function repeat<t>(n: number, fn: Function): t[] {
     }
     return array
 }
-export function removeDuplicates(array: any[]): any[] {
+export function removeDuplicates<t>(array: t[]): t[] {
     return [...new Set(array)];
 }

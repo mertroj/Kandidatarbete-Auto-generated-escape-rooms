@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
+import { Puzzle } from '../../interfaces';
 
-function OperatorMathPuzzle ({addHint, puzzle}: {addHint : Function, puzzle: any}) {
+function OperatorMathPuzzle ({addHint, puzzle}: {addHint : Function, puzzle: Puzzle}) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
