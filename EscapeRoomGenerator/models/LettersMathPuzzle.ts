@@ -13,7 +13,7 @@ export class LettersMathPuzzle implements Puzzle{
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
-    estimatedTime: number = 2;
+    estimatedTime: number = 3; //Average based on tests
 
     constructor(){
         let [question, letters, mainAnswer, shuffledAnswer] = this.init();
