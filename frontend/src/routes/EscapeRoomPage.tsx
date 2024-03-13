@@ -13,7 +13,7 @@ function EscapeRoomPage() {
     const [currentRoom, setCurrentRoom] = useState<Room>()
     
     function addHint(hint: string) {
-        setHintsList([...hintsList, hint])
+        setHintsList(hintsList => [...hintsList, hint])
     }
 
     function fetchEscapeRoom() {
