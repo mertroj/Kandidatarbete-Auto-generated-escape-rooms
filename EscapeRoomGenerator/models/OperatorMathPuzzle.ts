@@ -12,6 +12,7 @@ export class OperatorMathPuzzle implements Puzzle{
     description: string = "What is the sequence of operators used in the following expression?"
     hintLevel : number = 0;
     solved: boolean = false;
+    estimatedTime: number = 3;
 
     constructor() {
         let [question, answer] = this.init();
