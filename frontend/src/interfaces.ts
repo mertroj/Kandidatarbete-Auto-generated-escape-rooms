@@ -12,7 +12,17 @@ export interface Room {
     up: string;
     down: string;
     is_unlocked: boolean;
-    slots: any[]
+    slots: Puzzle[]
+}
+
+export interface Puzzle {
+    id: string;
+    type: string;
+    question:string;
+    description: string;
+    hintLevel: number;
+    solved: boolean;
+    estimatedTime: number;
 }
 
 export interface NewHint{
