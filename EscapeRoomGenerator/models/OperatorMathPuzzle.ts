@@ -12,12 +12,12 @@ export class OperatorMathPuzzle implements Puzzle{
     description: string = "What is the sequence of operators used in the following expression?"
     hintLevel : number = 0;
     solved: boolean = false;
-    difficulty: number;
     estimatedTime: number;
+    numberOfOperands: number;
 
     constructor(difficulty: number) {
-        this.difficulty = difficulty;
         this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard
+        this.numberOfOperands = 4 + (difficulty - 1); //easy: 4, medium: 5, hard: 6
         let [question, answer] = this.init();
         this.question = question;
         OperatorMathPuzzle.puzzles[this.id] = [this, answer]
@@ -32,7 +32,7 @@ export class OperatorMathPuzzle implements Puzzle{
     }
 
     getHint(): string{
-        if(this.hintLevel < 3){
+        if(this.hintLevel < this.numberOfOperands-1){
             return 'The next operations is ' + this.getAnswer()[this.hintLevel++];
         }else{
             return 'No more hints.'
@@ -47,15 +47,14 @@ export class OperatorMathPuzzle implements Puzzle{
 
     private init(): [string, string] {
         let numbers: number[] = [];
-        const numberOfOperands: number = 4 + (this.difficulty - 1); //easy: 4, medium: 5, hard: 6
-        for (let i = 0; i < numberOfOperands; i++) {
+        for (let i = 0; i < this.numberOfOperands; i++) {
             numbers.push(randomIntRange(1, 11));
         }
         
         let operator: string;
         let answer: string = ''
         let expression: string = numbers[0].toString();
-        for (let i = 1; i < numberOfOperands; i++) {
+        for (let i = 1; i < this.numberOfOperands; i++) {
             operator = choice(['+', '-', '*']);
             answer += operator;
             expression += operator;
