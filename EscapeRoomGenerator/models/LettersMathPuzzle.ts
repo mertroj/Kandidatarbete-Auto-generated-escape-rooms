@@ -5,7 +5,7 @@ import { Puzzle } from './Puzzle';
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Puzzle{
-    private static puzzles: {[key: string]: [LettersMathPuzzle, string, number]} = {}
+    private static puzzles: {[key: string]: [LettersMathPuzzle, string, number, string[]]} = {}
 
     id: string = uuidv4();
     type: string = "lettersMathPuzzle";
@@ -13,20 +13,19 @@ export class LettersMathPuzzle implements Puzzle{
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
-    private answers: string[];
 
     constructor(){
-        let [question, letters, answer, shuffledAnswer] = this.init();
+        let [question, letters, mainAnswer, shuffledAnswer] = this.init();
         this.question = question;
-        this.answers = this.generateAllMappings(
-            mapNumbersToLetters(answer.toString(), letters), //expected answer
+        let possibleAnswers = this.generateAllMappings(
+            mapNumbersToLetters(mainAnswer.toString(), letters), //expected answer
             mapNumbersToLetters(shuffledAnswer.toString(), letters), //shuffled answer
-            answer-shuffledAnswer, //remainder
-            letters[answer%10],
-            answer%10,
+            mainAnswer-shuffledAnswer, //remainder
+            letters[mainAnswer%10],
+            mainAnswer%10,
             letters
         );
-        LettersMathPuzzle.puzzles[this.id] = [this, letters, answer];
+        LettersMathPuzzle.puzzles[this.id] = [this, letters, mainAnswer, possibleAnswers];
     }
 
     private init(): [string, string, number, number] {
@@ -57,8 +56,11 @@ export class LettersMathPuzzle implements Puzzle{
         return LettersMathPuzzle.puzzles[this.id][1]
     }
 
-    private getAnswer(): number {
+    private getMainAnswer(): number {
         return LettersMathPuzzle.puzzles[this.id][2]
+    }
+    private getPossibleAnswers(): string[] {
+        return LettersMathPuzzle.puzzles[this.id][3]
     }
 
     private checkTermsValidity(remainder: number, firstTerm: number, firstTermsShuffled: number): boolean {
@@ -67,7 +69,7 @@ export class LettersMathPuzzle implements Puzzle{
 
     getHint(): string{
         if(this.hintLevel < 4){
-            const number: string = this.getAnswer().toString()[this.hintLevel++];
+            const number: string = this.getMainAnswer().toString()[this.hintLevel++];
             const letter: string = this.getLetters().charAt(Number(number));
             return 'The letter ' + letter + ' is ' + number;
         }
@@ -75,7 +77,7 @@ export class LettersMathPuzzle implements Puzzle{
     }
 
     checkAnswer(answer: string): boolean {
-        let res = this.answers.includes(answer);
+        let res = this.getPossibleAnswers().includes(answer);
         if (!this.solved) this.solved = res
         return res
     }
