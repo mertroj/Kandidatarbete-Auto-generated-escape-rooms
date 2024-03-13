@@ -1,4 +1,5 @@
 export interface EscapeRoom {
+    timer: Timer;
     id: string;
     rooms: Room[]
 }
@@ -27,4 +28,8 @@ export interface Puzzle {
 
 export interface NewHint{
     hint: string;
+}
+
+export interface Timer {
+    elapsedTime: number;
 }
