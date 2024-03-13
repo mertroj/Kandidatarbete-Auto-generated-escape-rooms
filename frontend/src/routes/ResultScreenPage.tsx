@@ -19,14 +19,15 @@ function ResultScreenPage() {
 
     async function fetchTimeTaken() {
         try {
+
             const storedTimeTaken = sessionStorage.getItem('timeTaken');
     
             if (storedTimeTaken) {
                 setFormattedTimeTaken(storedTimeTaken);
             } else {
-                const response = await axios.get<TimerProps>('http://localhost:8080/timer/elapsedTime');
-                await axios.put('http://localhost:8080/timer/pauseTimer');
-                const time: string = formatMilliseconds(response.data.elapsedTime);
+                const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
+                const escapeRoom: EscapeRoom = response.data;
+                const time: string = formatMilliseconds(escapeRoom.timer.elapsedTime);
                 setFormattedTimeTaken(time);
                 sessionStorage.setItem('timeTaken', time);
             }
