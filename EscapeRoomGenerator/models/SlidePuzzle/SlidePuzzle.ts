@@ -17,7 +17,6 @@ export class SlidePuzzle implements Puzzle{
     pieces: (Piece | null)[][];
     private rows: number;
     private cols: number;
-    private numbers: number[];
 
     constructor(difficulty: number){
         this.estimatedTime = difficulty * 3; //Arbitrary at the moment
@@ -25,43 +24,60 @@ export class SlidePuzzle implements Puzzle{
         //(row, col) = EASY => (3, 3), MEDIUM => (3, 4) or (4, 3), HARD => (3, 5) or (5, 3) or (4, 4)
         this.rows = 3 + randomIncrease;
         this.cols = 3 + difficulty - 1 - randomIncrease;
-        this.pieces = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
-        this.numbers = shuffleArray(Array.from({length: this.rows*this.cols - 1}, (_, i) => i + 1));
-        this.init();
+        this.pieces = this.init();
         SlidePuzzle.puzzles[this.id] = this;
     }
-    getHint(): string {
-        throw new Error('Method not implemented.');
-    }
-    checkAnswer(answer: string): boolean {
-        throw new Error('Method not implemented.');
+    checkAnswer(): boolean {
+        let previousNumber: number = 0; //numbers start at 1
+        for (let i = 0; i < this.rows; i++){
+            for (let j = 0; j < this.cols; j++){
+                if (i === this.rows - 1 && j === this.cols - 1 && this.pieces[i][j] === null){
+                    continue;
+                }
+                if (this.pieces[i][j] === null){ //if there is a null not at the last space
+                    return false;
+                }
+                let tempNumber = this.pieces[i][j]!.number; //safe since we checked for null above
+                if (tempNumber < previousNumber){
+                    return false;
+                }
+                previousNumber = tempNumber;
+            }
+        }
+        this.solved = true; //can be set to true even if it was true before
+        return true;
     }
 
-    private init(): void {
+    private init(): (Piece | null)[][] {
+        let tempPieces: (Piece | null)[][] = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
+        let numbers: number[] = shuffleArray(Array.from({length: this.rows*this.cols - 1}, (_, i) => i + 1));
         let inversionCounter: number = 0;
         //iterate over numbers as if it were a matrix
-        for (let index = 0; index < this.numbers.length; index++){
-            let currentNumber = this.numbers[index];
+        for (let index = 0; index < numbers.length; index++){
+            let currentNumber = numbers[index];
             for (let precedingIndex = 0; precedingIndex < index; precedingIndex++) {
-                if (this.numbers[precedingIndex] > currentNumber) {
+                if (numbers[precedingIndex] > currentNumber) {
                     inversionCounter++;
                 }
             }
             let i = Math.floor(index / this.cols);
             let j = index % this.cols;
-            this.pieces[i][j] = new Piece(currentNumber, new Position(i, j));
+            tempPieces[i][j] = new Piece(currentNumber, new Position(i, j));
         }
         //if the puzzle isn't solvable, swap the first two pieces since they are never null
         if (inversionCounter % 2 !== 0) {
-            let temp = this.pieces[0][0];
-            this.pieces[0][0] = this.pieces[0][1];
-            this.pieces[0][1] = temp;
+            let temp = tempPieces[0][0];
+            tempPieces[0][0] = tempPieces[0][1];
+            tempPieces[0][1] = temp;
             inversionCounter++;
         }
+        return tempPieces;
     }
+
     static get(puzzleId: string): SlidePuzzle {
         return SlidePuzzle.puzzles[puzzleId];
     }
+    
     tryMovePiece(piece: Piece | null): boolean {
         if (piece === null){
             return false;

@@ -10,6 +10,7 @@ interface PatchResponse {
 }
 function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzles>(puzzle);
+    const [isOpen, setIsOpen] = useState(false);
     
     async function handleCellClick(row: number, col: number) {
         try{
@@ -25,9 +26,25 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
             }
         }
     }
+    async function handleSubmit(){
+        try{
+            const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
+            if (response.data){
+                alert('Correct!');
+                setIsOpen(false);
+            }else{
+                alert('Incorrect');
+            }
+        }catch(error: any){
+            console.error(error);
+        }
+    }
 
     return (
         <Popup 
+            isOpen={isOpen}
+            onOpen={() => setIsOpen(true)}
+            onClose={() => setIsOpen(false)}
             trigger={
                 <div className='puzzle'>
                     <Button variant='outline-primary'>{puzzle.description}</Button>
@@ -48,7 +65,7 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                     ))}
                     <Row className="justify-content-md-center">
                         <Col xs="auto">
-                            <Button variant="success" className='mt-5'>Submit</Button>
+                            <Button variant="success" className='mt-5' onClick={() => handleSubmit()}>Submit</Button>
                         </Col>
                     </Row>
                 </Container>
