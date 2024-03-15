@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { SlidePuzzles } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
-import './slidePuzzle.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 interface PatchResponse {
@@ -51,12 +50,26 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                 </div>
             }
             children={
-                <Container>
+                <Container className='text-center'>
                     {updatedPuzzle.pieces.map((row, i) => (
                         <Row key={i} className="justify-content-md-center">
                         {row.map((cell, j) => (
-                            <Col xs="auto" key={j} className='border no-margin'>
-                                <Button style={{color: cell === null ? 'transparent': 'black'}} variant={'outline-primary'} onClick={() => handleCellClick(i, j)}>
+                            <Col xs={1} key={j} className=''>
+                                <Button 
+                                    style={
+                                        {
+                                            color: cell === null ? 'transparent': 'black', 
+                                            width:'4em',
+                                            height: '4em',
+                                            padding: '0',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            margin: '0 0 2em 0'
+                                        }
+                                    } 
+                                    variant={'outline-primary'} 
+                                    onClick={() => handleCellClick(i, j)}
+                                >
                                     {cell !== null ? cell.number : 0}
                                 </Button>
                             </Col>
