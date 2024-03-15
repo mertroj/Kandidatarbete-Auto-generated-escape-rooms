@@ -64,17 +64,14 @@ export class SlidePuzzle implements Puzzle{
             let j = index % this.cols;
             tempPieces[i][j] = new Piece(currentNumber, new Position(i, j));
         }
-        //if the puzzle isn't solvable, swap the first two pieces since they are never null
+        //if the puzzle isn't solvable, swap the first two pieces to increase/decrease inversion counter 
+            //since they are never null and do not affect the rest of the inversionCounter results
         if (inversionCounter % 2 !== 0) {
             let temp = tempPieces[0][0];
-            let tempPosition = tempPieces[0][0]!.position; //safe since when we come here, only the last piece can be null
             tempPieces[0][0] = tempPieces[0][1];
             tempPieces[0][0]!.position = new Position(0, 0); //safe since when we come here, only the last piece can be null
             tempPieces[0][1] = temp;
-            tempPieces[0][1]!.position = new Position(0, 1);
-            console.log('finished swapping the first two pieces');
-            console.log('first piece', tempPieces[0][0]?.position);
-            console.log('second piece', tempPieces[0][1]?.position);
+            tempPieces[0][1]!.position = new Position(0, 1); //safe since when we come here, only the last piece can be null
             inversionCounter++;
         }
         return tempPieces;
@@ -102,8 +99,6 @@ export class SlidePuzzle implements Puzzle{
             piece.position = newPos;
             return true;
         }
-        //console.log(this.pieces);
-        console.log('the piece', piece, 'has the position', piece.position)
         return false;
     }
     
