@@ -65,7 +65,7 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                                             justifyContent: 'center',
                                             alignItems: 'center',
                                             margin: '0 0 2em 0'
-                                        }
+                                        }   
                                     } 
                                     variant={'outline-primary'} 
                                     onClick={() => handleCellClick(i, j)}

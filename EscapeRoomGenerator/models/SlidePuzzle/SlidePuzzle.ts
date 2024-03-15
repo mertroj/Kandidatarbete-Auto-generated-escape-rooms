@@ -67,8 +67,14 @@ export class SlidePuzzle implements Puzzle{
         //if the puzzle isn't solvable, swap the first two pieces since they are never null
         if (inversionCounter % 2 !== 0) {
             let temp = tempPieces[0][0];
+            let tempPosition = tempPieces[0][0]!.position; //safe since when we come here, only the last piece can be null
             tempPieces[0][0] = tempPieces[0][1];
+            tempPieces[0][0]!.position = new Position(0, 0); //safe since when we come here, only the last piece can be null
             tempPieces[0][1] = temp;
+            tempPieces[0][1]!.position = new Position(0, 1);
+            console.log('finished swapping the first two pieces');
+            console.log('first piece', tempPieces[0][0]?.position);
+            console.log('second piece', tempPieces[0][1]?.position);
             inversionCounter++;
         }
         return tempPieces;
@@ -96,7 +102,8 @@ export class SlidePuzzle implements Puzzle{
             piece.position = newPos;
             return true;
         }
-    
+        //console.log(this.pieces);
+        console.log('the piece', piece, 'has the position', piece.position)
         return false;
     }
     
