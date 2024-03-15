@@ -6,7 +6,9 @@ import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
+import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
+import { SlidePuzzle } from "./models/SlidePuzzle/SlidePuzzle";
 
 
 const app: Express = express();
@@ -16,6 +18,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
+app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {

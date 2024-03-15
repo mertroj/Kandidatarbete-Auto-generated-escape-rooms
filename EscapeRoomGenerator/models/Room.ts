@@ -4,6 +4,7 @@ import { Anagram } from './Anagram';
 import { LettersMathPuzzle } from './LettersMathPuzzle';
 import { OperatorMathPuzzle } from './OperatorMathPuzzle';
 import { Puzzle } from './Puzzle';
+import { SlidePuzzle } from './SlidePuzzle/SlidePuzzle';
 
 
 export class Room {
@@ -32,7 +33,8 @@ export class Room {
             return frequencies<() => Puzzle>([
                 [1, () => new Anagram(5)], 
                 [1, () => new LettersMathPuzzle()], 
-                [1, () => new OperatorMathPuzzle()]
+                [1, () => new OperatorMathPuzzle()],
+                [10, () => new SlidePuzzle(3)],
             ])()
         });
         Room.rooms[this.id] = this;
