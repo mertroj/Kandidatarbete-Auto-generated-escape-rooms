@@ -27,6 +27,7 @@ export class SlidePuzzle implements Puzzle{
         this.pieces = this.init();
         SlidePuzzle.puzzles[this.id] = this;
     }
+
     checkAnswer(): boolean {
         let previousNumber: number = 0; //numbers start at 1
         for (let i = 0; i < this.rows; i++){
@@ -46,6 +47,11 @@ export class SlidePuzzle implements Puzzle{
         }
         this.solved = true; //can be set to true even if it was true before
         return true;
+    }
+
+    //TODO: Implement hint system
+    getHint(): boolean{
+        return false;
     }
 
     private init(): (Piece | null)[][] {
@@ -81,7 +87,7 @@ export class SlidePuzzle implements Puzzle{
         return SlidePuzzle.puzzles[puzzleId];
     }
     
-    tryMovePiece(piece: Piece | null): boolean {
+    movePiece(piece: Piece | null): boolean {
         if (piece === null){
             return false;
         }

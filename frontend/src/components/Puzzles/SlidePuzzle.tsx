@@ -5,8 +5,14 @@ import Popup from '../PopupComponent/Popup';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 
 interface PatchResponse {
+    isSuccessful: boolean;
     puzzle: SlidePuzzles;
 }
+interface HintResponse {
+    isSuccessful: boolean;
+    puzzle: SlidePuzzles;
+}
+
 function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzles>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
@@ -14,18 +20,16 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
     async function handleCellClick(row: number, col: number) {
         try{
             const response = await axios.patch<PatchResponse>(`http://localhost:8080/slidePuzzles/movePiece`, {row, col, puzzleId: puzzle.id});
-            if (response.status === 200) {
+            if (response.data.isSuccessful) {
                 setPuzzle(response.data.puzzle);
+            }else{
+                console.log('Invalid move');
             }
         }catch(error: any){
-            if (error.response && error.response.status === 400) {
-                console.log('Invalid move');
-            } else {
-                throw error;
-            }
+            console.log(error);
         }
     }
-    async function handleSubmit(){
+    async function handleSubmit(){ //closes the Popup if the answer is correct
         try{
             const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data){
@@ -36,6 +40,18 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
             }
         }catch(error: any){
             console.error(error);
+        }
+    }
+    async function handleHintRequest(){
+        try{
+            const response = await axios.get<HintResponse>(`http://localhost:8080/slidePuzzles/hint/?puzzleId=${puzzle.id}`);
+            if (response.data.isSuccessful) {
+                setPuzzle(response.data.puzzle);
+            }else{
+                console.log('No more hints. Question already answered.'); //Alert instead? Should not be needed later on
+            }
+        }catch(error: any){
+            console.log(error);
         }
     }
 
@@ -79,6 +95,11 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                     <Row className="justify-content-md-center">
                         <Col xs="auto">
                             <Button variant="success" className='mt-5' onClick={() => handleSubmit()}>Submit</Button>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-md-center">
+                        <Col xs="auto">
+                            <Button variant="danger" className='mt-5' onClick={() => handleHintRequest()}>Get help</Button>
                         </Col>
                     </Row>
                 </Container>

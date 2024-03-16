@@ -15,6 +15,11 @@ interface CheckAnswerRequest extends Request{
         puzzleId: string;
     }
 }
+interface HintRequest extends Request{
+    query: {
+        puzzleId: string;
+    }
+}
 
 SlidePuzzleRouter.patch('/movePiece', (req: MovePieceRequest, res: Response) => {
     //error check the body query parameters
@@ -38,12 +43,7 @@ SlidePuzzleRouter.patch('/movePiece', (req: MovePieceRequest, res: Response) => 
         const row: number = req.body.row;
         const col: number = req.body.col;
 
-        if (puzzle.tryMovePiece(puzzle.pieces[row][col])){
-            res.status(200).send({puzzle});
-        }else{
-            console.log('failed slide puzzle movement request', req.body);
-            res.status(400).send('Invalid move.');
-        }
+        res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col]), puzzle: puzzle});        
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
@@ -62,6 +62,24 @@ SlidePuzzleRouter.post('/checkAnswer', (req: CheckAnswerRequest, res: Response) 
             return;
         }
         res.status(200).send(puzzle.checkAnswer());
+    }catch(error: any){
+        res.status(500).send('Internal server error' + error.message);
+    }
+});
+
+SlidePuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
+    try{
+        const puzzleId = req.query.puzzleId;
+        if (puzzleId === undefined) {
+            res.status(400).send("The puzzleId parameter is missing");
+            return;
+        }
+        const puzzle = SlidePuzzle.get(puzzleId);
+        if (puzzle === undefined) {
+            res.status(404).send("The puzzleId parameter is invalid");
+            return;
+        }
+        res.status(200).send({isSuccessful: puzzle.getHint(), puzzle: puzzle});
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
