@@ -33,7 +33,8 @@ export class SlidePuzzle implements Puzzle{
         for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
             for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
                 if (i === this.rows - (1+this.hintLevel) && j === this.cols - (1+this.hintLevel)){
-                    break;
+                    console.log('skipping: ', i, j, this.pieces[i][j]);
+                    continue;
                 }
                 if (this.pieces[i][j] === null){ //if there is a null not at the last space
                     return false;
@@ -46,7 +47,6 @@ export class SlidePuzzle implements Puzzle{
             }
         }
         this.solved = true; //can be set to true even if it was true before
-        
         return true;
     }
 
@@ -61,7 +61,6 @@ export class SlidePuzzle implements Puzzle{
                     }else if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hintLevel)){
                         this.pieces[i][j] = null;
                         console.log("Hint used");
-                        console.log(this.pieces);
                         return true;
                     }
                 }
@@ -138,11 +137,16 @@ export class SlidePuzzle implements Puzzle{
 }
 /*
 RULES FOR SOLVABLE SLIDE PUZZLES:
-
+IF WIDTH IS EVEN:
 1. The inversion count of a puzzle is the number of 
     pairs of tiles when a tile with a higher number 
     appears before a tile with a lower number is even.
 
 2. The blank tile must be on an even row counting from the 
     bottom (always first row from the bottom in this case).
+
+IF WIDTH IS ODD:
+1. The inversion count of a puzzle is the number of 
+    pairs of tiles when a tile with a higher number 
+    appears before a tile with a lower number is even.
 */

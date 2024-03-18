@@ -21,6 +21,7 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
         try{
             const response = await axios.patch<PatchResponse>(`http://localhost:8080/slidePuzzles/movePiece`, {row, col, puzzleId: puzzle.id});
             if (response.data.isSuccessful) {
+                console.log(response.data.puzzle);
                 setPuzzle(response.data.puzzle);
             }else{
                 console.log('Invalid move');
