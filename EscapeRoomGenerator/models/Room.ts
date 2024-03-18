@@ -20,7 +20,7 @@ export class Room {
     is_unlocked: boolean;
     slots: Puzzle[];
 
-    constructor(x: number, y: number, slots: number) {
+    constructor(x: number, y: number, slots: number, difficulty: number) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
@@ -33,7 +33,7 @@ export class Room {
             return frequencies<() => Puzzle>([
                 [1, () => new Anagram(5)], 
                 [1, () => new LettersMathPuzzle()], 
-                [1, () => new OperatorMathPuzzle()]
+                [1, () => new OperatorMathPuzzle(difficulty)]
             ])()
         });
         Room.rooms[this.id] = this;
@@ -43,7 +43,7 @@ export class Room {
         return Room.rooms[roomId]
     }
 
-    static createRooms(nr_of_rooms: number, slots_in_room: number): Room[] {
+    static createRooms(nr_of_rooms: number, slots_in_room: number, difficulty: number): Room[] {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
@@ -54,7 +54,7 @@ export class Room {
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
     
-            rooms.push(new Room(...pos, slots_in_room));
+            rooms.push(new Room(...pos, slots_in_room, difficulty));
             visited.add(`${pos[0]},${pos[1]}`);
     
             around(pos).forEach((pos) => {

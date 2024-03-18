@@ -1,11 +1,13 @@
 // @ts-ignore
 import express, { Express, Request, Response } from "express";
 import  { EscapeRoom } from './models/EscapeRoom'
+// @ts-ignore
 import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
 import { MastermindPuzzleRouter } from "./routers/MastermindPuzzleRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
+import {Timer} from "./models/Timer";
 
 
 const app: Express = express();

@@ -13,9 +13,11 @@ export class Anagram implements Puzzle {
     description: string = 'Find the hidden word';
     hintLevel: number = 0;
     solved: boolean = false;
+    estimatedTime: number;
 
     constructor(estimatedTime: number) {
-        this.question = this.getQuestion(estimatedTime);
+        this.estimatedTime = estimatedTime
+        this.question = this.getQuestion();
         Anagram.puzzles[this.id] = this
     }
 
@@ -58,12 +60,12 @@ export class Anagram implements Puzzle {
         return res
     }
 
-    getQuestion(estimatedTime: number): string {
+    getQuestion(): string {
         let minLength: number;
         let maxLength: number;
-        if (estimatedTime >= 1 && estimatedTime <= 3) {
+        if (this.estimatedTime >= 1 && this.estimatedTime <= 3) {
             [minLength, maxLength] = [3, 4];
-        } else if (estimatedTime >= 4 && estimatedTime <= 7) {
+        } else if (this.estimatedTime >= 4 && this.estimatedTime <= 7) {
             [minLength, maxLength] = [5, 6];
         } else {
             [minLength, maxLength] = [7, 8];

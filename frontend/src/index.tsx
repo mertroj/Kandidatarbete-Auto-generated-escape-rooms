@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 import HomePage from './routes/HomePage';
 import PuzzleStart from './routes/EscapeRoomPage';
+import ResultScreenPage from "./routes/ResultScreenPage";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     path: "/escaperoom/:gameId",
     element: <PuzzleStart/>
   },
+  {
+    path: "/escaperoom/:gameId/result",
+    element: <ResultScreenPage/>
+  }
 ]);
 
 const root = ReactDOM.createRoot(
