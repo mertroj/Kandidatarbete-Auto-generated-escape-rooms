@@ -26,6 +26,7 @@ export class MastermindPuzzle implements Puzzle {
     description: string = 'Figure out the 3 digit combination';
     hintLevel: number = 2;
     solved: boolean = false;
+    estimatedTime: number = 3; //TODO - Testing
     private hints: string[] = ['The solution is: ', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
                             'After each guess some numbers change colours, maybe that means something'];

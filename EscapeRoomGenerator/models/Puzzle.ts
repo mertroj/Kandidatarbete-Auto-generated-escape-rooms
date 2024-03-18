@@ -5,4 +5,5 @@ export interface Puzzle {
     description: string;
     hintLevel: number;
     solved: boolean;
+    estimatedTime: number;
 }

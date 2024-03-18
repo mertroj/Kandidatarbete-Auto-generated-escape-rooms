@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Room } from './Room';
+import {Timer} from "./Timer";
 
 
 export class EscapeRoom {
@@ -7,15 +8,17 @@ export class EscapeRoom {
 
     id: string;
     rooms: Room[];
-    // TODO: add timestamp of creation
+    timer: Timer;
     
     constructor(players: number, difficulty: number) {
         let nr_of_rooms = players+difficulty;
         let slots_in_room = 5+difficulty;
         this.id = uuidv4();
-        this.rooms = Room.createRooms(nr_of_rooms, slots_in_room)
+        this.rooms = Room.createRooms(nr_of_rooms, slots_in_room, difficulty)
         this.rooms[0].is_unlocked = true
         EscapeRoom.escapeRooms[this.id] = this
+        this.timer = new Timer()
+        this.timer.start()
     }
 
     static get(gameId: string) : EscapeRoom | null {
@@ -25,7 +28,8 @@ export class EscapeRoom {
         return {
             id: gameId, 
             rooms: EscapeRoom.escapeRooms[gameId].rooms
-                        .filter((room) => room.is_unlocked)
+                        .filter((room) => room.is_unlocked),
+            timer: EscapeRoom.escapeRooms[gameId].timer
         }
     }
 }
