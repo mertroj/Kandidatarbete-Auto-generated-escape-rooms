@@ -34,7 +34,7 @@ export class Room {
                 [1, () => new Anagram(5)], 
                 [1, () => new LettersMathPuzzle()], 
                 [1, () => new OperatorMathPuzzle(difficulty)],
-                [1, () => new SlidePuzzle(difficulty)]
+                [10, () => new SlidePuzzle(difficulty)]
             ])()
         });
         Room.rooms[this.id] = this;

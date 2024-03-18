@@ -30,10 +30,10 @@ export class SlidePuzzle implements Puzzle{
 
     checkAnswer(): boolean {
         let previousNumber: number = 0; //numbers start at 1
-        for (let i = 0; i < this.rows; i++){
-            for (let j = 0; j < this.cols; j++){
-                if (i === this.rows - 1 && j === this.cols - 1 && this.pieces[i][j] === null){
-                    continue;
+        for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
+            for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
+                if (i === this.rows - (1+this.hintLevel) && j === this.cols - (1+this.hintLevel)){
+                    break;
                 }
                 if (this.pieces[i][j] === null){ //if there is a null not at the last space
                     return false;
@@ -46,11 +46,29 @@ export class SlidePuzzle implements Puzzle{
             }
         }
         this.solved = true; //can be set to true even if it was true before
+        
         return true;
     }
 
     //TODO: Implement hint system
     getHint(): boolean{
+        //replace the biggest number with the null piece
+        if (this.hintLevel < 2){
+            for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
+                for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
+                    if (this.pieces[i][j] === null){
+                        continue;
+                    }else if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hintLevel)){
+                        this.pieces[i][j] = null;
+                        console.log("Hint used");
+                        console.log(this.pieces);
+                        return true;
+                    }
+                }
+            }
+            this.hintLevel++;
+        }
+        console.log("No hint available");
         return false;
     }
 
