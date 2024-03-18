@@ -10,12 +10,9 @@ const JigsawTest: React.FC = () => {
     let SIZE = { x: 0, y: 0, width: 0, height: 0 };
 
     async function jigsawImage() {
-
-
-
         // Fetch the image URL from the backend
-        console.log("Fetching image")
-        const response = await fetch('http://localhost:8080/escaperoom/jigsawtest/image');
+        console.log("Fetching image");
+        const response = await fetch('http://localhost:8080/jigsawtest/image');
         console.log(response);
         console.log("Fetched image");
         if (response.ok) {
