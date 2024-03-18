@@ -48,7 +48,8 @@ function HomePage() {
                     If you ever feel stuck just click on the “Hint” button on the right side of the page.
                 </p>
             </Row>
-            <form className='d-flex justify-content-center flex-column align-items-center' onSubmit={e => startEscapeRoom(e)}>
+            <form className='d-flex justify-content-center flex-column align-items-center'
+                  onSubmit={e => startEscapeRoom(e)}>
                 <div className='w-100 d-flex justify-content-around'>
                     <select
                         name="players"
@@ -86,7 +87,9 @@ function HomePage() {
                 <input type="text" placeholder='Enter gamecode here' onChange={(e) => joinGameTextChange(e)}/>
                 <button onClick={joinGame}>Join game</button>
             </div>
+            <a href={"/escaperoom/jigsawtest"}>Jigsaw Test</a>
         </div>
+
 
     );
 }
