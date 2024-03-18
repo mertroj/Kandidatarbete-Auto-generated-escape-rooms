@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Room } from '../../interfaces';
 import Anagram from "../Puzzles/Anagram";
-import MastermindPuzzle from '../Puzzles/MastermindPuzzle';
+import MastermindPuzzle from "../Puzzles/MastermindPuzzle";
 import LettersMathPuzzle from "../Puzzles/LettersMathPuzzle";
 import OperatorMathPuzzle from "../Puzzles/OperatorMathPuzzle";
 import './RoomComponent.css'

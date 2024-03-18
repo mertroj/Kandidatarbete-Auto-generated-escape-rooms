@@ -5,7 +5,4 @@ export interface Puzzle {
     description: string;
     hintLevel: number;
     solved: boolean;
-
-    getHint(): string;
-    checkAnswer(answer: string): boolean;
 }

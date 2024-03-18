@@ -1,8 +1,6 @@
-import { arrayBuffer } from "stream/consumers";
 import { MastermindPuzzle } from "../models/MastermindPuzzles";
 import express, { Request, Response } from "express";
 
-const puzzle = new MastermindPuzzle();
 export const MastermindPuzzleRouter = express.Router();
 
 

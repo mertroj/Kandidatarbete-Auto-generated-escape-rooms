@@ -10,19 +10,19 @@ function generateNumbers(){ //Generate an array of 3 random numbers
 }
 
 function stringToNumberArray(string: string): Number[]{
-    let numbers : Number[] = new Array(3);
+    let numbers : Number[] = new Array(string.length);
     for(let i = 0; i < string.length; i++){
         numbers[i] = +string.charAt(i);
     }
     return numbers;
 }
 
-export class MastermindPuzzle {
+export class MastermindPuzzle implements Puzzle {
     private static puzzles: {[key: string]: MastermindPuzzle} = {}
 
     id: string = uuidv4();
-    type: string = 'mastermind';
-    question: string;
+    type: string = 'mastermindPuzzle';
+    question: string = '';
     description: string = 'Figure out the 3 digit combination';
     hintLevel: number = 2;
     solved: boolean = false;
@@ -59,16 +59,16 @@ export class MastermindPuzzle {
     }
 
     checkAnswer(answer: string): Number[]{
-        let bools: Number[] = new Array(this.getSolution.length);
+        let bools: Number[] = new Array(this.solution.length);
         let numAns = stringToNumberArray(answer);
 
-        for(let i = 0; i < this.getSolution.length; i++){
+        for(let i = 0; i < this.solution.length; i++){
             bools[i] = 2; //Base value 2 for incorrect
-            if(numAns[i] == this.getSolution[i]) //If correct set 0
+            if(numAns[i] == this.solution[i]) //If correct set 0
                 bools[i] = 0;
             else
-                for(let j = 0; j < this.getSolution.length; j++){
-                    if(numAns[i] == this.getSolution[j]) //if somewhere is correct set 1
+                for(let j = 0; j < this.solution.length; j++){
+                    if(numAns[i] == this.solution[j]) //if somewhere is correct set 1
                         bools[i] = 1; 
                     }
             }
