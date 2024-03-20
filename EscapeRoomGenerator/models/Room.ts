@@ -33,7 +33,7 @@ export class Room {
             return frequencies<() => Puzzle>([
                 [1, () => new Anagram(5)], 
                 [1, () => new LettersMathPuzzle()], 
-                [1, () => new MastermindPuzzle()], 
+                [1, () => new MastermindPuzzle(difficulty)], 
                 [1, () => new OperatorMathPuzzle(difficulty)]
             ])()
         });

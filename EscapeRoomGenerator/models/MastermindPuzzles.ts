@@ -1,8 +1,8 @@
 import { Puzzle } from "./Puzzle";
 import { v4 as uuidv4 } from 'uuid';
 
-function generateNumbers(){ //Generate an array of 3 random numbers
-    let numbers : Number[] = new Array(3);
+function generateNumbers(difficulty: number){ //Generate an array of 3 random numbers
+    let numbers : Number[] = new Array(difficulty);
     for(let i = 0; i < 3; i++){
         numbers[i] = Math.floor(Math.random() * 9)
     }
@@ -23,8 +23,9 @@ export class MastermindPuzzle implements Puzzle {
     id: string = uuidv4();
     type: string = 'mastermindPuzzle';
     question: string = '';
-    description: string = 'Figure out the 3 digit combination';
+    description: string;
     hintLevel: number = 2;
+    difficulty: number; //Decides the length of the array - Easy: 3 | Medium: 4 | Hard: 5
     solved: boolean = false;
     estimatedTime: number = 3; //TODO - Testing
     private hints: string[] = ['The solution is: ', 
@@ -32,9 +33,11 @@ export class MastermindPuzzle implements Puzzle {
                             'After each guess some numbers change colours, maybe that means something'];
     solution: Number[];
     
-    constructor(){
-        this.solution = generateNumbers();
+    constructor(diff: number){
+        this.difficulty = diff + 2;
+        this.solution = generateNumbers(this.difficulty);
         MastermindPuzzle.puzzles[this.id] = this
+        this.description = 'Figure out the ' + this.difficulty + ' digit combination';
     }
 
     static get(puzzleId: string): MastermindPuzzle {
