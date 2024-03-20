@@ -3,48 +3,59 @@ import React, { useEffect, useRef, useState } from 'react';
 const JigsawTest: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+    const [loadingError, setLoadingError] = useState<string | null>(null);
+    const [canvasResized, setCanvasResized] = useState<boolean>(false); // Track whether canvas has been resized
     let IMAGE: HTMLImageElement | null = null;
-    let CANVAS: HTMLCanvasElement | null = null;
     let CONTEXT: CanvasRenderingContext2D | null = null;
     let SCALAR = 0.6;
     let SIZE = { x: 0, y: 0, width: 0, height: 0 };
 
     async function jigsawImage() {
-        // Fetch the image URL from the backend
-        console.log("Fetching image");
-        const response = await fetch('http://localhost:8080/jigsawtest/image');
-        console.log(response);
-        console.log("Fetched image");
-        if (response.ok) {
-            const blob = await response.blob();
-            const imageUrl = URL.createObjectURL(blob);
+        try {
+            const response = await fetch('http://localhost:8080/jigsawtest/image');
+            if (response.ok) {
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
 
-            // Load the image
-            IMAGE = new Image();
-            IMAGE.src = imageUrl;
+                IMAGE = new Image();
+                IMAGE.src = imageUrl;
 
-            IMAGE.onload = function () {
-                handleResize();
-                setImageLoaded(true);
-                window.addEventListener("resize", handleResize);
-                updateCanvas();
-            };
-            CANVAS = document.getElementById("canvasRef") as HTMLCanvasElement;
-            CONTEXT = CANVAS.getContext("2d");
-        } else {
-            console.error('Failed to fetch image');
+                IMAGE.onload = function () {
+                    handleResize(); // Resize canvas after image load
+                    setImageLoaded(true);
+                    setLoadingError(null);
+                    window.addEventListener("resize", handleResize);
+                };
+
+                IMAGE.onerror = function () {
+                    setLoadingError('Error loading image');
+                };
+            } else {
+                setLoadingError('Failed to fetch image');
+            }
+        } catch (error) {
+            setLoadingError('Error fetching image');
+            console.error('Error fetching image:', error);
         }
     }
 
     useEffect(() => {
         jigsawImage();
-        console.log(imageLoaded);
     }, []);
 
+    useEffect(() => {
+        // Resize canvas once after image has loaded
+        if (imageLoaded && !canvasResized) {
+            handleResize();
+            setCanvasResized(true);
+        }
+    }, [imageLoaded, canvasResized]);
+
     function handleResize() {
-        if (CANVAS && IMAGE) {
-            CANVAS.width = window.innerWidth;
-            CANVAS.height = window.innerHeight;
+        if (canvasRef.current && IMAGE) {
+            const canvas = canvasRef.current;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
             let resizer = SCALAR *
                 Math.min(
@@ -55,22 +66,25 @@ const JigsawTest: React.FC = () => {
             SIZE.height = IMAGE.height * resizer;
             SIZE.x = window.innerWidth / 2 - SIZE.width / 2;
             SIZE.y = window.innerHeight / 2 - SIZE.height / 2;
+
+            CONTEXT = canvas.getContext("2d");
+            if (CONTEXT && IMAGE) {
+                redrawImage();
+            }
         }
     }
 
-    function updateCanvas() {
+    function redrawImage() {
         if (CONTEXT && IMAGE) {
+            CONTEXT.clearRect(0, 0, window.innerWidth, window.innerHeight);
             CONTEXT.drawImage(IMAGE, 0, 0, SIZE.width, SIZE.height);
-            window.requestAnimationFrame(updateCanvas);
         }
     }
 
     return (
         <div>
-            {imageLoaded && (
-
-                <canvas id="canvasRef" width={window.innerWidth} height={window.innerHeight}></canvas>
-            )}
+            {loadingError && <div>{loadingError}</div>}
+            <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
         </div>
     );
 };

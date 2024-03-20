@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
-app.use('/anagrams', AnagramRouter); // TODO: change placeholder
+app.use('/anagrams', AnagramRouter);
 app.use('/jigsawtest', JigsawRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
