@@ -30,21 +30,16 @@ export class SlidePuzzle implements Puzzle{
 
     checkAnswer(): boolean {
         let previousNumber: number = 0; //numbers start at 1
-        for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-            for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-                if (i === this.rows - (1+this.hintLevel) && j === this.cols - (1+this.hintLevel)){
-                    console.log('skipping: ', i, j, this.pieces[i][j]);
-                    continue;
-                }
-                if (this.pieces[i][j] === null){ //if there is a null not at the last space
-                    return false;
-                }
-                let tempNumber = this.pieces[i][j]!.number; //safe since we checked for null above
-                if (tempNumber < previousNumber){
-                    return false;
-                }
-                previousNumber = tempNumber;
+        let flattenedPieces = this.pieces.flat();
+        for (let i = 0; i < flattenedPieces.length - (1+this.hintLevel); i++){ 
+            if (flattenedPieces[i] === null){ //if there is a null not at the last space
+                return false;
             }
+            let tempNumber = flattenedPieces[i]!.number; //safe since we checked for null above
+            if (tempNumber < previousNumber){
+                return false;
+            }
+            previousNumber = tempNumber;
         }
         this.solved = true; //can be set to true even if it was true before
         return true;
@@ -60,14 +55,12 @@ export class SlidePuzzle implements Puzzle{
                         continue;
                     }else if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hintLevel)){
                         this.pieces[i][j] = null;
-                        console.log("Hint used");
+                        this.hintLevel++;
                         return true;
                     }
                 }
             }
-            this.hintLevel++;
         }
-        console.log("No hint available");
         return false;
     }
 
@@ -104,17 +97,23 @@ export class SlidePuzzle implements Puzzle{
         return SlidePuzzle.puzzles[puzzleId];
     }
     
-    movePiece(piece: Piece | null): boolean {
+    movePiece(piece: Piece | null, newPos?: Position): boolean {
         if (piece === null){
             return false;
         }
-        const possiblePositions = [
-            { x: piece.position.x - 1, y: piece.position.y }, //up
-            { x: piece.position.x + 1, y: piece.position.y }, //down
-            { x: piece.position.x, y: piece.position.y - 1 }, //left
-            { x: piece.position.x, y: piece.position.y + 1 }, //right
-        ];
-        const newPos = possiblePositions.find(pos => this.checkValidMove(pos));
+        if(newPos === undefined){
+            const possiblePositions = [
+                { x: piece.position.x - 1, y: piece.position.y }, //up
+                { x: piece.position.x + 1, y: piece.position.y }, //down
+                { x: piece.position.x, y: piece.position.y - 1 }, //left
+                { x: piece.position.x, y: piece.position.y + 1 }, //right
+            ];
+            newPos = possiblePositions.find(pos => this.checkValidMove(pos));
+        }else{
+            if (!this.checkValidMove(newPos)){
+                return false;
+            }
+        }
     
         if (newPos) {
             this.pieces[piece.position.x][piece.position.y] = null;
@@ -150,3 +149,5 @@ IF WIDTH IS ODD:
     pairs of tiles when a tile with a higher number 
     appears before a tile with a lower number is even.
 */
+
+//TODO: possible to add a move counter on the popup

@@ -1,0 +1,51 @@
+.cell-button{
+    position: relative;
+    display: flex;
+    border: 1px solid DodgerBlue;
+    border-radius: 0.5em;
+    width:4em;
+    height: 4em;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 2em 0;
+    transition: background-color 0.3s;
+}
+.cell-button:hover{
+    /*main button*/
+}
+.arrow{
+    position: absolute;
+}
+.arrow:hover{
+    border-radius: 0.4em 0.4em 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: dodgerblue;
+    cursor: pointer
+}
+.arrow.left:hover, .arrow.right:hover{
+    height: 100%;
+    width: 35%;
+}
+.arrow.left, .arrow.right{
+    top: 50%;
+    transform: translateY(-50%);
+}
+.arrow.up:hover, .arrow.down:hover{
+    width: 100%;
+}
+.arrow.up{
+    border-radius: 0.4em 0.4em 0 0;
+}
+.arrow.down{
+    border-radius: 0 0 0.4em 0.4em;
+}
+.arrow.right{
+    border-radius: 0 0.4em 0.4em 0;
+}
+.arrow.left{
+    border-radius: 0.4em 0 0 0.4em;
+}

@@ -1,13 +1,15 @@
 import express, { Request, Response } from "express";
 import { SlidePuzzle } from "../models/SlidePuzzle/SlidePuzzle";
+import { Position } from "../models/SlidePuzzle/Position";
 
 export const SlidePuzzleRouter = express.Router();
 
 interface MovePieceRequest extends Request{
     body: {
-        row: number;
-        col: number;
+        pos: [number, number];
+        newPos?: [number, number];
         puzzleId: string;
+        autoMove: boolean;
     }
 }
 interface CheckAnswerRequest extends Request{
@@ -27,11 +29,11 @@ SlidePuzzleRouter.patch('/movePiece', (req: MovePieceRequest, res: Response) => 
         if (req.body.puzzleId === undefined) {
             res.status(400).send("The puzzleId parameter is missing");
             return;
-        }else if (req.body.row === undefined) {
-            res.status(400).send("The row parameter is missing");
+        }else if (req.body.pos === undefined || req.body.pos[0] === undefined || req.body.pos[1] === undefined) {
+            res.status(400).send("The pos parameter is missing");
             return;
-        }else if (req.body.col === undefined) {
-            res.status(400).send("The col parameter is missing");
+        }else if (!req.body.autoMove && (req.body.newPos === undefined || req.body.newPos[0] === undefined || req.body.newPos[1] === undefined)) {
+            res.status(400).send("The newPos parameter is missing");
             return;
         }
         let puzzle: SlidePuzzle = SlidePuzzle.get(req.body.puzzleId);
@@ -40,10 +42,15 @@ SlidePuzzleRouter.patch('/movePiece', (req: MovePieceRequest, res: Response) => 
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        const row: number = req.body.row;
-        const col: number = req.body.col;
+        const row: number = req.body.pos[0];
+        const col: number = req.body.pos[1];
+        if(!req.body.autoMove){
+            const newPos = new Position(req.body.newPos![0], req.body.newPos![1]); //safe to use ! since we check for undefined above
+            res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col], newPos), puzzle: puzzle});
+        }else{
+            res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col]), puzzle: puzzle});
+        }
 
-        res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col]), puzzle: puzzle});        
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
