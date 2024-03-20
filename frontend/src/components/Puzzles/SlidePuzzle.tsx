@@ -119,7 +119,11 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                                             if (cell !== null) e.currentTarget.style.color = 'black';
                                         }
                                     }}
-                                    onClick={(e) => handleClick(i, j, e, true)}
+                                    onClick={(e) => {
+                                        if (updatedPuzzle.hintLevel === 0){
+                                            handleClick(i, j, e, true);
+                                        }
+                                    }}
                                 >
                                     <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
                                     <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
@@ -133,12 +137,12 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
                     ))}
                     <Row className="justify-content-md-center">
                         <Col xs="auto">
-                            <Button variant="success" className='mt-5' onClick={() => handleSubmit()}>Submit</Button>
+                            <Button variant="success" className='mt-3' onClick={() => handleSubmit()}>Submit</Button>
                         </Col>
                     </Row>
                     <Row className="justify-content-md-center">
                         <Col xs="auto">
-                            <Button variant="danger" className='mt-5' onClick={() => handleHintRequest()}>Get help</Button>
+                            <Button variant="danger" className='mt-1' onClick={() => handleHintRequest()}>Get help</Button>
                         </Col>
                     </Row>
                 </Container>

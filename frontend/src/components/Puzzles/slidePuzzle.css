@@ -11,11 +11,14 @@
     margin: 0 0 2em 0;
     transition: background-color 0.3s;
 }
+/*
 .cell-button:hover{
-    /*main button*/
+    the general div cell component
 }
+*/
 .arrow{
     position: absolute;
+    font-size: 12px;
 }
 .arrow:hover{
     border-radius: 0.4em 0.4em 0 0;
@@ -29,6 +32,7 @@
 .arrow.left:hover, .arrow.right:hover{
     height: 100%;
     width: 35%;
+    font-size: 15px;
 }
 .arrow.left, .arrow.right{
     top: 50%;
@@ -36,16 +40,25 @@
 }
 .arrow.up:hover, .arrow.down:hover{
     width: 100%;
+    height: 35%;
+    font-size: 15px;
 }
 .arrow.up{
     border-radius: 0.4em 0.4em 0 0;
+    width: 50%;
 }
 .arrow.down{
     border-radius: 0 0 0.4em 0.4em;
+    width: 50%;
 }
 .arrow.right{
     border-radius: 0 0.4em 0.4em 0;
+    height: 30%;
 }
 .arrow.left{
     border-radius: 0.4em 0 0 0.4em;
+    height: 30%;
+}
+body{
+    min-width: 1000px;
 }
