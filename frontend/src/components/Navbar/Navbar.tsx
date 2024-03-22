@@ -23,7 +23,7 @@ function Navbar () {
 
     return (
         <div className='w-100 d-flex justify-content-center navbar'>
-            {image ? <a href="/"><img src={image.src} alt='logo' /> </a> : null}
+            {/*image ? <a href="/"><img src={image.src} alt='logo' /> </a> : null*/}
             {/*<a href="/">Home</a>*/}
         </div>
     );

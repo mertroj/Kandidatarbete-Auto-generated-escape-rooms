@@ -1,46 +1,33 @@
 import express, { Request, Response } from "express";
 import path from "path";
+import { Theme } from "../models/Theme";
+import { EscapeRoom } from "../models/EscapeRoom";
 
 export const ImageRouter = express.Router();
 const imagesData = require('../themedImages.json')
 
-enum Theme {
-    MAGICALWORKSHOP = "Magical Workshop",
-    PHAROAHTOMB = "Pharoah's Tomb"
-}
 interface ImageRequest extends Request {
     query: {
-        theme: Theme //requires us to redeclare the Theme enum in the frontend
+        gameId: string;
     }
 }
 
-ImageRouter.get("/themeImage", async (req: ImageRequest, res: Response) => {
+ImageRouter.get("/themeImage", async (req: Request, res: Response) => {
     try{
-        if(req.query.theme === undefined) {
-            res.status(400).send("Theme query parameter is missing");
-            return;
+        if (req.query.gameId === undefined || req.query.gameId === "") {
+            res.status(400).send("The gameId parameter is missing")
+            return
         }
-        else {
-            let images: string[];
-            let randomImage: string;
-            switch(req.query.theme) {
-                case Theme.MAGICALWORKSHOP:
-                    images = imagesData[Theme.MAGICALWORKSHOP];
-                    randomImage = images[Math.floor(Math.random() * images.length)];
-                    console.log(randomImage);
-                    res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
-                    break;
-                case Theme.PHAROAHTOMB:
-                    images = imagesData[Theme.PHAROAHTOMB];
-                    randomImage = images[Math.floor(Math.random() * images.length)];
-                    console.log(randomImage);
-                    res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
-                    break;
-                default:
-                    res.status(404).send("Invalid theme query parameter");
-                    return;
-            }
+        const gameId = String(req.query.gameId)
+        const escapeRoom = EscapeRoom.get(gameId)
+        if (escapeRoom === undefined || escapeRoom === null) {
+            res.status(404).send("The gameId parameter is invalid")
+            return
         }
+        const images = imagesData[escapeRoom.theme];
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+        console.log(randomImage);
+        res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
     } catch (error) {
         res.status(500).send("Internal server error");
     }

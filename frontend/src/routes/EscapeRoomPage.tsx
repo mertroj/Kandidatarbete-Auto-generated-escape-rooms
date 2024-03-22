@@ -13,8 +13,15 @@ function EscapeRoomPage() {
     const [hintsList, setHintsList] = useState<string[]>([])
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
     const [currentRoom, setCurrentRoom] = useState<Room>()
+    const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
+    async function fetchImage() {
+        const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
+        const blob = await response.blob();
+        const objectURL = URL.createObjectURL(blob);
+        setBackgroundImageURL(objectURL);
+    }
 
     function addHint(hint: string) {
         setHintsList(hintsList => [...hintsList, hint])
@@ -45,18 +52,37 @@ function EscapeRoomPage() {
 
     useEffect(() => {
         fetchEscapeRoom()
-    }, [])
+    }, []);
+    
+    useEffect(() => {
+        if(!backgroundImageURL){
+            fetchImage();
+        }
+    }, [gameId]);
     
     return (
         <div className="d-flex w-100">
-            <div className="w-100 d-flex flex-column justify-content-between mh-100">
-                <Navbar/>
+            <img 
+                src={backgroundImageURL} 
+                alt="background image" 
+                style={{
+                    opacity:'60%', 
+                    position:'absolute',
+                    top:'0',
+                    left:'0',
+                    width:'100%',
+                    height:'auto',
+                    zIndex:'-1'
+            }}/>
+            <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
+                {/*<Navbar/>*/}
                 {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
-                
+                {/*
                 <Row>
-                    {/* Using the constructed URL. To be removed and be redirected automatically when done */}
+                    {/* Using the constructed URL. To be removed and be redirected automatically when done *}
                     <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
                 </Row>
+                */}
 
             </div>
 
