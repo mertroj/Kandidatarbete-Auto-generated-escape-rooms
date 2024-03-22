@@ -28,6 +28,16 @@ function RoomComponent ({room, addHint}: {room: Room, addHint: Function}) {
     }, [room])
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
+            <img src="https://th.bing.com/th/id/OIG3..dK0wbzBpj1oWLQDrX.n?w=270&h=270&c=6&r=0&o=5&dpr=2&pid=ImgGn" alt="" 
+            style={{
+                opacity:'50%', 
+                position:'absolute',
+                top:'0',
+                left:'0',
+                width:'100%',
+                height:'auto',
+                zIndex:'-1'
+            }}/>
             {puzzles}
         </div>
     );

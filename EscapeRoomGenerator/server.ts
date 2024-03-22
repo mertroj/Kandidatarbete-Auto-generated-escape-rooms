@@ -7,6 +7,7 @@ import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 import {Timer} from "./models/Timer";
+import { ImageRouter } from "./routers/ImageRouter";
 
 
 const app: Express = express();
@@ -17,6 +18,7 @@ app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/anagrams', AnagramRouter); // TODO: change placeholder
+app.use('/images', ImageRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players))

@@ -6,6 +6,7 @@ import Hinting from "../components/Hinting/hinting";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
 import Navbar from '../components/Navbar/Navbar';
 import {Row} from "react-bootstrap";
+import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
@@ -51,29 +52,26 @@ function EscapeRoomPage() {
             <div className="w-100 d-flex flex-column justify-content-between mh-100">
                 <Navbar/>
                 {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
-
-                {currentRoom && escapeRoom ? <div className="d-flex justify-content-center">
-
-                    {currentRoom.left ? <button onClick={moveLeft} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button> : null}
-
-                    {currentRoom.right ? <button onClick={moveRight} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button> : null}
-
-                    {currentRoom.up ? <button onClick={moveUp} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button> : null}
-
-                    {currentRoom.down ? <button onClick={moveDown} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button> : null}
-
-                </div> : null}
                 
-                <p className="w-100">Game ID: {gameId}</p>
-
                 <Row>
-                    {/* Using the constructed URL */}
+                    {/* Using the constructed URL. To be removed and be redirected automatically when done */}
                     <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
                 </Row>
 
             </div>
 
-            <Hinting hintsList={hintsList} />
+            <div className="panel-container">
+                <Hinting hintsList={hintsList} />
+                <NavigationPanel 
+                    gameId={gameId} 
+                    currentRoom={currentRoom}
+                    escapeRoom={escapeRoom}
+                    moveLeft={moveLeft}
+                    moveRight={moveRight}
+                    moveUp={moveUp}
+                    moveDown={moveDown}
+                />
+            </div>
         </div>
     );
 }
