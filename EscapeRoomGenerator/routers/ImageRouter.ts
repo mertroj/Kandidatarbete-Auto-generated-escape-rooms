@@ -26,7 +26,6 @@ ImageRouter.get("/themeImage", async (req: Request, res: Response) => {
         }
         const images = imagesData[escapeRoom.theme];
         const randomImage = images[Math.floor(Math.random() * images.length)];
-        console.log(randomImage);
         res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
     } catch (error) {
         res.status(500).send("Internal server error");

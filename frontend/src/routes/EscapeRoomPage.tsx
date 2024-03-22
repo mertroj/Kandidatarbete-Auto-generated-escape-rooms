@@ -77,12 +77,12 @@ function EscapeRoomPage() {
             <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
                 {/*<Navbar/>*/}
                 {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
-                {/*
-                <Row>
-                    {/* Using the constructed URL. To be removed and be redirected automatically when done *}
-                    <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
-                </Row>
-                */}
+
+                {
+                /*Using the constructed URL. 
+                TODO: To be removed and be redirected automatically when done */
+                }
+                <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
 
             </div>
 
