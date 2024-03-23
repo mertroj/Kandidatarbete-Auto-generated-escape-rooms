@@ -21,7 +21,6 @@ export class PuzzleFactory{
             dp.addObserver(puzzle);
         }
         return puzzle;
-        throw new Error("Not implemented");
     }
     static createRandomEndPuzzle(difficulty: number, dependentPuzzles: Puzzle[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles);
@@ -29,7 +28,6 @@ export class PuzzleFactory{
             dp.addObserver(puzzle);
         }
         return puzzle;
-        throw new Error("Not implemented");
         //Add Jigsaw puzzle
     }
 }
