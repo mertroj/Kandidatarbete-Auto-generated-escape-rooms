@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from './Helpers';
 import { Puzzle } from './Puzzle';
+import { shuffleArray } from './Helpers';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -132,14 +133,6 @@ export class LettersMathPuzzle implements Puzzle{
         let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
         return originalMapped - remainder === shuffledMapped;
     }
-}
-
-function shuffleArray<t>(array: t[]): t[] {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
 
 function mapNumbersToLetters(numbers: string, letters: string): string {

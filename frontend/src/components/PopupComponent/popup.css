@@ -5,7 +5,10 @@
     top: 10%;
     left: 10%;
     right: 10%;
-    bottom: 10%;
+    bottom: auto; /* Changed from 10% to auto */
+    max-height: 80%; /* Added max-height */
+    overflow-y: auto; /* Added overflow-y */
+
 }
 .overlay-background{
     top: 0;

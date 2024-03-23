@@ -11,24 +11,27 @@ export type Position =
 
 export interface PopupProps {
     trigger: JSX.Element; 
+    isOpen: boolean;
+    onOpen: () => void;
+    onClose: () => void;
     children: React.ReactNode;
 }
 function Popup (popupProps: PopupProps) {
-    const [isVisible, setIsVisible] = useState(false);
+
     return (
         <div>
-            <div onClick={() => setIsVisible(true)}>
+            <div onClick={popupProps.onOpen}>
                 {popupProps.trigger} {/* check that the position of the trigger in the component that uses popup isn't affected?*/ }
             </div>
 
-            {isVisible && (
+            {popupProps.isOpen && (
                 <div>
                     <div className='overlay-background'>
                     </div>
                     <div className='overlay'>
                         <div className='bg-light'>
                             <Navbar className='p-0 justify-content-end'>
-                                <Button style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={() => setIsVisible(false)} type='button' variant='outline-danger'></Button>
+                                <Button style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={popupProps.onClose} type='button' variant='outline-danger'></Button>
                             </Navbar>
                         </div>
                         <div className='m-5'>
