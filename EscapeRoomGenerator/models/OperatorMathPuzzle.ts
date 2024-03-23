@@ -14,6 +14,7 @@ export class OperatorMathPuzzle implements Puzzle{
     solved: boolean = false;
     estimatedTime: number;
     private numberOfOperands: number;
+    isLocked: boolean = false;
 
     constructor(difficulty: number) {
         this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard

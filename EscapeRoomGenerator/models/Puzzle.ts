@@ -6,4 +6,5 @@ export interface Puzzle {
     hintLevel: number;
     solved: boolean;
     estimatedTime: number;
+    isLocked: boolean; 
 }

@@ -7,16 +7,20 @@ const anagramsData = require('../anagrams.json')
 export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}
 
+    private difficulty: number;
     id: string = uuidv4();
     type: string = 'anagram';
     question: string;
     description: string = 'Find the hidden word';
     hintLevel: number = 0;
-    solved: boolean = false;
     estimatedTime: number;
+    solved: boolean = false;
+    
+    isLocked: boolean = false;
 
-    constructor(estimatedTime: number) {
-        this.estimatedTime = estimatedTime
+    constructor(difficulty: number) {
+        this.difficulty = difficulty;
+        this.estimatedTime = 2*this.difficulty;
         this.question = this.getQuestion();
         Anagram.puzzles[this.id] = this
     }
@@ -63,11 +67,11 @@ export class Anagram implements Puzzle {
     getQuestion(): string {
         let minLength: number;
         let maxLength: number;
-        if (this.estimatedTime >= 1 && this.estimatedTime <= 3) {
+        if (this.difficulty === 1) {
             [minLength, maxLength] = [3, 4];
-        } else if (this.estimatedTime >= 4 && this.estimatedTime <= 7) {
+        } else if (this.difficulty === 2) {
             [minLength, maxLength] = [5, 6];
-        } else {
+        } else { // difficulty === 3
             [minLength, maxLength] = [7, 8];
         }
         const randomLength = randomIntRange(minLength, maxLength+1);

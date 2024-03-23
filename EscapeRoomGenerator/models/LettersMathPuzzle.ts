@@ -14,6 +14,7 @@ export class LettersMathPuzzle implements Puzzle{
     hintLevel: number = 0;
     solved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
+    isLocked: boolean = false;
 
     constructor(){
         let [question, letters, mainAnswer, shuffledAnswer] = this.init();
