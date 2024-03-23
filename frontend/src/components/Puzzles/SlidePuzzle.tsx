@@ -3,7 +3,7 @@ import { SlidePuzzles } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
 import './slidePuzzle.css';
-import { Button, ButtonGroup, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 
 interface PatchResponse {
     isSuccessful: boolean;
@@ -19,8 +19,11 @@ enum Direction {
     LEFT = 'left',
     RIGHT = 'right'
 }
-
-function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
+interface SlidePuzzleProps {
+    puzzle: SlidePuzzles;
+    onSolve: Function;
+}
+function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzles>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -60,6 +63,7 @@ function SlidePuzzle ({puzzle}: {puzzle: SlidePuzzles}) {
             const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data){
                 alert('Correct!');
+                onSolve();
                 setIsOpen(false);
             }else{
                 alert('Incorrect');

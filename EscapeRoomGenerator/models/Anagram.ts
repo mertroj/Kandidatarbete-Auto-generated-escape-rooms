@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomInt, randomIntRange } from './Helpers'
-import { Puzzle } from './Puzzle';
+import { Observer, Puzzle } from './Puzzle';
 
 const anagramsData = require('../anagrams.json')
 
@@ -8,6 +8,7 @@ export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}
 
     private difficulty: number;
+    private observers: Observer[] = [];
     id: string = uuidv4();
     type: string = 'anagram';
     question: string;
@@ -15,8 +16,8 @@ export class Anagram implements Puzzle {
     hintLevel: number = 0;
     estimatedTime: number;
     solved: boolean = false;
-    
     isLocked: boolean = false;
+
 
     constructor(difficulty: number) {
         this.difficulty = difficulty;
@@ -31,6 +32,14 @@ export class Anagram implements Puzzle {
 
     private getAnswers(): string {
         return anagramsData[`${this.question.length}`].find((a: string[]) => a[0] == this.question)[1]
+    }
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update();
+        });
     }
 
     getHint(): string {
@@ -60,7 +69,8 @@ export class Anagram implements Puzzle {
         } else {
             res = answers.toLowerCase() === answerLowerCase;
         }
-        if (!this.solved) this.solved = res
+        if (!this.solved) this.solved = res;
+        if (res) this.notifyObservers();
         return res
     }
 

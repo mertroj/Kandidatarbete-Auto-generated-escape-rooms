@@ -1,5 +1,5 @@
 import {Edge, Graph} from "graphlib";
-import { DivergingTree } from "./DivergingTree";
+import { divergingTree } from "./DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 
@@ -15,6 +15,7 @@ class TimeoutError extends Error {
 }
 
 export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
+    console.log('Populating puzzle tree with required total time of the room: ', estimatedTime);
     let remainingTime: number = estimatedTime;
     let puzzleBox: Puzzle[] = [];
     while(true){
@@ -34,8 +35,10 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }
         }
     }
-    let graph: Graph = DivergingTree(puzzleBox.length) //To be replaced with a function that return a correct graph
+    let graph: Graph = divergingTree(puzzleBox.length) //To be replaced with a function that return a correct graph
     if(puzzleBox.length !== graph.nodeCount()-1){
+        console.log('puzzleBox length: ', puzzleBox.length);
+        console.log('graph nodes count: ', graph.nodeCount()-1);
         throw new Error("Diverging tree does not have as many nodes as required");
     }
     let nodes = graph.nodes();

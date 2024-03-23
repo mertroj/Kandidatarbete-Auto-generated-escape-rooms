@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { choice, randomIntRange } from './Helpers'
-import { Puzzle } from './Puzzle';
+import { Observer, Puzzle } from './Puzzle';
 
 
 export class OperatorMathPuzzle implements Puzzle{
     private static puzzles: {[key:string]: [OperatorMathPuzzle, string]} = {}
     
+    private numberOfOperands: number;
+    private observers: Observer[] = [];
     id: string = uuidv4();
     type: string = "operatorMathPuzzle"
     question: string;
@@ -13,7 +15,6 @@ export class OperatorMathPuzzle implements Puzzle{
     hintLevel : number = 0;
     solved: boolean = false;
     estimatedTime: number;
-    private numberOfOperands: number;
     isLocked: boolean = false;
 
     constructor(difficulty: number) {
@@ -43,7 +44,16 @@ export class OperatorMathPuzzle implements Puzzle{
     checkAnswer(answer: string): boolean {
         let res: boolean = answer === this.getAnswer();
         if (!this.solved) this.solved = res
+        if (res) this.notifyObservers();
         return res
+    }
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update();
+        });
     }
 
     private init(): [string, string] {

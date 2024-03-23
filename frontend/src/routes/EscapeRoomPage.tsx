@@ -29,6 +29,16 @@ function EscapeRoomPage() {
         })
     }
 
+    async function fetchUpdatedRoom(roomId: string): Promise<Room> {
+        try{
+            const response = await axios.get<Room>('http://localhost:8080/room?roomId=' + roomId);
+            return response.data;
+        }catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
     function moveLeft() {
         setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left))
     }
@@ -50,7 +60,7 @@ function EscapeRoomPage() {
         <div className="d-flex w-100">
             <div className="w-100 d-flex flex-column justify-content-between mh-100">
                 <Navbar/>
-                {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
+                {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} getUpdatedRoom={fetchUpdatedRoom}/> : null}
 
                 {currentRoom && escapeRoom ? <div className="d-flex justify-content-center">
 

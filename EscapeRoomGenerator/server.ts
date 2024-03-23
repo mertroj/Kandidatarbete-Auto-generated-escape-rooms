@@ -22,30 +22,46 @@ app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
-    let players = parseInt(String(req.query.players))
-    let difficulty = parseInt(String(req.query.difficulty))
+    let players = parseInt(String(req.query.players));
+    let difficulty = parseInt(String(req.query.difficulty));
 
-    console.log("Creating an escape room")
+    console.log("Creating an escape room");
 
     if (Number.isNaN(players)) {
-        res.status(400).send("The player query parameter is missing or invalid")
+        res.status(400).send("The player query parameter is missing or invalid");
     } else if (Number.isNaN(difficulty)) {
-        res.status(400).send("The difficulty query parameter is missing or invalid")
+        res.status(400).send("The difficulty query parameter is missing or invalid");
     } else {
         let er: EscapeRoom = new EscapeRoom(players, difficulty);
         res.send(er.id);
     }
-    console.log("Finished")
+    console.log("Finished");
 });
 
 app.get('/escaperoom', (req: Request, res: Response) => {
-    let gameId = String(req.query.gameId)
+    let gameId = String(req.query.gameId);
     let er = EscapeRoom.get(gameId);
     if (er == null) {
-        res.status(400).send("The entered game id does not exist")
+        res.status(400).send("The entered game id does not exist");
     } else {
         res.send(er);
     }
+});
+
+app.get('/room', (req: Request, res: Response) => {
+    let roomId = String(req.query.roomId);
+    let gameId = String(req.query.gameId);
+    let er = EscapeRoom.get(gameId);
+    if (er == null) {
+        res.status(400).send("The entered game id does not exist");
+        return;
+    }
+    let room = er.rooms.find((room) => room.id === roomId);
+    if (room === null){
+        res.status(400).send("The entered room id does not exist");
+        return;
+    }
+    res.status(200).send(room);
 });
 
 app.listen(port, () => {

@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Piece } from "./Piece";
 import { Position } from "./Position";
 import {shuffleArray} from "../Helpers";
-import { Puzzle } from '../Puzzle';
+import { Observable, Observer, Puzzle } from '../Puzzle';
 
-export class SlidePuzzle implements Puzzle{
+export class SlidePuzzle implements Puzzle, Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
 
     id: string = uuidv4();
@@ -15,10 +15,17 @@ export class SlidePuzzle implements Puzzle{
     hintLevel: number = 0;
     estimatedTime: number;
     pieces: (Piece | null)[][];
+    isLocked: boolean = false;
     private rows: number;
     private cols: number;
+    private dependentPuzzles: Puzzle[] = [];
+    private observers: Observer[] = [];
 
-    constructor(difficulty: number){
+    constructor(difficulty: number, dependentPuzzles: Puzzle[] = []){
+        if (dependentPuzzles.length > 0){
+            this.isLocked = true;
+            this.dependentPuzzles = dependentPuzzles;
+        }
         this.estimatedTime = difficulty * 3; //Arbitrary at the moment
         let randomIncrease = Math.floor(Math.random() * difficulty);
         //(row, col) = EASY => (3, 3), MEDIUM => (3, 4) or (4, 3), HARD => (3, 5) or (5, 3) or (4, 4)
@@ -26,6 +33,17 @@ export class SlidePuzzle implements Puzzle{
         this.cols = 3 + difficulty - 1 - randomIncrease;
         this.pieces = this.init();
         SlidePuzzle.puzzles[this.id] = this;
+    }
+    update(): void{
+        if (this.dependentPuzzles.every(p => p.solved)) this.isLocked = false;
+    }
+    addObserver(observer: Observer): void{
+        this.observers.push(observer);
+    }
+    notifyObservers(): void{
+        this.observers.forEach(observer => {
+            observer.update();
+        });
     }
 
     checkAnswer(): boolean {
@@ -42,6 +60,7 @@ export class SlidePuzzle implements Puzzle{
             previousNumber = tempNumber;
         }
         this.solved = true; //can be set to true even if it was true before
+        this.notifyObservers();
         return true;
     }
 

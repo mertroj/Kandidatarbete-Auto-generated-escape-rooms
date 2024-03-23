@@ -11,7 +11,7 @@ import {Graph} from "graphlib";
  * @param {number} nodeAmount - The total number of nodes in the diverging tree.
  * @returns {graph} A Graph object representing the generated diverging tree.
  */
-export function DivergingTree(nodeAmount: number): Graph {
+export function divergingTree(nodeAmount: number): Graph {
     const MAX_NODES_ROW: number = 4;
     const MIN_NODES_ROW: number = 2;
     const maxConvergingNodes: number = Math.floor(nodeAmount / 11) + 1;

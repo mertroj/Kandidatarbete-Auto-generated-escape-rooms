@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from './Helpers';
-import { Puzzle } from './Puzzle';
+import { Observer, Puzzle } from './Puzzle';
 import { shuffleArray } from './Helpers';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -16,6 +16,7 @@ export class LettersMathPuzzle implements Puzzle{
     solved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
     isLocked: boolean = false;
+    private observers: Observer[] = [];
 
     constructor(){
         let [question, letters, mainAnswer, shuffledAnswer] = this.init();
@@ -70,6 +71,15 @@ export class LettersMathPuzzle implements Puzzle{
         return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
     }
 
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update();
+        });
+    }
+
     getHint(): string{
         if(this.hintLevel < 4){
             const number: string = this.getMainAnswer().toString()[this.hintLevel++];
@@ -82,6 +92,7 @@ export class LettersMathPuzzle implements Puzzle{
     checkAnswer(answer: string): boolean {
         let res = this.getPossibleAnswers().includes(answer);
         if (!this.solved) this.solved = res
+        if (res) this.notifyObservers();
         return res
     }
 
