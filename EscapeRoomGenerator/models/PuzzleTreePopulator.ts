@@ -15,24 +15,20 @@ class TimeoutError extends Error {
 }
 
 export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
-    console.log('Populating puzzle tree with required total time of the room: ', estimatedTime);
-    let remainingTime: number = estimatedTime;
-    let puzzleBox: Puzzle[] = [];
+    let puzzleBox: Puzzle[];
     while(true){
-        try{
+        let remainingTime: number = estimatedTime;
+        puzzleBox = [];
+        while(true){
             if(remainingTime <= 0){ //Should never be under 0 bcz of recursiveness in generatePuzzle(), but just in case
                 break;
             }
             let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty);
             remainingTime -= tempPuzzleObject.estimatedTime;
             puzzleBox.push(tempPuzzleObject);
-        }catch(e){
-            if(e instanceof TimeoutError){
-                console.log(e.message); //to be removed?
-                break;
-            }else{
-                throw e; //rethrow the error if it is not a TimeoutError
-            }
+        }
+        if(puzzleBox.length > 2){
+            break;
         }
     }
     let graph: Graph = divergingTree(puzzleBox.length) //To be replaced with a function that return a correct graph

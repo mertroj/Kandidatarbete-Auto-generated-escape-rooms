@@ -39,17 +39,14 @@ export class Room {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
-        let nrOfRooms: number = getNumberOfRooms(players, difficulty);
-        let totalWeights = (nrOfRooms * (nrOfRooms + 1)) / 2;
+        let nrOfRooms: number = Math.floor(totalTime / 20);
 
         while (rooms.length < nrOfRooms) {
             let pos_i = randomIntRange(0, possible_locations.length);
             let [pos] = possible_locations.splice(pos_i, 1);
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
-            
-            let weight = rooms.length + 1; //use length as a loop index
-            let roomTime = Math.floor((weight / totalWeights) * totalTime); //increase roomTime as we go along
+
             let graph = puzzleTreePopulator(20, difficulty);
             rooms.push(new Room(...pos, graph.nodes().map((node) => graph.node(node) as Puzzle)));
         
@@ -79,10 +76,4 @@ function connectRooms(rooms: Room[]): Room[] {
         if (r) room.down = r.id
     })
     return rooms
-}
-
-function getNumberOfRooms(players: number, difficulty: number): number {
-    const minRooms = difficulty;
-    const maxRooms = difficulty + players;
-    return Math.floor(Math.random() * (maxRooms - minRooms + 1)) + minRooms;
 }

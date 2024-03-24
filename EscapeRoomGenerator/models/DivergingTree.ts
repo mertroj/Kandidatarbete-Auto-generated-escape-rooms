@@ -12,6 +12,7 @@ import {Graph} from "graphlib";
  * @returns {graph} A Graph object representing the generated diverging tree.
  */
 export function divergingTree(nodeAmount: number): Graph {
+    console.log("Generating diverging tree with " + nodeAmount + " nodes");
     const MAX_NODES_ROW: number = 4;
     const MIN_NODES_ROW: number = 2;
     const maxConvergingNodes: number = Math.floor(nodeAmount / 11) + 1;
@@ -28,8 +29,7 @@ export function divergingTree(nodeAmount: number): Graph {
     let nodesMade: number = 0;
 
     if (nodeAmount < 3) {
-        console.log("Not enough nodes to make a diverging-tree");
-        return divergingTree;
+        throw new Error("Not enough nodes to make a diverging-tree. Node count: " + nodeAmount.toString());
     }
 
     while (nodesMade < nodeAmount) {
