@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-//TODO:  Fix the bug with the pieces not properly splitting up the image
+//TODO:  Fix the bug with the pieces not always being drawn.
 
 const JigsawTest: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -8,11 +8,11 @@ const JigsawTest: React.FC = () => {
     let CONTEXT: any | null = null;
     let SCALAR = 0.6;
     let [SIZE, setSize] = useState({ x: 0, y: 0, width: 0, height: 0, rows: 2, columns: 2 });
-    let PIECES: any[] = [];
+    let PIECES: Piece[] = [];
     let SELECTED_PIECE: any = null;
     let CANVAS: HTMLCanvasElement | null = canvasRef.current;
 
-    async function jigsawImage() {
+    async function jigsawImage(rows: number, columns: number) {
         try {
             const response = await fetch('http://localhost:8080/jigsawtest/image');
             if (response.ok) {
@@ -30,7 +30,7 @@ const JigsawTest: React.FC = () => {
                     addEventListeners();
                     updateGame();
                 };
-                initializePieces(5,5); // TODO: maybe remove later
+                initializePieces(rows,columns);
                 randomizePieces();
             }
 
@@ -40,7 +40,7 @@ const JigsawTest: React.FC = () => {
     }
 
     useEffect(() => {
-        jigsawImage();
+        jigsawImage(4,4);
     }, []);
 
     useEffect(() => {
@@ -74,6 +74,7 @@ const JigsawTest: React.FC = () => {
 
     }
 
+    // could be used instead of specifing rows and columns (requires refactoring the code)
     function setDifficulty(difficulty: string) {
         switch (difficulty) {
             case 'easy':
@@ -88,7 +89,7 @@ const JigsawTest: React.FC = () => {
         }
     }
 
-    function isComplete() {
+    function checkAnswer() { // checks if the puzzle is complete
         for (let piece of PIECES) {
             if (!piece.correct) {
                 return false;
@@ -130,9 +131,9 @@ const JigsawTest: React.FC = () => {
     }
 
     function onMouseUp() {
-        if (SELECTED_PIECE.isClose()){
+        if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
             SELECTED_PIECE.snap();
-            if (isComplete()) {
+            if (checkAnswer()) {
                 console.log("Puzzle complete");
             }
         }
@@ -162,6 +163,7 @@ const JigsawTest: React.FC = () => {
         window.requestAnimationFrame(updateGame);
     }
 
+
     function initializePieces(rows: number, columns: number) {
         SIZE.rows = rows;
         SIZE.columns = columns;
@@ -178,7 +180,7 @@ const JigsawTest: React.FC = () => {
             for (let j = 0; j < SIZE.columns; j++) {
                 const piece = PIECES[count];
                 if (i==SIZE.rows-1) {
-                    piece.bottom = null;
+                    piece.bottom = NaN;
                 }
                 else {
                     const sgn = (Math.random() - 0.5) < 0 ? -1 : 1;
@@ -186,7 +188,7 @@ const JigsawTest: React.FC = () => {
                 }
 
                 if (j == SIZE.columns-1){
-                    piece.right = null
+                    piece.right = NaN
                 }
                 else{
                     const sgn = (Math.random()-0.5)<0? -1:1;
@@ -194,13 +196,13 @@ const JigsawTest: React.FC = () => {
                 }
 
                 if(j == 0){
-                    piece.left = null;
+                    piece.left = NaN;
                 }
                 else {
                     piece.left =- PIECES[count-1].right;
                 }
                 if (i==0){
-                    piece.top = null;
+                    piece.top = NaN;
                 }
                 else {
                     piece.top = -PIECES[count - SIZE.columns].bottom;
@@ -240,6 +242,10 @@ const JigsawTest: React.FC = () => {
         xCorrect: number;
         yCorrect: number;
         correct: boolean;
+        bottom: any = null;
+        right: any = null;
+        left: any = null;
+        top: any = null;
         constructor(rowIndex: any, colIndex: any) {
             this.rowIndex = rowIndex;
             this.colIndex = colIndex;
@@ -251,29 +257,143 @@ const JigsawTest: React.FC = () => {
             this.yCorrect = this.y;
             this.correct = true;
         }
-        draw(context: { beginPath: () => void; drawImage: (arg0: HTMLImageElement | null, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number) => void; rect: (arg0: number, arg1: number, arg2: number, arg3: number) => void; stroke: () => void; }) {
+        draw(context: { beginPath: () => void; moveTo: (arg0: number, arg1: number) => void; lineTo: (arg0: number, arg1: number) => void; bezierCurveTo: (arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number) => void; save: () => void; clip: () => void; drawImage: (arg0: HTMLImageElement, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number) => void; restore: () => void; stroke: () => void; }) {
             context.beginPath();
 
-            context.drawImage(IMAGE,
-                this.colIndex * IMAGE.width / SIZE.columns,
-                this.rowIndex * IMAGE.height / SIZE.rows,
-                IMAGE.width / SIZE.columns,
-                IMAGE.height / SIZE.rows,
-                this.x,
-                this.y,
-                this.width,
-                this.height)
+            const sz = Math.min(this.width, this.height);  // Hard coded values for the aesthetics
+            const neck = 0.08*sz;
+            const tabWidth = 0.2*sz;
+            const tabHeight = 0.2*sz;
+
 
             //context.rect(this.x, this.y, this.width, this.height);
             // from top left
             context.moveTo(this.x, this.y);
-            // to bottom right
+            // to top right
+            if (this.top) {
+                context.lineTo(this.x + this.width * Math.abs(this.top) - neck,
+                    this.y);
+                context.bezierCurveTo(
+                    this.x + this.width*Math.abs(this.top) - neck,
+                    this.y - tabHeight*Math.sign(this.top)*0.2,
+
+                    this.x + this.width*Math.abs(this.top) - tabWidth,
+                    this.y - tabHeight*Math.sign(this.top),
+
+                    this.x + this.width*Math.abs(this.top),
+                    this.y - tabHeight*Math.sign(this.top)
+                )
+
+                context.bezierCurveTo(
+                    this.x + this.width*Math.abs(this.top) + tabWidth,
+                    this.y - tabHeight*Math.sign(this.top),
+
+                    this.x + this.width*Math.abs(this.top) + neck,
+                    this.y - tabHeight*Math.sign(this.top)*0.2,
+
+                    this.x + this.width*Math.abs(this.top) + neck,
+                    this.y
+                )
+            }
             context.lineTo(this.x + this.width, this.y);
+
             // to bottom right
+            if (this.right) {
+                context.lineTo(this.x + this.width, this.y + this.height * Math.abs(this.right) - neck);
+                context.bezierCurveTo(
+                    this.x + this.width + tabHeight*Math.sign(this.right)*0.2,
+                    this.y + this.height*Math.abs(this.right) - neck,
+
+                    this.x + this.width + tabHeight*Math.sign(this.right),
+                    this.y + this.height*Math.abs(this.right) - tabWidth,
+
+                    this.x + this.width + tabHeight*Math.sign(this.right),
+                    this.y + this.height*Math.abs(this.right)
+                )
+                context.bezierCurveTo(
+                    this.x + this.width + tabHeight*Math.sign(this.right),
+                    this.y + this.height*Math.abs(this.right) + tabWidth,
+
+                    this.x + this.width + tabHeight*Math.sign(this.right)*0.2,
+                    this.y + this.height*Math.abs(this.right) + neck,
+
+                    this.x + this.width,
+                    this.y + this.height*Math.abs(this.right) + neck
+                )
+            }
             context.lineTo(this.x + this.width, this.y + this.height);
+
+            // to bottom left
+            if (this.bottom) {
+                context.lineTo(this.x + this.width * Math.abs(this.bottom) + neck, this.y + this.height);
+                context.bezierCurveTo(
+                    this.x + this.width*Math.abs(this.bottom) + neck,
+                    this.y + this.height + tabHeight*Math.sign(this.bottom)*0.2,
+
+                    this.x + this.width*Math.abs(this.bottom) + tabWidth,
+                    this.y + this.height + tabHeight*Math.sign(this.bottom),
+
+                    this.x + this.width*Math.abs(this.bottom),
+                    this.y + this.height + tabHeight*Math.sign(this.bottom)
+                )
+                context.bezierCurveTo(
+                    this.x + this.width*Math.abs(this.bottom) - tabWidth,
+                    this.y + this.height + tabHeight*Math.sign(this.bottom),
+
+                    this.x + this.width*Math.abs(this.bottom) - neck,
+                    this.y + this.height + tabHeight*Math.sign(this.bottom)*0.2,
+
+                    this.x + this.width*Math.abs(this.bottom) - neck,
+                    this.y + this.height
+                )
+            }
+            context.lineTo(this.x, this.y + this.height);
+
             //to top left
+            if(this.left){
+                context.lineTo(this.x, this.y + this.height * Math.abs(this.left) + neck);
+                context.bezierCurveTo(
+                    this.x - tabHeight*Math.sign(this.left)*0.2,
+                    this.y + this.height*Math.abs(this.left) + neck,
+
+                    this.x - tabHeight*Math.sign(this.left),
+                    this.y + this.height*Math.abs(this.left) + tabWidth,
+
+                    this.x - tabHeight*Math.sign(this.left),
+                    this.y + this.height*Math.abs(this.left)
+                )
+                context.bezierCurveTo(
+                    this.x - tabHeight*Math.sign(this.left),
+                    this.y + this.height*Math.abs(this.left) - tabWidth,
+
+                    this.x - tabHeight*Math.sign(this.left)*0.2,
+                    this.y + this.height*Math.abs(this.left) - neck,
+
+                    this.x,
+                    this.y + this.height*Math.abs(this.left) - neck
+                )
+            }
             context.lineTo(this.x, this.y);
 
+
+            const scaledTabHeight: number =
+                Math.min(IMAGE.width/SIZE.columns,
+                IMAGE.height/SIZE.rows)*tabHeight/sz;
+
+            context.save();
+            context.clip();
+
+            context.drawImage(IMAGE,
+                this.colIndex*IMAGE.width/SIZE.columns - scaledTabHeight,
+                this.rowIndex*IMAGE.height/SIZE.rows - scaledTabHeight,
+                IMAGE.width/SIZE.columns + scaledTabHeight*2,
+                IMAGE.height/SIZE.rows + scaledTabHeight*2,
+                this.x-tabHeight,
+                this.y-tabHeight,
+                this.width+tabHeight*2,
+                this.height+tabHeight*2);
+
+            context.restore();
             context.stroke();
         }
         isClose() {
