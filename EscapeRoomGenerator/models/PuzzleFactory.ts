@@ -6,27 +6,22 @@ import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 
 export class PuzzleFactory{
-    static createRandomPuzzle(difficulty: number): Puzzle{
+    ////THE BUG IS HERE... DO NOT ADD THE OBSERVERS BEFORE MAKING SURE THAT THE PUZZLE IT ACCEPTED IN THE RECURSION
+    static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
-            [1, () => new Anagram(difficulty)], //false converging
-            [1, () => new LettersMathPuzzle()], //false converging
-            [1, () => new OperatorMathPuzzle(difficulty)], //false converging
-            [1, () => new SlidePuzzle(difficulty)], //false converging
+            [1, () => new Anagram(difficulty, dependentPuzzles)], //false converging
+            [1, () => new LettersMathPuzzle(dependentPuzzles)], //false converging
+            [1, () => new OperatorMathPuzzle(difficulty, dependentPuzzles)], //false converging
+            [1, () => new SlidePuzzle(difficulty, dependentPuzzles)], //false converging
             //Add Mastermind
         ])();
     }
-    static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: Puzzle[]): Puzzle{
+    static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles);
-        for (let dp of dependentPuzzles){
-            dp.addObserver(puzzle);
-        }
         return puzzle;
     }
-    static createRandomEndPuzzle(difficulty: number, dependentPuzzles: Puzzle[]): Puzzle{
+    static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles);
-        for (let dp of dependentPuzzles){
-            dp.addObserver(puzzle);
-        }
         return puzzle;
         //Add Jigsaw puzzle
     }

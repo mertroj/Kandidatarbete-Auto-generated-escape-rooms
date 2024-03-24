@@ -18,13 +18,13 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
     isLocked: boolean = false;
     private rows: number;
     private cols: number;
-    private dependentPuzzles: Puzzle[] = [];
-    private observers: Observer[] = [];
+    private dependentPuzzles: string[] ;
+    observers: Observer[] = [];
 
-    constructor(difficulty: number, dependentPuzzles: Puzzle[] = []){
+    constructor(difficulty: number, dependentPuzzles: string[]){
+        this.dependentPuzzles = dependentPuzzles;
         if (dependentPuzzles.length > 0){
             this.isLocked = true;
-            this.dependentPuzzles = dependentPuzzles;
         }
         this.estimatedTime = difficulty * 3; //Arbitrary at the moment
         let randomIncrease = Math.floor(Math.random() * difficulty);
@@ -34,15 +34,18 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
         this.pieces = this.init();
         SlidePuzzle.puzzles[this.id] = this;
     }
-    update(): void{
-        if (this.dependentPuzzles.every(p => p.solved)) this.isLocked = false;
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
     }
     addObserver(observer: Observer): void{
         this.observers.push(observer);
     }
     notifyObservers(): void{
         this.observers.forEach(observer => {
-            observer.update();
+            observer.update(this.id);
         });
     }
 

@@ -8,7 +8,8 @@ export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}
 
     private difficulty: number;
-    private observers: Observer[] = [];
+    observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
+    private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
     id: string = uuidv4();
     type: string = 'anagram';
     question: string;
@@ -18,8 +19,9 @@ export class Anagram implements Puzzle {
     solved: boolean = false;
     isLocked: boolean = false;
 
-
-    constructor(difficulty: number) {
+    constructor(difficulty: number, dependentPuzzlez: string[]) {
+        this.dependentPuzzles = dependentPuzzlez;
+        if (this.dependentPuzzles.length > 0) this.isLocked = true;
         this.difficulty = difficulty;
         this.estimatedTime = 2*this.difficulty;
         this.question = this.getQuestion();
@@ -38,8 +40,14 @@ export class Anagram implements Puzzle {
     }
     notifyObservers(): void {
         this.observers.forEach(observer => {
-            observer.update();
+            observer.update(this.id);
         });
+    }
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
     }
 
     getHint(): string {

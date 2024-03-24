@@ -14,23 +14,21 @@ interface RoomsFetchResponse{
 interface RoomComponentProps {
     room: Room;
     addHint: Function;
-    getUpdatedRoom: (roomId: string) => Promise<Room>;
+    updateRoom: Function;
 }
 function RoomComponent (roomProps: RoomComponentProps) {
-    const {room, addHint, getUpdatedRoom} = roomProps;
-    const [puzzles, setPuzzles] = useState<JSX.Element[]>();
-    const [updatedRoom, setRoom] = useState<Room>(room);
+    const {room, addHint, updateRoom} = roomProps;
+    const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     async function updatePuzzles(){
         console.log("Updating puzzles");
-        const response = await axios.get<RoomsFetchResponse>(`http://localhost:8080/room?roomId=${room.id}`);
-        setRoom(await getUpdatedRoom(room.id));
+        updateRoom();
     }
 
     useEffect(() => {
-        console.log(room.slots)
-        let nodes = updatedRoom.slots.map((puzzle) => {
+        let nodes = room.slots.map((puzzle) => {
             if(!puzzle.solved && !puzzle.isLocked){
+                console.log('trying to render puzzle:', room.slots);
                 if (puzzle.type === 'anagram')
                     return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updatePuzzles}/>
                 
@@ -45,13 +43,15 @@ function RoomComponent (roomProps: RoomComponentProps) {
 
                 return <p>Invalid puzzle</p>
             }else if(puzzle.isLocked){
-                return <p>There are many recipes to the way out, maybe you haven¨t found them all</p>
+                return null;
+                //return <p>There are many recipes to the way out, maybe you haven¨t found them all</p>
             }else{
-                return <p>Puzzle solved</p> //maybe change to null in order to be skipped when rendering
+                return null;
+                //return <p>Puzzle solved</p> //maybe change to null in order to be skipped when rendering
             }
         })
         setPuzzles(nodes)
-    }, [updatedRoom])
+    }, [room])
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
             {puzzles}

@@ -18,7 +18,7 @@ export class Room {
     is_unlocked: boolean;
     slots: Puzzle[];
 
-    constructor(x: number, y: number, graph: Graph) {
+    constructor(x: number, y: number, puzzles: Puzzle[]) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
@@ -27,9 +27,7 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = graph.nodes().map((node) => {
-            return graph.node(node); //fetch the puzzles from the graph nodes
-        });
+        this.slots = puzzles;
         Room.rooms[this.id] = this;
     }
 
@@ -52,7 +50,8 @@ export class Room {
             
             let weight = rooms.length + 1; //use length as a loop index
             let roomTime = Math.floor((weight / totalWeights) * totalTime); //increase roomTime as we go along
-            rooms.push(new Room(...pos, puzzleTreePopulator(roomTime, difficulty)));
+            let graph = puzzleTreePopulator(20, difficulty);
+            rooms.push(new Room(...pos, graph.nodes().map((node) => graph.node(node) as Puzzle)));
         
             visited.add(`${pos[0]},${pos[1]}`);
     
@@ -62,8 +61,6 @@ export class Room {
         }
         return connectRooms(rooms);
     }
-
-
 }
 
 function connectRooms(rooms: Room[]): Room[] {

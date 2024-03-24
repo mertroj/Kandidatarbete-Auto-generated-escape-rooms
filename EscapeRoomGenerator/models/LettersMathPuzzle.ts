@@ -16,9 +16,12 @@ export class LettersMathPuzzle implements Puzzle{
     solved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
     isLocked: boolean = false;
-    private observers: Observer[] = [];
+    observers: Observer[] = [];
+    private dependentPuzzles: string[];
 
-    constructor(){
+    constructor(dependentPuzzles: string[]){
+        this.dependentPuzzles = dependentPuzzles;
+        if (this.dependentPuzzles.length > 0) this.isLocked = true;
         let [question, letters, mainAnswer, shuffledAnswer] = this.init();
         this.question = question;
         let possibleAnswers = this.generateAllMappings(
@@ -76,8 +79,14 @@ export class LettersMathPuzzle implements Puzzle{
     }
     notifyObservers(): void {
         this.observers.forEach(observer => {
-            observer.update();
+            observer.update(this.id);
         });
+    }
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
     }
 
     getHint(): string{
