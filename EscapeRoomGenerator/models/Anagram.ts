@@ -8,7 +8,7 @@ export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}
 
     private difficulty: number;
-    observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
+    private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
     private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
     id: string = uuidv4();
     type: string = 'anagram';

@@ -19,7 +19,7 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
     private rows: number;
     private cols: number;
     private dependentPuzzles: string[] ;
-    observers: Observer[] = [];
+    private observers: Observer[] = [];
 
     constructor(difficulty: number, dependentPuzzles: string[]){
         this.dependentPuzzles = dependentPuzzles;

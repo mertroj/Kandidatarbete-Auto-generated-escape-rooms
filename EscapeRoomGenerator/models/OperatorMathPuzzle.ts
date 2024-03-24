@@ -7,7 +7,7 @@ export class OperatorMathPuzzle implements Puzzle{
     private static puzzles: {[key:string]: [OperatorMathPuzzle, string]} = {}
     
     private numberOfOperands: number;
-    observers: Observer[] = [];
+    private observers: Observer[] = [];
     private dependentPuzzles: string[];
     id: string = uuidv4();
     type: string = "operatorMathPuzzle"

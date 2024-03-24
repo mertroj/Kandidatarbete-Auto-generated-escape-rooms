@@ -7,7 +7,6 @@ export interface Puzzle extends Observable, Observer{
     solved: boolean;
     estimatedTime: number;
     isLocked: boolean; 
-    observers: Observer[];
 }
 export interface Observable{ //To be implemented by all puzzles that be independent
     addObserver(observer: Observer): void;

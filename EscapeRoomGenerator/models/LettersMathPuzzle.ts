@@ -16,7 +16,7 @@ export class LettersMathPuzzle implements Puzzle{
     solved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
     isLocked: boolean = false;
-    observers: Observer[] = [];
+    private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     constructor(dependentPuzzles: string[]){
