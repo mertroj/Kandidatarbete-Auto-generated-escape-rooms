@@ -134,7 +134,7 @@ const JigsawTest: React.FC = () => {
         if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
             SELECTED_PIECE.snap();
             if (checkAnswer()) {
-                console.log("Puzzle complete");
+                console.log("Puzzle complete");  // TODO: Change to completion screen
             }
         }
         SELECTED_PIECE = null;
@@ -153,10 +153,11 @@ const JigsawTest: React.FC = () => {
     function updateGame() { // previously named updateCanvas
         CONTEXT.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-        CONTEXT.globalAlpha = 0.5;
-        CONTEXT.drawImage(IMAGE, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
-        CONTEXT.globalAlpha = 1;
+        CONTEXT.strokeStyle = 'black'; // Set the stroke color to black
+        CONTEXT.lineWidth = 2; // Set the line width to 2 pixels
 
+        // Draw the puzzle area outline
+        CONTEXT.strokeRect(SIZE.x, SIZE.y, SIZE.width, SIZE.height);
         for (let piece of PIECES) {
             piece.draw(CONTEXT);
         }
