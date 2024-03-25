@@ -38,16 +38,20 @@ function EscapeRoomPage() {
     }
 
     function moveLeft() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left))
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
+        fetchImage();
     }
     function moveRight() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right))
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
+        fetchImage();
     }
     function moveUp() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up))
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
+        fetchImage();
     }
     function moveDown() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down))
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
+        fetchImage();
     }
 
     useEffect(() => {

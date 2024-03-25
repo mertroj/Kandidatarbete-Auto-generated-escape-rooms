@@ -31,13 +31,6 @@ ImageRouter.get("/themeImage", async (req: Request, res: Response) => {
         res.status(500).send("Internal server error");
     }
 });
-ImageRouter.get("/logoImage", async (req: Request, res: Response) => {
-    try{
-        res.status(200).sendFile(path.join(__dirname, '../Images/logo.jpg'));
-    } catch (error) {
-        res.status(500).send("Internal server error");
-    }
-});
 /*
 function getRandomImage(): string {
     const images = imagesData[Theme.MAGICALWORKSHOP];
