@@ -92,62 +92,67 @@ function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
             onClose={() => setIsOpen(false)}
             trigger={
                 <div className='puzzle'>
-                    <Button variant='outline-primary'>{puzzle.description}</Button>
+                    <Button variant='outline-primary'>{puzzle.question}</Button>
                 </div>
             }
             children={
                 <Container className='text-center'>
-                    {updatedPuzzle.pieces.map((row, i) => (
-                        <Row key={i} className="justify-content-md-center">
-                        {row.map((cell, j) => (
-                            <Col xs={1} key={j}>
-                                <div 
-                                    className='cell-button'
-                                    style={
-                                        {
-                                            color: cell === null ? 'transparent': 'black'
-                                        }
-                                    }
-                                    onMouseEnter={(e) => {
-                                        if (updatedPuzzle.hintLevel === 0){ 
-                                            e.currentTarget.style.cursor = 'pointer';
-                                            e.currentTarget.style.backgroundColor = 'DodgerBlue';
-                                            if (cell !== null) e.currentTarget.style.color = 'white';
-                                        }
-                                        
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (updatedPuzzle.hintLevel === 0){ 
-                                            e.currentTarget.style.cursor = 'default';
-                                            e.currentTarget.style.backgroundColor = 'white';
-                                            if (cell !== null) e.currentTarget.style.color = 'black';
-                                        }
-                                    }}
-                                    onClick={(e) => {
-                                        if (updatedPuzzle.hintLevel === 0){
-                                            handleClick(i, j, e, true);
-                                        }
-                                    }}
-                                >
-                                    <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
-                                    <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
-                                    <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
-                                    <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
-                                    {cell !== null ? cell.number : 0}
-                                </div>
-                            </Col>
-                        ))}
-                        </Row>
-                    ))}
-                    <Row className="justify-content-md-center">
-                        <Col xs="auto">
-                            <Button variant="success" className='mt-3' onClick={() => handleSubmit()}>Submit</Button>
-                        </Col>
+                    <Row className='mb-3'>
+                        <h5>{updatedPuzzle.description}</h5>
                     </Row>
-                    <Row className="justify-content-md-center">
-                        <Col xs="auto">
-                            <Button variant="danger" className='mt-1' onClick={() => handleHintRequest()}>Get help</Button>
-                        </Col>
+                    <Row>
+                        {updatedPuzzle.pieces.map((row, i) => (
+                            <Row key={i} className="justify-content-md-center">
+                            {row.map((cell, j) => (
+                                <Col xs={1} key={j}>
+                                    <div 
+                                        className='cell-button'
+                                        style={
+                                            {
+                                                color: cell === null ? 'transparent': 'black'
+                                            }
+                                        }
+                                        onMouseEnter={(e) => {
+                                            if (updatedPuzzle.hintLevel === 0){ 
+                                                e.currentTarget.style.cursor = 'pointer';
+                                                e.currentTarget.style.backgroundColor = 'DodgerBlue';
+                                                if (cell !== null) e.currentTarget.style.color = 'white';
+                                            }
+                                            
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (updatedPuzzle.hintLevel === 0){ 
+                                                e.currentTarget.style.cursor = 'default';
+                                                e.currentTarget.style.backgroundColor = 'white';
+                                                if (cell !== null) e.currentTarget.style.color = 'black';
+                                            }
+                                        }}
+                                        onClick={(e) => {
+                                            if (updatedPuzzle.hintLevel === 0){
+                                                handleClick(i, j, e, true);
+                                            }
+                                        }}
+                                    >
+                                        <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
+                                        <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
+                                        <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
+                                        <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
+                                        {cell !== null ? cell.number : 0}
+                                    </div>
+                                </Col>
+                            ))}
+                            </Row>
+                        ))}
+                        <Row className="justify-content-md-center">
+                            <Col xs="auto">
+                                <Button variant="success" className='mt-3' onClick={() => handleSubmit()}>Submit</Button>
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col xs="auto">
+                                <Button variant="danger" className='mt-1' onClick={() => handleHintRequest()}>Get help</Button>
+                            </Col>
+                        </Row>
                     </Row>
                 </Container>
             }
