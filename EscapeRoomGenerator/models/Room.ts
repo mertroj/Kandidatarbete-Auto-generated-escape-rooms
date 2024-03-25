@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { point, randomIntRange, repeat, frequencies, around } from './Helpers';
-import { Anagram } from './Anagram';
-import { LettersMathPuzzle } from './LettersMathPuzzle';
-import { OperatorMathPuzzle } from './OperatorMathPuzzle';
+import { point, randomIntRange, around } from './Helpers';
 import { Puzzle } from './Puzzle';
+import { Graph } from 'graphlib';
+import { puzzleTreePopulator } from './PuzzleTreePopulator';
 
 
 export class Room {
@@ -19,7 +18,7 @@ export class Room {
     is_unlocked: boolean;
     slots: Puzzle[];
 
-    constructor(x: number, y: number, slots: number, difficulty: number) {
+    constructor(x: number, y: number, puzzles: Puzzle[]) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
@@ -28,13 +27,7 @@ export class Room {
         this.up = '';
         this.down = '';
         this.is_unlocked = true;
-        this.slots = repeat(5, () => {
-            return frequencies<() => Puzzle>([
-                [1, () => new Anagram(5)], 
-                [1, () => new LettersMathPuzzle()], 
-                [1, () => new OperatorMathPuzzle(difficulty)]
-            ])()
-        });
+        this.slots = puzzles;
         Room.rooms[this.id] = this;
     }
 
@@ -42,18 +35,21 @@ export class Room {
         return Room.rooms[roomId]
     }
 
-    static createRooms(nr_of_rooms: number, slots_in_room: number, difficulty: number): Room[] {
+    static createRooms(totalTime: number, players: number, difficulty: number): Room[] {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
-    
-        while (rooms.length < nr_of_rooms) {
+        let nrOfRooms: number = Math.floor(totalTime / 20);
+
+        while (rooms.length < nrOfRooms) {
             let pos_i = randomIntRange(0, possible_locations.length);
             let [pos] = possible_locations.splice(pos_i, 1);
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
-    
-            rooms.push(new Room(...pos, slots_in_room, difficulty));
+
+            let graph = puzzleTreePopulator(20, difficulty);
+            rooms.push(new Room(...pos, graph.nodes().map((node) => graph.node(node) as Puzzle)));
+        
             visited.add(`${pos[0]},${pos[1]}`);
     
             around(pos).forEach((pos) => {

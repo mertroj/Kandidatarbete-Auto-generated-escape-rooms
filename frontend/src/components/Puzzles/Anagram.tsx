@@ -4,15 +4,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 import { Puzzle } from '../../interfaces';
 
-
-function AnagramComponent ({addHint, puzzle}: {addHint : Function, puzzle: Puzzle}) {
+interface AnagramProps {
+    addHint: Function;
+    puzzle: Puzzle;
+    onSolve: Function;
+}
+function AnagramComponent (anagramProps: AnagramProps) {
+    const {puzzle, addHint, onSolve} = anagramProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
             const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            alert(response.data ? 'Correct!' : 'Incorrect!');
+            if(response.data){
+                alert('Correct!');
+                onSolve();
+            }else{
+                alert('Incorrect!');
+            }
         } catch (error) {
             console.error(error);
         }

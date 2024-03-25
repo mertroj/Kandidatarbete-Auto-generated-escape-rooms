@@ -22,35 +22,48 @@ function EscapeRoomPage() {
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
             setEscapeRoom(response.data);
-            setCurrentRoom(response.data.rooms[0])
+            if(!currentRoom){
+                setCurrentRoom(response.data.rooms[0]);
+            }else{
+                setCurrentRoom(response.data.rooms.find((room) => room.id === currentRoom.id));
+            }
         }).catch((error) => {
-            console.error(error)
-            window.location.pathname = '/'
+            console.error(error);
+            window.location.pathname = '/';
         })
     }
 
     function moveLeft() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left))
+        console.log('left');
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
     }
     function moveRight() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right))
+        console.log('right');
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
     }
     function moveUp() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up))
+        console.log('up');
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
     }
     function moveDown() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down))
+        console.log('down');
+        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
     }
 
     useEffect(() => {
-        fetchEscapeRoom()
-    }, [])
+        fetchEscapeRoom();
+    }, []);
+
+    useEffect(() => {
+        console.log('currentRoom ep', currentRoom?.id);
+    }, [currentRoom]);
     
     return (
         <div className="d-flex w-100">
             <div className="w-100 d-flex flex-column justify-content-between mh-100">
                 <Navbar/>
-                {currentRoom ? <RoomComponent room={currentRoom} addHint={addHint} /> : null}
+                {currentRoom ? 
+                    <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
 
                 {currentRoom && escapeRoom ? <div className="d-flex justify-content-center">
 

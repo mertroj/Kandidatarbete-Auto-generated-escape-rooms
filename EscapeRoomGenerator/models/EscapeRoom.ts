@@ -11,10 +11,10 @@ export class EscapeRoom {
     timer: Timer;
     
     constructor(players: number, difficulty: number) {
-        let nr_of_rooms = players+difficulty;
-        let slots_in_room = 5+difficulty;
+        let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
+        //let totalTime: number = (difficulty + 19) * Math.log2(players);
         this.id = uuidv4();
-        this.rooms = Room.createRooms(nr_of_rooms, slots_in_room, difficulty)
+        this.rooms = Room.createRooms(totalTime, players, difficulty)
         this.rooms[0].is_unlocked = true
         EscapeRoom.escapeRooms[this.id] = this
         this.timer = new Timer()

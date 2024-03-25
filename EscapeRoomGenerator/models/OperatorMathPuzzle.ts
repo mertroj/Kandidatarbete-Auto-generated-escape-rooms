@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { choice, randomIntRange } from './Helpers'
-import { Puzzle } from './Puzzle';
+import { Observer, Puzzle } from './Puzzle';
 
 
 export class OperatorMathPuzzle implements Puzzle{
     private static puzzles: {[key:string]: [OperatorMathPuzzle, string]} = {}
     
+    private numberOfOperands: number;
+    private observers: Observer[] = [];
+    private dependentPuzzles: string[];
     id: string = uuidv4();
     type: string = "operatorMathPuzzle"
     question: string;
@@ -13,9 +16,11 @@ export class OperatorMathPuzzle implements Puzzle{
     hintLevel : number = 0;
     solved: boolean = false;
     estimatedTime: number;
-    private numberOfOperands: number;
+    isLocked: boolean = false;
 
-    constructor(difficulty: number) {
+    constructor(difficulty: number, dependentPuzzles: string[]) {
+        this.dependentPuzzles = dependentPuzzles;
+        if (this.dependentPuzzles.length > 0) this.isLocked = true;
         this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard
         this.numberOfOperands = 4 + (difficulty - 1); //easy: 4, medium: 5, hard: 6
         let [question, answer] = this.init();
@@ -42,7 +47,22 @@ export class OperatorMathPuzzle implements Puzzle{
     checkAnswer(answer: string): boolean {
         let res: boolean = answer === this.getAnswer();
         if (!this.solved) this.solved = res
+        if (res) this.notifyObservers();
         return res
+    }
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update(this.id);
+        });
+    }
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
     }
 
     private init(): [string, string] {

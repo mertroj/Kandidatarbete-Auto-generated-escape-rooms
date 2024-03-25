@@ -4,14 +4,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 import { Puzzle } from '../../interfaces';
 
-function OperatorMathPuzzle ({addHint, puzzle}: {addHint : Function, puzzle: Puzzle}) {
+interface LettersMathPuzzleProps {
+    addHint: Function;
+    puzzle: Puzzle;
+    onSolve: Function;
+}
+function OperatorMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
+    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
             const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            alert(response.data ? 'Correct!' : 'Incorrect!');
+            if(response.data){
+                alert('Correct!');
+                onSolve();
+            }else{
+                alert('Incorrect!');
+            }
         } catch (error) {
             console.error(error);
         }
