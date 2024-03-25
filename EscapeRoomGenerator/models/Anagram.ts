@@ -54,7 +54,7 @@ export class Anagram implements Puzzle {
         const answers = this.getAnswers()
     
         if (this.hintLevel === this.question.length) {
-            return 'Bro..... you got the whole word already, what you doing with your life even?'
+            return 'No more hints.';
         }
         if (!answers.length) return '';
     

@@ -78,6 +78,7 @@ function HomePage() {
                     >
                         <option value="" hidden>Theme</option>
                         <option value="magical_workshop">Magical workshop</option>
+                        <option value="pharoah's_tomb">Pharoah's Tomb</option>
                     </select>
                 </div>
                 <button className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</button>
