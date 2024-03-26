@@ -24,7 +24,7 @@ export class PuzzleFactory{
     static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         return frequencies<() => Puzzle>([
             [1, () => new SlidePuzzle(difficulty, dependentPuzzles)],
-            [10, () => new Jigsaw(difficulty, dependentPuzzles)]
+            [1, () => new Jigsaw(difficulty, dependentPuzzles)]
         ])();
     }
 }
