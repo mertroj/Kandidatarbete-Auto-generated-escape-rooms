@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {JigsawPuzzle, Piece, Puzzle} from "../../interfaces";
-import axios from "axios";
+import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
 
 //TODO:  Fix the bug with the pieces not always being drawn.
 
@@ -177,7 +176,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
         }
     }
 
-    class FrontEndPiece implements Piece{
+    class FrontEndPiece implements JigsawPiece{
         rowIndex: number;
         colIndex: number;
         x: number;
@@ -191,7 +190,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
         right: any;
         left: any;
         top: any;
-        constructor(backendPiece: Piece) {
+        constructor(backendPiece: JigsawPiece) {
 
             this.rowIndex = backendPiece.rowIndex;
             this.colIndex = backendPiece.colIndex;

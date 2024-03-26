@@ -1,5 +1,3 @@
-import exp from "node:constants";
-
 export interface EscapeRoom {
     timer: Timer;
     id: string;
@@ -36,7 +34,7 @@ export interface Timer {
     elapsedTime: number;
 }
 
-export interface Piece {
+export interface JigsawPiece {
     rowIndex: number;
     colIndex: number;
     correct: boolean;
@@ -47,7 +45,7 @@ export interface Piece {
 }
 
 export interface JigsawPuzzle extends Puzzle{
-    pieces: Piece[];
+    pieces: JigsawPiece[];
     size: {rows: number, columns: number};
 
 }
