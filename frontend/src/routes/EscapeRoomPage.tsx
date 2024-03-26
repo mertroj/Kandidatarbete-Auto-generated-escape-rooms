@@ -1,6 +1,6 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { EscapeRoom, Room } from "../interfaces"
 import Hinting from "../components/Hinting/hinting";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
@@ -10,17 +10,34 @@ import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
+    const navigate = useNavigate();
     const [hintsList, setHintsList] = useState<string[]>([])
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
     const [currentRoom, setCurrentRoom] = useState<Room>()
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
+    function checkEscapeRoomDone(): boolean {
+        if (escapeRoom){
+            for (let room of escapeRoom?.rooms || []) {
+                for (let slot of room.slots) {
+                    if (!slot.solved) {
+                        return false;
+                    }
+                }
+            } return true;
+        } return false;
+    }
+
     async function fetchImage() {
-        const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
-        const blob = await response.blob();
-        const objectURL = URL.createObjectURL(blob);
-        setBackgroundImageURL(objectURL);
+        try {
+            const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
+            const blob = await response.blob();
+            const objectURL = URL.createObjectURL(blob);
+            setBackgroundImageURL(objectURL);
+        } catch (error) {
+            console.error('Error fetching image:', error);
+        }
     }
 
     function addHint(hint: string) {
@@ -63,7 +80,7 @@ function EscapeRoomPage() {
     }
 
     useEffect(() => {
-        fetchEscapeRoom()
+        fetchEscapeRoom();
     }, []);
     
     useEffect(() => {
@@ -71,6 +88,12 @@ function EscapeRoomPage() {
             fetchImage();
         }
     }, [gameId]);
+
+    useEffect(() => {
+        if (checkEscapeRoomDone()) {
+            navigate(resultScreenUrl);
+        }
+    }, [escapeRoom]);
     
     return (
         <div className="d-flex w-100">
@@ -90,13 +113,6 @@ function EscapeRoomPage() {
                 {/*<Navbar/>*/}
                 {currentRoom ? 
                     <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
-
-                {
-                /*Using the constructed URL. 
-                TODO: To be removed and be redirected automatically when done */
-                }
-                <a href={resultScreenUrl}>THE VOID CONSUMES ALL THE LIGHT AND JOY FROM EVERYONE. DON'T TRUST THE NEWS!</a>
-
             </div>
 
             <div className="panel-container">

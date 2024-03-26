@@ -10,6 +10,7 @@ import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
+import { DescriptionRouter } from "./routers/DescriptionRouter";
 
 
 const app: Express = express();
@@ -22,6 +23,7 @@ app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter); // TODO: change placeholder
 app.use('/images', ImageRouter);
+app.use('/lockedPuzzle', DescriptionRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players));

@@ -47,7 +47,7 @@ export class Room {
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
 
-            let graph = puzzleTreePopulator(20, difficulty);
+            let graph = puzzleTreePopulator(5, difficulty);
             rooms.push(new Room(...pos, graph.nodes().map((node) => graph.node(node) as Puzzle)));
         
             visited.add(`${pos[0]},${pos[1]}`);

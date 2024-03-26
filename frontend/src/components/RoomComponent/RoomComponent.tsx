@@ -5,21 +5,25 @@ import LettersMathPuzzle from "../Puzzles/LettersMathPuzzle";
 import OperatorMathPuzzle from "../Puzzles/OperatorMathPuzzle";
 import './RoomComponent.css'
 import { useEffect, useState } from 'react';
-import SlidePuzzle from '../Puzzles/SlidePuzzle';
+import SlidePuzzle from '../Puzzles/slidePuzzle';
+import LockedPuzzle from '../Puzzles/LockedPuzzle';
 
 interface RoomComponentProps {
     room: Room;
     addHint: Function;
     updateRoom: Function;
+    
 }
 function RoomComponent (roomProps: RoomComponentProps) {
     const {room, addHint, updateRoom} = roomProps;
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
-        let spanNodes: JSX.Element[] = [];
+        let hasLockedPuzzle: boolean = false;
+        let allSolved: boolean = true;
         let nodes = room.slots.map((puzzle) => {
             if(!puzzle.solved && !puzzle.isLocked){
+                allSolved = false;
                 console.log('trying to render puzzle:', room.slots);
                 if (puzzle.type === 'anagram')
                     return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
@@ -35,12 +39,21 @@ function RoomComponent (roomProps: RoomComponentProps) {
 
                 return <p>Invalid puzzle</p>
             }else if(puzzle.isLocked){ //definitely not solved since it is locked
-                return null; //TODO: Check if endPuzzle for example or converging and do something else
+                allSolved = false;
+                if(hasLockedPuzzle){
+                    return null;
+                } else {
+                    hasLockedPuzzle = true;
+                    return <LockedPuzzle key={puzzle.id}/>;
+                }
             }else{  //puzzle is solved
                 return null;
-                //return <p>Puzzle solved</p> //maybe change to null in order to be skipped when rendering
             }
-        })
+        });
+        if(allSolved){ //means that nodes is full of nulls
+            console.log(nodes);
+            nodes.push(<div key={room.id} className='empty-room'>Nothing to do here! Go elsewhere</div>);
+        }
         setPuzzles(nodes);
     }, [room])
     return (
