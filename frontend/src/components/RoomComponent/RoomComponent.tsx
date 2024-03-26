@@ -35,7 +35,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     return <SlidePuzzle key={puzzle.id} puzzle={puzzle as SlidePuzzles} onSolve={updateRoom}/>
 
             if (puzzle.type === 'jigsawpuzzle')
-                return <Jigsaw key={puzzle.id} puzzle={puzzle as JigsawPuzzle} />
+                return <Jigsaw key={puzzle.id} puzzle={puzzle as JigsawPuzzle} onSolve={updateRoom}/>
 
             return <p>Invalid puzzle</p>
                 return <p>Invalid puzzle</p>

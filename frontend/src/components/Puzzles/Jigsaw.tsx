@@ -5,7 +5,7 @@ import axios from "axios";
 
 //TODO:  Fix the bug with the pieces not always being drawn.
 
-function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
+function Jigsaw ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     let IMAGE: HTMLImageElement;
@@ -43,6 +43,17 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
 
         } catch (error) {
             console.error('Error fetching image:', error);
+        }
+    }
+    async function checkAnswer() {
+        try {
+            console.log("checking answer", puzzle.id);
+            const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
+            if (response.data) {
+                onSolve();
+            }
+        } catch (error) {
+            console.error('Error checking answer :', error);
         }
     }
     async function patchCorrect(id: string, isCorrect: boolean) {
@@ -124,13 +135,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
     async function onMouseUp() {
         if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
             SELECTED_PIECE.snap();
-            try {
-                console.log("checking answer", puzzle.id);
-                const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
-
-            } catch (error) {
-                console.error('Error checking answer :', error);
-            }
+            await checkAnswer();
         }
         SELECTED_PIECE = null;
     }
