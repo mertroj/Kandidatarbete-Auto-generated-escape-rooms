@@ -51,6 +51,7 @@ export interface Position {
 }
 
 export interface JigsawPiece {
+    id: string;
     rowIndex: number;
     colIndex: number;
     correct: boolean;
@@ -58,6 +59,8 @@ export interface JigsawPiece {
     right: any;
     left: any;
     top: any;
+
+    setCorrect(correct: boolean): void;
 }
 
 export interface JigsawPuzzle extends Puzzle{

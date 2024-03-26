@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
+import {useParams} from "react-router-dom";
+import axios from "axios";
 
 //TODO:  Fix the bug with the pieces not always being drawn.
 
 function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
+    const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     let IMAGE: HTMLImageElement;
     let CONTEXT: any = null;
@@ -19,7 +22,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
 
     async function jigsawImage(rows: number, columns: number) {
         try {
-            const response = await fetch('http://localhost:8080/jigsaw/image');
+            const response = await fetch('http://localhost:8080/jigsaw/image/?gameId=' + gameId);
             if (response.ok) {
                 CANVAS = canvasRef.current;
                 const blob = await response.blob();
@@ -41,7 +44,15 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
             console.error('Error fetching image:', error);
         }
     }
+    async function patchCorrect(id: string, isCorrect: boolean) {
+        try {
+            console.log("patching correct", puzzle.id);
+            const response = await axios.patch(`http://localhost:8080/jigsaw/setCorrect`, {pieceId: id, puzzleId: puzzle.id, isCorrect: isCorrect});
 
+        } catch (error) {
+            console.error('Error setting correct :', error);
+        }
+    }
 
     useEffect(() => {
         jigsawImage(4,4);
@@ -98,7 +109,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
                 x: event.x - SELECTED_PIECE.x,
                 y: event.y - SELECTED_PIECE.y
             }
-            SELECTED_PIECE.correct = false;
+            patchCorrect(SELECTED_PIECE.id, false);
         }
     }
 
@@ -109,12 +120,16 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
         }
     }
 
-    function onMouseUp() {
+    async function onMouseUp() {
         if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
             SELECTED_PIECE.snap();
-            // if (checkAnswer()) { // Example for where and how to check if the player completes the puzzle
-            //     console.log("Puzzle complete");  // TODO: Change to completion screen
-            // }
+            try {
+                console.log("checking answer", puzzle.id);
+                const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
+
+            } catch (error) {
+                console.error('Error checking answer :', error);
+            }
         }
         SELECTED_PIECE = null;
     }
@@ -172,11 +187,12 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
             }
             PIECES[i].x = location.x;
             PIECES[i].y = location.y;
-            PIECES[i].correct = false;
+            PIECES[i].setCorrect(false);
         }
     }
 
     class FrontEndPiece implements JigsawPiece{
+        id: string;
         rowIndex: number;
         colIndex: number;
         x: number;
@@ -190,7 +206,11 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
         right: any;
         left: any;
         top: any;
+
+        private backendPiece: JigsawPiece;
         constructor(backendPiece: JigsawPiece) {
+            this.id = backendPiece.id;
+            this.backendPiece = backendPiece;
 
             this.rowIndex = backendPiece.rowIndex;
             this.colIndex = backendPiece.colIndex;
@@ -205,8 +225,9 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
             this.height = SIZE.height / SIZE.rows;
             this.xCorrect = this.x;
             this.yCorrect = this.y;
-            this.correct = true;
+            this.correct = backendPiece.correct;
         }
+
         draw(context: { beginPath: () => void; moveTo: (arg0: number, arg1: number) => void; lineTo: (arg0: number, arg1: number) => void; bezierCurveTo: (arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number) => void; save: () => void; clip: () => void; drawImage: (arg0: HTMLImageElement, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number) => void; restore: () => void; stroke: () => void; }) {
             context.beginPath();
 
@@ -352,7 +373,12 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
         snap() {
             this.x = this.xCorrect;
             this.y = this.yCorrect;
-            this.correct = true;
+            this.setCorrect(true);
+        }
+
+        setCorrect(correct: boolean): void {
+            patchCorrect(this.id, correct);
+            this.correct = this.backendPiece.correct;
         }
     }
     function distance(piece1: Coordinates, piece2: Coordinates){

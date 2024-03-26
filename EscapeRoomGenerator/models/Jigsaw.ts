@@ -1,7 +1,5 @@
-import { Puzzle } from './Puzzle';
+import {Observer, Puzzle} from './Puzzle';
 import {v4 as uuidv4} from "uuid";
-
-
 
 export class Jigsaw implements Puzzle {
     private static puzzles: {[key: string]: Jigsaw} = {}
@@ -10,18 +8,25 @@ export class Jigsaw implements Puzzle {
         return Jigsaw.puzzles[puzzleId]
     }
 
+    private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
+    private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
+
     description: string = "Solve the jigsaw puzzle";
     estimatedTime: number;
     hintLevel: number = 0;
     question: string = "";
     solved: boolean = false;
     type: string = 'jigsawpuzzle';
+    isLocked: boolean = false;
 
     pieces: Piece[] = [];
 
     size: Size = {rows: 0, columns: 0 }
 
-    constructor(difficulty: number) {  // 1 = easy, 2 = medium, 3 = hard
+    constructor(difficulty: number, dependentPuzzles: string[]) {  // 1 = easy, 2 = medium, 3 = hard
+        this.dependentPuzzles = dependentPuzzles;
+        if (this.dependentPuzzles.length > 0) this.isLocked = true;
+
         switch (difficulty) {
             case 1:
                 this.size = {rows: 3, columns: 3}
@@ -40,12 +45,10 @@ export class Jigsaw implements Puzzle {
                 break;
         }
         this.pieces = createPieces(this.size);
-
-
-        // TODO: add generator related elements
+        Jigsaw.puzzles[this.id] = this;
 
     }
-    checkAnswer(answer: string): boolean {
+    checkAnswer(): boolean {
         for (let piece of this.pieces) {
             if (!piece.correct) {
                 return false;
@@ -57,6 +60,22 @@ export class Jigsaw implements Puzzle {
 
     getHint(): string {
         return "Perhaps start with the corners";
+    }
+
+
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update(this.id);
+        });
+    }
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
     }
 
 }
@@ -115,6 +134,7 @@ function createPieces(size: Size): Piece[]{
 }
 
 export class Piece {
+    id: string;
     rowIndex: number;
     colIndex: number;
     correct: boolean;
@@ -123,6 +143,7 @@ export class Piece {
     left: any = null;
     top: any = null;
     constructor(rowIndex: number, colIndex: number) {
+        this.id = uuidv4();
         this.rowIndex = rowIndex;
         this.colIndex = colIndex;
         this.correct = true;

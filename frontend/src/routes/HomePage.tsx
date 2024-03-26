@@ -88,7 +88,6 @@ function HomePage() {
                 <input type="text" placeholder='Enter gamecode here' onChange={(e) => joinGameTextChange(e)}/>
                 <button onClick={joinGame}>Join game</button>
             </div>
-            <a href={"/escaperoom/jigsawtest"}>Jigsaw Test</a>
         </div>
 
 

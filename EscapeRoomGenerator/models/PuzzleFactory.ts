@@ -4,6 +4,7 @@ import { LettersMathPuzzle } from "./LettersMathPuzzle";
 import { OperatorMathPuzzle } from "./OperatorMathPuzzle";
 import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
+import {Jigsaw} from "./Jigsaw";
 
 export class PuzzleFactory{
     ////THE BUG IS HERE... DO NOT ADD THE OBSERVERS BEFORE MAKING SURE THAT THE PUZZLE IT ACCEPTED IN THE RECURSION
@@ -21,8 +22,9 @@ export class PuzzleFactory{
         return puzzle;
     }
     static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
-        let puzzle = new SlidePuzzle(difficulty, dependentPuzzles);
-        return puzzle;
-        //Add Jigsaw puzzle
+        return frequencies<() => Puzzle>([
+            [1, () => new SlidePuzzle(difficulty, dependentPuzzles)],
+            [10, () => new Jigsaw(difficulty, dependentPuzzles)]
+        ])();
     }
 }
