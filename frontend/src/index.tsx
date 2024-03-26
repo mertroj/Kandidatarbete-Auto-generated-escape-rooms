@@ -7,7 +7,6 @@ import './index.css';
 import HomePage from './routes/HomePage';
 import PuzzleStart from './routes/EscapeRoomPage';
 import ResultScreenPage from "./routes/ResultScreenPage";
-import JigsawTest from "./routes/JigsawTest"; // TODO: REMOVE WHEN DONE
 
 const router = createBrowserRouter([
   {
@@ -21,10 +20,6 @@ const router = createBrowserRouter([
   {
     path: "/escaperoom/:gameId/result",
     element: <ResultScreenPage/>
-  },
-  {
-    path: "/escaperoom/jigsawtest", // TODO: REMOVE WHEN DONE
-    element: <JigsawTest/>
   }
 ]);
 

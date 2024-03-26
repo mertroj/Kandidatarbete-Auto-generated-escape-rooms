@@ -18,7 +18,7 @@ app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/anagrams', AnagramRouter);
-app.use('/jigsawtest', JigsawRouter); // TODO: change placeholder
+app.use('/jigsaw', JigsawRouter); // TODO: change placeholder
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players))

@@ -1,20 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
+import {JigsawPuzzle, Piece, Puzzle} from "../../interfaces";
+import axios from "axios";
+
 //TODO:  Fix the bug with the pieces not always being drawn.
 
-const JigsawTest: React.FC = () => {
+function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
     let IMAGE: HTMLImageElement;
-    let CONTEXT: any | null = null;
-    let SCALAR = 0.6;
-    let [SIZE, setSize] = useState({ x: 0, y: 0, width: 0, height: 0, rows: 2, columns: 2 });
-    let PIECES: Piece[] = [];
+    let CONTEXT: any = null;
+    let SCALAR: number = 0.6;
+
+
+    let [SIZE] = useState({ x: 0, y: 0, width: 0, height: 0, rows: 0, columns: 0 });
+    let PIECES: FrontEndPiece[] = [];
     let SELECTED_PIECE: any = null;
-    let CANVAS: HTMLCanvasElement | null = canvasRef.current;
+
+
+    let CANVAS: HTMLCanvasElement | null    = canvasRef.current;
 
     async function jigsawImage(rows: number, columns: number) {
         try {
-            const response = await fetch('http://localhost:8080/jigsawtest/image');
+            const response = await fetch('http://localhost:8080/jigsaw/image');
             if (response.ok) {
                 CANVAS = canvasRef.current;
                 const blob = await response.blob();
@@ -24,20 +30,19 @@ const JigsawTest: React.FC = () => {
                 IMAGE.src = imageUrl;
 
                 IMAGE.onload = function () {
-                    handleResize(); // Resize canvas after image load // TODO: fix later currently broken
-                    setImageLoaded(true);
-                    window.addEventListener("resize", handleResize);
+                    handleResize(); // Resize canvas after image load
                     addEventListeners();
                     updateGame();
                 };
-                initializePieces(rows,columns);
-                randomizePieces();
+                initializeGame();
+                randomizePiecesLocation();
             }
 
         } catch (error) {
             console.error('Error fetching image:', error);
         }
     }
+
 
     useEffect(() => {
         jigsawImage(4,4);
@@ -70,33 +75,8 @@ const JigsawTest: React.FC = () => {
 
         // @ts-ignore
         CONTEXT = CANVAS.getContext("2d");
-
-
     }
 
-    // could be used instead of specifing rows and columns (requires refactoring the code)
-    function setDifficulty(difficulty: string) {
-        switch (difficulty) {
-            case 'easy':
-                initializePieces(3, 3);
-                break;
-            case 'medium':
-                initializePieces(5, 5);
-                break;
-            case 'hard':
-                initializePieces(10, 10);
-                break;
-        }
-    }
-
-    function checkAnswer() { // checks if the puzzle is complete
-        for (let piece of PIECES) {
-            if (!piece.correct) {
-                return false;
-            }
-        }
-        return true;
-    }
     function addEventListeners() {
         // @ts-ignore
         CANVAS.addEventListener("mousedown", onMouseDown);
@@ -133,9 +113,9 @@ const JigsawTest: React.FC = () => {
     function onMouseUp() {
         if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
             SELECTED_PIECE.snap();
-            if (checkAnswer()) {
-                console.log("Puzzle complete");  // TODO: Change to completion screen
-            }
+            // if (checkAnswer()) { // Example for where and how to check if the player completes the puzzle
+            //     console.log("Puzzle complete");  // TODO: Change to completion screen
+            // }
         }
         SELECTED_PIECE = null;
     }
@@ -165,52 +145,16 @@ const JigsawTest: React.FC = () => {
     }
 
 
-    function initializePieces(rows: number, columns: number) {
-        SIZE.rows = rows;
-        SIZE.columns = columns;
+    function initializeGame(){
         const newPieces: any[] = [];
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < columns; j++) {
-                newPieces.push(new Piece(i, j));
-            }
-        }
+        let backendPuzzle: JigsawPuzzle = puzzle;
+        backendPuzzle.pieces.forEach(piece =>{
+            newPieces.push(new FrontEndPiece(piece));
+        });
         PIECES = newPieces;
 
-        let count: number = 0;
-        for (let i = 0; i < SIZE.rows; i++) {
-            for (let j = 0; j < SIZE.columns; j++) {
-                const piece = PIECES[count];
-                if (i==SIZE.rows-1) {
-                    piece.bottom = NaN;
-                }
-                else {
-                    const sgn = (Math.random() - 0.5) < 0 ? -1 : 1;
-                    piece.bottom = sgn * (Math.random() * 0.4 + 0.3);
-                }
-
-                if (j == SIZE.columns-1){
-                    piece.right = NaN
-                }
-                else{
-                    const sgn = (Math.random()-0.5)<0? -1:1;
-                    piece.right = sgn*(Math.random()*0.4+0.3);
-                }
-
-                if(j == 0){
-                    piece.left = NaN;
-                }
-                else {
-                    piece.left =- PIECES[count-1].right;
-                }
-                if (i==0){
-                    piece.top = NaN;
-                }
-                else {
-                    piece.top = -PIECES[count - SIZE.columns].bottom;
-                }
-                count++;
-            }
-        }
+        SIZE.rows = backendPuzzle.size.rows;
+        SIZE.columns = backendPuzzle.size.columns;
     }
 
 
@@ -218,7 +162,7 @@ const JigsawTest: React.FC = () => {
         x: number;
         y: number;
     }
-    function randomizePieces() {
+    function randomizePiecesLocation() {
 
         for (let i = 0; i < PIECES.length; i++) {
             let location: Coordinates = {
@@ -233,9 +177,9 @@ const JigsawTest: React.FC = () => {
         }
     }
 
-    class Piece {
-        rowIndex: any;
-        colIndex: any;
+    class FrontEndPiece implements Piece{
+        rowIndex: number;
+        colIndex: number;
         x: number;
         y: number;
         width: number;
@@ -243,13 +187,19 @@ const JigsawTest: React.FC = () => {
         xCorrect: number;
         yCorrect: number;
         correct: boolean;
-        bottom: any = null;
-        right: any = null;
-        left: any = null;
-        top: any = null;
-        constructor(rowIndex: any, colIndex: any) {
-            this.rowIndex = rowIndex;
-            this.colIndex = colIndex;
+        bottom: any;
+        right: any;
+        left: any;
+        top: any;
+        constructor(backendPiece: Piece) {
+
+            this.rowIndex = backendPiece.rowIndex;
+            this.colIndex = backendPiece.colIndex;
+            this.bottom = backendPiece.bottom;
+            this.right = backendPiece.right;
+            this.left = backendPiece.left;
+            this.top = backendPiece.top;
+
             this.x = SIZE.x + SIZE.width * this.colIndex / SIZE.columns;
             this.y = SIZE.y + SIZE.height * this.rowIndex / SIZE.rows;
             this.width = SIZE.width / SIZE.columns;
@@ -267,7 +217,6 @@ const JigsawTest: React.FC = () => {
             const tabHeight = 0.2*sz;
 
 
-            //context.rect(this.x, this.y, this.width, this.height);
             // from top left
             context.moveTo(this.x, this.y);
             // to top right
@@ -419,4 +368,4 @@ const JigsawTest: React.FC = () => {
     );
 };
 
-export default JigsawTest;
+export default Jigsaw;
