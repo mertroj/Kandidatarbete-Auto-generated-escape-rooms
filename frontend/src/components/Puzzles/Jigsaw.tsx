@@ -20,11 +20,11 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
 
     let CANVAS: HTMLCanvasElement | null    = canvasRef.current;
 
-    async function jigsawImage(rows: number, columns: number) {
+    async function jigsawImage() {
         try {
             const response = await fetch('http://localhost:8080/jigsaw/image/?gameId=' + gameId);
             if (response.ok) {
-                CANVAS = canvasRef.current;
+
                 const blob = await response.blob();
                 const imageUrl = URL.createObjectURL(blob);
 
@@ -32,12 +32,13 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
                 IMAGE.src = imageUrl;
 
                 IMAGE.onload = function () {
+                    CANVAS = canvasRef.current;
                     handleResize(); // Resize canvas after image load
                     addEventListeners();
                     updateGame();
+                    initializeGame();
+                    randomizePiecesLocation();
                 };
-                initializeGame();
-                randomizePiecesLocation();
             }
 
         } catch (error) {
@@ -55,7 +56,7 @@ function Jigsaw ({puzzle}: {puzzle: JigsawPuzzle}) {
     }
 
     useEffect(() => {
-        jigsawImage(4,4);
+        jigsawImage();
     }, []);
 
     useEffect(() => {
