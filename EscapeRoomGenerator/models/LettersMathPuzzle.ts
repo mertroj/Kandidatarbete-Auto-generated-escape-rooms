@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from './Helpers';
-import { Puzzle } from './Puzzle';
+import { Observer, Puzzle } from './Puzzle';
+import { shuffleArray } from './Helpers';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -13,9 +14,14 @@ export class LettersMathPuzzle implements Puzzle{
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     solved: boolean = false;
-    estimatedTime: number = 2;
+    estimatedTime: number = 3; //Average based on tests
+    isLocked: boolean = false;
+    private observers: Observer[] = [];
+    private dependentPuzzles: string[];
 
-    constructor(){
+    constructor(dependentPuzzles: string[]){
+        this.dependentPuzzles = dependentPuzzles;
+        if (this.dependentPuzzles.length > 0) this.isLocked = true;
         let [question, letters, mainAnswer, shuffledAnswer] = this.init();
         this.question = question;
         let possibleAnswers = this.generateAllMappings(
@@ -68,6 +74,21 @@ export class LettersMathPuzzle implements Puzzle{
         return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
     }
 
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.forEach(observer => {
+            observer.update(this.id);
+        });
+    }
+    update(id: string): void{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+        }
+    }
+
     getHint(): string{
         if(this.hintLevel < 4){
             const number: string = this.getMainAnswer().toString()[this.hintLevel++];
@@ -80,6 +101,7 @@ export class LettersMathPuzzle implements Puzzle{
     checkAnswer(answer: string): boolean {
         let res = this.getPossibleAnswers().includes(answer);
         if (!this.solved) this.solved = res
+        if (res) this.notifyObservers();
         return res
     }
 
@@ -131,14 +153,6 @@ export class LettersMathPuzzle implements Puzzle{
         let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
         return originalMapped - remainder === shuffledMapped;
     }
-}
-
-function shuffleArray<t>(array: t[]): t[] {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
 }
 
 function mapNumbersToLetters(numbers: string, letters: string): string {

@@ -33,3 +33,11 @@ export function repeat<t>(n: number, fn: Function): t[] {
 export function removeDuplicates<t>(array: t[]): t[] {
     return [...new Set(array)];
 }
+
+export function shuffleArray<t>(array: t[]): t[] {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}

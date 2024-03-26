@@ -23,6 +23,7 @@ export interface Puzzle {
     description: string;
     hintLevel: number;
     solved: boolean;
+    isLocked: boolean;
     estimatedTime: number;
 }
 
@@ -32,6 +33,21 @@ export interface NewHint{
 
 export interface Timer {
     elapsedTime: number;
+}
+
+export interface SlidePuzzles extends Puzzle{
+    //question is irrelevant here
+    pieces: (Piece | null)[][];
+}
+
+export interface Piece {
+    number: number;
+    position: Position;
+}
+
+export interface Position {
+    x: number;
+    y: number;
 }
 
 export interface JigsawPiece {
