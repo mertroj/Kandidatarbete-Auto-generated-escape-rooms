@@ -16,6 +16,7 @@ class TimeoutError extends Error {
 
 export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
     let puzzleBox: Puzzle[];
+    let counter = 0;
     while(true){
         let remainingTime: number = estimatedTime;
         puzzleBox = [];
@@ -29,7 +30,10 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
         }
         if(puzzleBox.length > 2){
             break;
+        }else if(counter > 50){ //prevent infinite loop if not possible
+            throw new TimeoutError("Failed to generate a puzzle box with the required time " +estimatedTime+ " after 50 tries");
         }
+        counter++;
     }
     let graph: Graph = divergingTree(puzzleBox.length) //To be replaced with a function that return a correct graph
 

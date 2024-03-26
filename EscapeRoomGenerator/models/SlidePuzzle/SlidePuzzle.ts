@@ -9,8 +9,8 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
 
     id: string = uuidv4();
     type: string = "slidePuzzle";
-    question: string = 'No question for this puzzle type.';
-    description: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
+    question: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
+    description: string = "The last squares are the ones to be empty, the rest should be in order";
     solved: boolean = false;
     hintLevel: number = 0;
     estimatedTime: number;
@@ -18,7 +18,7 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
     isLocked: boolean = false;
     private rows: number;
     private cols: number;
-    private dependentPuzzles: string[] ;
+    private dependentPuzzles: string[];
     private observers: Observer[] = [];
 
     constructor(difficulty: number, dependentPuzzles: string[]){

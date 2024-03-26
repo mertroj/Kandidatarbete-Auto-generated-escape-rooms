@@ -8,7 +8,8 @@ import { AnagramRouter } from "./routers/AnagramRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
-import { SlidePuzzle } from "./models/SlidePuzzle/SlidePuzzle";
+import { ImageRouter } from "./routers/ImageRouter";
+import { Theme } from "./models/Theme";
 
 
 const app: Express = express();
@@ -20,20 +21,24 @@ app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter); // TODO: change placeholder
+app.use('/images', ImageRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     let players = parseInt(String(req.query.players));
     let difficulty = parseInt(String(req.query.difficulty));
+    let theme = String(req.query.theme);
 
     console.log("Creating an escape room");
 
     if (Number.isNaN(players)) {
         res.status(400).send("The player query parameter is missing or invalid");
     } else if (Number.isNaN(difficulty)) {
-        res.status(400).send("The difficulty query parameter is missing or invalid");
+        res.status(400).send("The difficulty query parameter is missing or invalid");;
+    } else if (theme === undefined || theme === "" || !(Object.values(Theme) as string[]).includes(theme)) {
+        res.status(400).send("The theme query parameter is missing or invalid");
     } else {
-        let er: EscapeRoom = new EscapeRoom(players, difficulty);
-        res.send(er.id);
+        let er: EscapeRoom = new EscapeRoom(players, difficulty, theme as Theme);
+        res.status(200).send(er.id);
     }
     console.log("Finished");
 });

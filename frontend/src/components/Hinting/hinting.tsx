@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './hinting.css'
+import './hinting.css';
 
 
 
 
 function Hinting ({hintsList} : {hintsList : string[]}) {
-    const [hintNodes, setHintNodes] = useState<JSX.Element[]>([])
+    const [hintNodes, setHintNodes] = useState<JSX.Element[]>([]);
+
 
     useEffect(() => {
         let i = 0;
@@ -14,7 +15,8 @@ function Hinting ({hintsList} : {hintsList : string[]}) {
     }, [hintsList])
 
     return (
-        <div className={'hint-window d-flex flex-column text-center vh-100'}>
+
+        <div className={'hint-window d-flex flex-column text-center'}>
             <h2>Hints list:</h2>
             <div className='hint-container overflow-y-scroll'>
                 {hintNodes}

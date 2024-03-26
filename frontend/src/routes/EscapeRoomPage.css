@@ -1,0 +1,6 @@
+.panel-container {
+    display: flex;
+    align-items: stretch;
+    height: 100vh;
+    width: 50px;
+}

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Room } from './Room';
 import {Timer} from "./Timer";
+import { Theme } from './Theme';
 
 
 export class EscapeRoom {
@@ -9,8 +10,9 @@ export class EscapeRoom {
     id: string;
     rooms: Room[];
     timer: Timer;
-    
-    constructor(players: number, difficulty: number) {
+    theme: Theme;
+    constructor(players: number, difficulty: number, theme: Theme) {
+        this.theme = theme;
         let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
         this.id = uuidv4();
@@ -29,7 +31,8 @@ export class EscapeRoom {
             id: gameId, 
             rooms: EscapeRoom.escapeRooms[gameId].rooms
                         .filter((room) => room.is_unlocked),
-            timer: EscapeRoom.escapeRooms[gameId].timer
+            timer: EscapeRoom.escapeRooms[gameId].timer,
+            theme: EscapeRoom.escapeRooms[gameId].theme
         }
     }
 }
