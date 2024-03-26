@@ -30,15 +30,15 @@ export class Jigsaw implements Puzzle {
         switch (difficulty) {
             case 1:
                 this.size = {rows: 3, columns: 3}
-                this.estimatedTime = 2
+                this.estimatedTime = 2;
                 break;
             case 2:
                 this.size = {rows: 5, columns: 5}
-                this.estimatedTime = 5
+                this.estimatedTime = 4;
                 break;
             case 3:
                 this.size = {rows: 10, columns: 10}
-                this.estimatedTime = 12
+                this.estimatedTime = 10;
                 break;
             default:
                 this.estimatedTime = 0
