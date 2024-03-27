@@ -103,5 +103,5 @@ JigsawRouter.patch('/setCorrect', (req: setCorrectRequest, res: Response) => {
 });
 
 JigsawRouter.post('/create', (req: Request, res: Response) => {
-    res.status(200).send(new Jigsaw(2, []));
+    res.status(200).send(new Jigsaw(1, []));
 });

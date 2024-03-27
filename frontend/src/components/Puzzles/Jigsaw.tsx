@@ -3,8 +3,6 @@ import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
 import {useParams} from "react-router-dom";
 import axios from "axios";
 
-//TODO:  Fix the bug with the pieces not always being drawn.
-
 function Jigsaw ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -374,7 +372,7 @@ function Jigsaw ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
         }
         isClose() {
             return distance({x: this.x, y: this.y},
-                {x: this.xCorrect, y: this.yCorrect}) < this.width / 3;
+                {x: this.xCorrect, y: this.yCorrect}) < this.width / 2.5;
         }
         snap() {
             this.x = this.xCorrect;
