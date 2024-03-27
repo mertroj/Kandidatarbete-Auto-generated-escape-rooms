@@ -1,7 +1,7 @@
-import {Observer, Puzzle} from './Puzzle';
+import { Observable, Observer } from './ObserverPattern';
 import {v4 as uuidv4} from "uuid";
 
-export class Jigsaw implements Puzzle {
+export class Jigsaw implements Observable, Observer {
     private static puzzles: {[key: string]: Jigsaw} = {}
     id: string = uuidv4();
     static get(puzzleId: string): Jigsaw {
@@ -78,6 +78,19 @@ export class Jigsaw implements Puzzle {
         }
     }
 
+    strip() {
+        return {
+            type: this.type,
+            id: this.id,
+            question: this.question,
+            description: this.description,
+            hintLevel: this.hintLevel,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            pieces: this.pieces,
+            size: this.size
+        }
+    }
 }
 
 

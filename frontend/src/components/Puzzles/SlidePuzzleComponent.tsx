@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SlidePuzzles } from '../../interfaces';
+import { SlidePuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
 import './slidePuzzle.css';
@@ -7,11 +7,11 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 
 interface PatchResponse {
     isSuccessful: boolean;
-    puzzle: SlidePuzzles;
+    puzzle: SlidePuzzle;
 }
 interface HintResponse {
     isSuccessful: boolean;
-    puzzle: SlidePuzzles;
+    puzzle: SlidePuzzle;
 }
 enum Direction {
     UP = 'up',
@@ -20,11 +20,11 @@ enum Direction {
     RIGHT = 'right'
 }
 interface SlidePuzzleProps {
-    puzzle: SlidePuzzles;
+    puzzle: SlidePuzzle;
     onSolve: Function;
 }
-function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
-    const [updatedPuzzle, setPuzzle] = useState<SlidePuzzles>(puzzle);
+function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
+    const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>, autoMove: boolean, dir?: Direction) {
@@ -159,4 +159,4 @@ function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
     );
 }
 
-export default SlidePuzzle;
+export default SlidePuzzleComponent;

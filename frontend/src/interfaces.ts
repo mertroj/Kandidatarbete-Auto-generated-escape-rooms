@@ -4,10 +4,10 @@ export interface EscapeRoom {
     rooms: Room[]
 }
 
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle
+
 export interface Room {
     id: string;
-    x: number;
-    y: number;
     left: string;
     right: string;
     up: string;
@@ -16,10 +16,32 @@ export interface Room {
     puzzles: Puzzle[]
 }
 
-export interface Puzzle {
+export interface AnagramPuzzle {
     id: string;
     type: string;
-    question:string;
+    question: string;
+    description: string;
+    hintLevel: number;
+    solved: boolean;
+    isLocked: boolean;
+    estimatedTime: number;
+}
+
+export interface LettersMathPuzzle {
+    id: string;
+    type: string;
+    question: string;
+    description: string;
+    hintLevel: number;
+    solved: boolean;
+    isLocked: boolean;
+    estimatedTime: number;
+}
+
+export interface OperatorsMathPuzzle {
+    id: string;
+    type: string;
+    question: string;
     description: string;
     hintLevel: number;
     solved: boolean;
@@ -35,8 +57,15 @@ export interface Timer {
     elapsedTime: number;
 }
 
-export interface SlidePuzzles extends Puzzle{
-    //question is irrelevant here
+export interface SlidePuzzle {
+    id: string;
+    type: string;
+    question: string;
+    description: string;
+    hintLevel: number;
+    solved: boolean;
+    isLocked: boolean;
+    estimatedTime: number;
     pieces: (Piece | null)[][];
 }
 
@@ -63,7 +92,15 @@ export interface JigsawPiece {
     setCorrect(correct: boolean): void;
 }
 
-export interface JigsawPuzzle extends Puzzle{
+export interface JigsawPuzzle {
+    id: string;
+    type: string;
+    question: string;
+    description: string;
+    hintLevel: number;
+    solved: boolean;
+    isLocked: boolean;
+    estimatedTime: number;
     pieces: JigsawPiece[];
     size: {rows: number, columns: number};
 

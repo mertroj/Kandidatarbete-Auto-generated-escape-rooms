@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
-import { Puzzle } from '../../interfaces';
+import { OperatorsMathPuzzle } from '../../interfaces';
 
-interface LettersMathPuzzleProps {
+interface OperatorMathPuzzleProps {
     addHint: Function;
-    puzzle: Puzzle;
+    puzzle: OperatorsMathPuzzle;
     onSolve: Function;
 }
-function OperatorMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
+function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
+    const {puzzle, addHint, onSolve} = operatorMathPuzzleProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -59,4 +59,4 @@ function OperatorMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
     );
 }
 
-export default OperatorMathPuzzle;
+export default OperatorMathPuzzleComponent;

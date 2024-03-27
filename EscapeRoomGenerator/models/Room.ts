@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Graph } from 'graphlib';
-import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
-import { Puzzle } from './Puzzles/Puzzle';
+import { puzzleTreePopulator } from './puzzles/PuzzleTreePopulator';
+import { Puzzle } from './puzzles/Puzzle';
 
 
 export class Room {
@@ -42,7 +42,7 @@ export class Room {
             up: this.up,
             down: this.down,
             isLocked: this.isLocked,
-            puzzles: this.graph.nodes().map((node) => (this.graph.node(node) as Puzzle))
+            puzzles: this.graph.nodes().map((node) => (this.graph.node(node) as Puzzle).strip())
         }
     }
 }

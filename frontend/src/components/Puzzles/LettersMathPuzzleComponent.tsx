@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
-import { Puzzle } from '../../interfaces';
+import { LettersMathPuzzle } from '../../interfaces';
 
-interface AnagramProps {
+interface LettersMathPuzzleProps {
     addHint: Function;
-    puzzle: Puzzle;
+    puzzle: LettersMathPuzzle;
     onSolve: Function;
 }
-function AnagramComponent (anagramProps: AnagramProps) {
-    const {puzzle, addHint, onSolve} = anagramProps;
+function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzleProps) {
+    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
+            const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 alert('Correct!');
                 onSolve();
@@ -27,9 +27,10 @@ function AnagramComponent (anagramProps: AnagramProps) {
             console.error(error);
         }
     }
+    
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
+            const response = await axios.get(`http://localhost:8080/lettersMathPuzzles/hint/?puzzleId=${puzzle.id}`);
             addHint(response.data);
         } catch (error) {
             console.error(error);
@@ -54,7 +55,8 @@ function AnagramComponent (anagramProps: AnagramProps) {
                 </button>
             </div>
         </div>
+        
     );
 }
 
-export default AnagramComponent;
+export default LettersMathPuzzleComponent;
