@@ -43,8 +43,6 @@ app.get('/creategame', (req: Request, res: Response) => {
     let difficulty = parseInt(String(req.query.difficulty));
     let theme = String(req.query.theme);
 
-    console.log("Creating an escape room");
-
     if (Number.isNaN(players)) {
         res.status(400).send("The player query parameter is invalid");
     } else if (Number.isNaN(difficulty)) {
