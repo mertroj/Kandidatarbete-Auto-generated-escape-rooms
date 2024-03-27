@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Piece } from "./Piece";
 import { Position } from "./Position";
-import {shuffleArray} from "../Helpers";
-import { Observable, Observer, Puzzle } from '../Puzzle';
+import {shuffleArray} from "../../Helpers";
+import { Observable, Observer } from '../ObserverPattern';
 
-export class SlidePuzzle implements Puzzle, Observer, Observable{
+export class SlidePuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
 
     id: string = uuidv4();
@@ -154,6 +154,20 @@ export class SlidePuzzle implements Puzzle, Observer, Observable{
             return true;
         }
         return false;
+    }
+
+    strip() {
+        return {
+            type: this.type,
+            id: this.id,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+
+            question: this.question,
+            description: this.description,
+            pieces: this.pieces
+        }
     }
 }
 /*

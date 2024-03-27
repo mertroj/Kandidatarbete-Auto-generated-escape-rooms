@@ -1,7 +1,6 @@
 import * as path from "node:path";
 import { Request, Response } from 'express';
-import {Jigsaw, Piece} from "../models/Jigsaw";
-import {LettersMathPuzzle} from "../models/LettersMathPuzzle";
+import {Jigsaw, Piece} from "../models/puzzles/Jigsaw";
 import {EscapeRoom} from "../models/EscapeRoom";
 
 export const JigsawRouter = require('express').Router();

@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
-import { Puzzle } from '../../interfaces';
+import { AnagramPuzzle } from '../../interfaces';
 
-interface LettersMathPuzzleProps {
+interface AnagramProps {
     addHint: Function;
-    puzzle: Puzzle;
+    puzzle: AnagramPuzzle;
     onSolve: Function;
 }
-function LettersMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
+
+function AnagramPuzzleComponent (anagramProps: AnagramProps) {
+    const {puzzle, addHint, onSolve} = anagramProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
+            const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 alert('Correct!');
                 onSolve();
@@ -27,18 +28,13 @@ function LettersMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
             console.error(error);
         }
     }
-    
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/lettersMathPuzzles/hint/?puzzleId=${puzzle.id}`);
+            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
             addHint(response.data);
         } catch (error) {
             console.error(error);
         }
-    }
-
-    if (puzzle.question === null || puzzle.estimatedTime === 0 /* || description === null */) {
-        return <h1>Loading...</h1>;
     }
 
     return (
@@ -55,8 +51,7 @@ function LettersMathPuzzle (lettersMathPuzzleProps: LettersMathPuzzleProps) {
                 </button>
             </div>
         </div>
-        
     );
 }
 
-export default LettersMathPuzzle;
+export default AnagramPuzzleComponent;

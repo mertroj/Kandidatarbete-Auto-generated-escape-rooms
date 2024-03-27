@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { choice, randomIntRange } from './Helpers'
-import { Observer, Puzzle } from './Puzzle';
+import { choice, randomIntRange } from '../Helpers'
+import { Observable, Observer } from './ObserverPattern';
 
 
-export class OperatorMathPuzzle implements Puzzle{
+export class OperatorMathPuzzle implements Observable, Observer {
     private static puzzles: {[key:string]: [OperatorMathPuzzle, string]} = {}
     
     private numberOfOperands: number;
@@ -83,5 +83,18 @@ export class OperatorMathPuzzle implements Puzzle{
         let question = numbers.join(" □ ") + ` = ${eval(expression)}`
 
         return [question, answer]
+    }
+
+    strip() {
+        return {
+            type: this.type,
+            id: this.id,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+
+            question: this.question,
+            description: this.description,
+        }
     }
 }

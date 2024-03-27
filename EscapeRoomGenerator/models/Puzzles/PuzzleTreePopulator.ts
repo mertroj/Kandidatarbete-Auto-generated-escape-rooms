@@ -1,5 +1,5 @@
 import {Edge, Graph, alg} from "graphlib";
-import { divergingTree } from "./DivergingTree";
+import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 
@@ -73,7 +73,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             graph.setNode(nodeId, puzzleBox[i]);
         }catch(e){
             if(e instanceof TimeoutError){
-                console.log(e.message); //to be removed?
+                console.error(e.message); //to be removed?
                 break;
             }else{
                 throw e; //rethrow the error if it is not a TimeoutError

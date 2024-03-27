@@ -1,4 +1,4 @@
-import { Anagram } from "../models/Anagram";
+import { Anagram } from "../models/puzzles/Anagram";
 import express, { Request, Response } from "express";
 
 export const AnagramRouter = express.Router();

@@ -5,7 +5,7 @@ import axios from "axios";
 
 //TODO:  Fix the bug with the pieces not always being drawn.
 
-function Jigsaw ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
+function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     let IMAGE: HTMLImageElement;
@@ -399,4 +399,4 @@ function Jigsaw ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     );
 };
 
-export default Jigsaw;
+export default JigsawPuzzleComponent;
