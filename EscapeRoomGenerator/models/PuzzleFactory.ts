@@ -12,28 +12,28 @@ export class PuzzleFactory{
     private static operatorCounter = 0;
     private static slideCounter = 0;
 
-    ////THE BUG IS HERE... DO NOT ADD THE OBSERVERS BEFORE MAKING SURE THAT THE PUZZLE IT ACCEPTED IN THE RECURSION
+    //1000 gives more granularity than 100 whitout affecting the relative probabilities since the weight are relative, not absolute
     static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
-            [100 - (this.anagramCounter/100), () =>
+            [1000 - (this.anagramCounter/1000), () =>
                 {
                     this.anagramCounter++;
                     return new Anagram(difficulty, dependentPuzzles);
                 }
             ],            
-            [100 - (this.lettersCounter/100), () =>
+            [1000 - (this.lettersCounter/1000), () =>
                 {
                     this.lettersCounter++;
                     return new LettersMathPuzzle(dependentPuzzles);
                 }
             ],
-            [100 - (this.operatorCounter/100), () =>
+            [1000 - (this.operatorCounter/1000), () =>
                 {
                     this.operatorCounter++;
                     return new OperatorMathPuzzle(difficulty, dependentPuzzles);
                 }
             ],
-            [100 - (this.slideCounter/100), () => 
+            [1000 - (this.slideCounter/1000), () => 
                 {
                     this.slideCounter++;
                     return new SlidePuzzle(difficulty, dependentPuzzles);
