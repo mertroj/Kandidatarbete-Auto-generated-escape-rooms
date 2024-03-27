@@ -26,13 +26,13 @@ export class Room {
         this.right = '';
         this.up = '';
         this.down = '';
-        this.is_unlocked = true;
+        this.is_unlocked = puzzles.some((puzzle) => !puzzle.isLocked);
         this.slots = puzzles;
         Room.rooms[this.id] = this;
     }
 
     static get(roomId: string): Room {
-        return Room.rooms[roomId]
+        return Room.rooms[roomId];
     }
 
     static createRooms(totalTime: number, players: number, difficulty: number): Room[] {
@@ -40,6 +40,10 @@ export class Room {
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
+        let graph = puzzleTreePopulator(totalTime, difficulty);
+        let nodes = graph.nodes();
+        let avgNodesPerRoom = Math.floor(nodes.length / nrOfRooms);
+        let remainingNodes = nodes.length % nrOfRooms;
 
         while (rooms.length < nrOfRooms) {
             let pos_i = randomIntRange(0, possible_locations.length);
@@ -47,8 +51,10 @@ export class Room {
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
 
-            let graph = puzzleTreePopulator(20, difficulty);
-            rooms.push(new Room(...pos, graph.nodes().map((node) => graph.node(node) as Puzzle)));
+            let roomNodes = nodes.splice(0, avgNodesPerRoom + (remainingNodes > 0 ? 1 : 0));
+            if (remainingNodes > 0) remainingNodes--;
+
+            rooms.push(new Room(...pos, roomNodes.map((node) => graph.node(node) as Puzzle)));
         
             visited.add(`${pos[0]},${pos[1]}`);
     

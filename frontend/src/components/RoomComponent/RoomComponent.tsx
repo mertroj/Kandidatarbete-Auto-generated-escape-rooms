@@ -38,10 +38,9 @@ function RoomComponent (roomProps: RoomComponentProps) {
                 if (puzzle.type === 'slidePuzzle')
                     return <SlidePuzzle key={puzzle.id} puzzle={puzzle as SlidePuzzles} onSolve={updateRoom}/>
 
-            if (puzzle.type === 'jigsawpuzzle')
-                return <Jigsaw key={puzzle.id} puzzle={puzzle as JigsawPuzzle} onSolve={updateRoom}/>
+                if (puzzle.type === 'jigsawpuzzle')
+                    return <Jigsaw key={puzzle.id} puzzle={puzzle as JigsawPuzzle} onSolve={updateRoom}/>
 
-            return <p>Invalid puzzle</p>
                 return <p>Invalid puzzle</p>
             }else if(puzzle.isLocked){ //definitely not solved since it is locked
                 allSolved = false;
@@ -51,7 +50,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     hasLockedPuzzle = true;
                     return <LockedPuzzle key={puzzle.id}/>;
                 }
-            }else{  //puzzle is solved
+            }else{ //puzzle is solved
                 return null;
             }
         });
