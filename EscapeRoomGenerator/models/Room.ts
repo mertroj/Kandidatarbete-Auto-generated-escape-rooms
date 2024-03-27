@@ -15,7 +15,7 @@ export class Room {
     right: string;
     up: string;
     down: string;
-    is_unlocked: boolean;
+    isLocked: boolean;
     slots: Puzzle[];
 
     constructor(x: number, y: number, puzzles: Puzzle[]) {
@@ -26,7 +26,7 @@ export class Room {
         this.right = '';
         this.up = '';
         this.down = '';
-        this.is_unlocked = puzzles.some((puzzle) => !puzzle.isLocked);
+        this.isLocked = puzzles.every((puzzle) => puzzle.isLocked);
         this.slots = puzzles;
         Room.rooms[this.id] = this;
     }
