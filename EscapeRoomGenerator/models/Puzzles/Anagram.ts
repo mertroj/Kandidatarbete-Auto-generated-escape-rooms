@@ -107,11 +107,12 @@ export class Anagram implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+            
             question: this.question,
             description: this.description,
-            hintLevel: this.hintLevel,
-            solved: this.solved,
-            isLocked: this.isLocked
         }
     }
 }

@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Piece } from "./Piece";
 import { Position } from "./Position";
 import {shuffleArray} from "../../Helpers";
-import { Observable, Observer } from '../Puzzle';
+import { Observable, Observer } from '../ObserverPattern';
 
 export class SlidePuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
@@ -160,11 +160,12 @@ export class SlidePuzzle implements Observer, Observable{
         return {
             type: this.type,
             id: this.id,
-            question: this.question,
-            description: this.description,
-            hintLevel: this.hintLevel,
             solved: this.solved,
             isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+
+            question: this.question,
+            description: this.description,
             pieces: this.pieces
         }
     }

@@ -19,34 +19,34 @@ export interface Room {
 export interface AnagramPuzzle {
     id: string;
     type: string;
-    question: string;
-    description: string;
-    hintLevel: number;
     solved: boolean;
     isLocked: boolean;
-    estimatedTime: number;
+    hintLevel: number;
+
+    question: string;
+    description: string;
 }
 
 export interface LettersMathPuzzle {
     id: string;
     type: string;
-    question: string;
-    description: string;
-    hintLevel: number;
     solved: boolean;
     isLocked: boolean;
-    estimatedTime: number;
+    hintLevel: number;
+
+    question: string;
+    description: string;
 }
 
 export interface OperatorsMathPuzzle {
     id: string;
     type: string;
-    question: string;
-    description: string;
-    hintLevel: number;
     solved: boolean;
     isLocked: boolean;
-    estimatedTime: number;
+    hintLevel: number;
+
+    question: string;
+    description: string;
 }
 
 export interface NewHint{
@@ -60,12 +60,12 @@ export interface Timer {
 export interface SlidePuzzle {
     id: string;
     type: string;
-    question: string;
-    description: string;
-    hintLevel: number;
     solved: boolean;
     isLocked: boolean;
-    estimatedTime: number;
+    hintLevel: number;
+
+    question: string;
+    description: string;
     pieces: (Piece | null)[][];
 }
 
@@ -95,12 +95,12 @@ export interface JigsawPiece {
 export interface JigsawPuzzle {
     id: string;
     type: string;
-    question: string;
-    description: string;
-    hintLevel: number;
     solved: boolean;
     isLocked: boolean;
-    estimatedTime: number;
+    hintLevel: number;
+
+    question: string;
+    description: string;
     pieces: JigsawPiece[];
     size: {rows: number, columns: number};
 

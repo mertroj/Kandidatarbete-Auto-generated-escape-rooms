@@ -82,11 +82,12 @@ export class Jigsaw implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
-            question: this.question,
-            description: this.description,
-            hintLevel: this.hintLevel,
             solved: this.solved,
             isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+            
+            question: this.question,
+            description: this.description,
             pieces: this.pieces,
             size: this.size
         }

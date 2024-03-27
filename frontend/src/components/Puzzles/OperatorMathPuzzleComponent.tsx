@@ -37,10 +37,6 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
         }
     }
 
-    if (puzzle.question === null || puzzle.estimatedTime === 0 /* || description === null */) {
-        return <h1>Loading...</h1>;
-    }
-
     return (
         <div className='puzzle'>
             <p>{puzzle.description}</p>
