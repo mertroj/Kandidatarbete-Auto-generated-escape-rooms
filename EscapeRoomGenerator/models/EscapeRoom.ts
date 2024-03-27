@@ -17,10 +17,11 @@ export class EscapeRoom {
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
         this.id = uuidv4();
         this.rooms = Room.createRooms(totalTime, players, difficulty)
-        this.rooms[0].is_unlocked = true
+        this.rooms[0].isLocked = true
         EscapeRoom.escapeRooms[this.id] = this
         this.timer = new Timer()
         this.timer.start()
+        console.log(this.rooms);
     }
 
     static get(gameId: string) : EscapeRoom | null {
@@ -32,8 +33,7 @@ export class EscapeRoom {
         });
         return {
             id: gameId, 
-            rooms: EscapeRoom.escapeRooms[gameId].rooms
-                        .filter((room) => room.is_unlocked),
+            rooms: EscapeRoom.escapeRooms[gameId].rooms,
             timer: EscapeRoom.escapeRooms[gameId].timer,
             theme: EscapeRoom.escapeRooms[gameId].theme
         }
@@ -41,13 +41,13 @@ export class EscapeRoom {
 }
 
 function checkForUnlocked(room: Room): void {
-    if (!room.is_unlocked) {
+    if (room.isLocked) {
         room.slots.forEach((slot) => {
-            if (!slot.isLocked) {
-                room.is_unlocked = true;
+            if(!slot.isLocked) {
+                room.isLocked = false;
                 return;
             }
-        })
+        });
     }
 }
 
