@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Puzzle } from './Puzzle';
 import { Graph } from 'graphlib';
-import { puzzleTreePopulator } from './PuzzleTreePopulator';
+import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
+import { Puzzle } from './Puzzles/Puzzle';
 
 
 export class Room {

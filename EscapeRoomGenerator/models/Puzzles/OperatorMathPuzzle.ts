@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { choice, randomIntRange } from './Helpers'
+import { choice, randomIntRange } from '../Helpers'
 import { Observer, Puzzle } from './Puzzle';
 
 

@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-import { SlidePuzzle } from "../models/SlidePuzzle/SlidePuzzle";
-import { Position } from "../models/SlidePuzzle/Position";
+import { SlidePuzzle } from "../models/Puzzles/SlidePuzzle/SlidePuzzle";
+import { Position } from "../models/Puzzles/SlidePuzzle/Position";
 
 export const SlidePuzzleRouter = express.Router();
 

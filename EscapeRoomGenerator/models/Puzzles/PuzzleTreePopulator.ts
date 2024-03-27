@@ -1,5 +1,5 @@
 import {Edge, Graph, alg} from "graphlib";
-import { divergingTree } from "./DivergingTree";
+import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 

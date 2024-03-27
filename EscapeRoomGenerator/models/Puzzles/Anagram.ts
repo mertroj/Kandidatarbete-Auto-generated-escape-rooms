@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomInt, randomIntRange } from './Helpers'
+import { randomInt, randomIntRange } from '../Helpers'
 import { Observer, Puzzle } from './Puzzle';
 
-const anagramsData = require('../anagrams.json')
+const anagramsData = require('../../anagrams.json')
 
 export class Anagram implements Puzzle {
     private static puzzles: {[key: string]: Anagram} = {}

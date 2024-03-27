@@ -1,4 +1,4 @@
-import { OperatorMathPuzzle } from "../models/OperatorMathPuzzle";
+import { OperatorMathPuzzle } from "../models/Puzzles/OperatorMathPuzzle";
 import express, { Request, Response } from "express";
 
 export const OperatorMathPuzzleRouter = express.Router();

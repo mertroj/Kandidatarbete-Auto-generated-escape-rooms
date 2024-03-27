@@ -1,4 +1,4 @@
-import { LettersMathPuzzle } from "../models/LettersMathPuzzle";
+import { LettersMathPuzzle } from "../models/Puzzles/LettersMathPuzzle";
 import express, { Request, Response } from "express";
 
 export const LettersMathPuzzleRouter = express.Router();

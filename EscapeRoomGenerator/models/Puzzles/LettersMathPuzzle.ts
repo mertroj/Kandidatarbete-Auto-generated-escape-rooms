@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomIntRange, removeDuplicates } from './Helpers';
+import { randomIntRange, removeDuplicates } from '../Helpers';
 import { Observer, Puzzle } from './Puzzle';
-import { shuffleArray } from './Helpers';
+import { shuffleArray } from '../Helpers';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

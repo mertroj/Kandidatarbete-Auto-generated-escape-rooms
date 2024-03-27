@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Piece } from "./Piece";
 import { Position } from "./Position";
-import {shuffleArray} from "../Helpers";
+import {shuffleArray} from "../../Helpers";
 import { Observable, Observer, Puzzle } from '../Puzzle';
 
 export class SlidePuzzle implements Puzzle, Observer, Observable{
