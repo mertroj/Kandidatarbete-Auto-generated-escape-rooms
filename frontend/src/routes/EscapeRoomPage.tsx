@@ -51,7 +51,7 @@ function EscapeRoomPage() {
     }
 
     function addHint(hint: string) {
-        setHintsList(hintsList => [...hintsList, hint])
+        setHintsList(hintsList => [...hintsList, hint]);
     }
 
     function fetchEscapeRoom() {

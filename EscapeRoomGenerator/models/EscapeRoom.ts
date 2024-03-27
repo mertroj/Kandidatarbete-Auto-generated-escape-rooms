@@ -27,6 +27,9 @@ export class EscapeRoom {
         if (EscapeRoom.escapeRooms[gameId] === undefined) {
             return null
         }
+        EscapeRoom.escapeRooms[gameId].rooms.map((room) => {
+            checkForUnlocked(room);
+        });
         return {
             id: gameId, 
             rooms: EscapeRoom.escapeRooms[gameId].rooms
@@ -37,4 +40,14 @@ export class EscapeRoom {
     }
 }
 
+function checkForUnlocked(room: Room): void {
+    if (!room.is_unlocked) {
+        room.slots.forEach((slot) => {
+            if (!slot.isLocked) {
+                room.is_unlocked = true;
+                return;
+            }
+        })
+    }
+}
 
