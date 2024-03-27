@@ -8,6 +8,7 @@ import { AnagramRouter } from "./routers/AnagramRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
+import { JigsawRouter } from "./routers/JigsawRouter";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
 import { DescriptionRouter } from "./routers/DescriptionRouter";
@@ -21,8 +22,9 @@ app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
-app.use('/anagrams', AnagramRouter); // TODO: change placeholder
+app.use('/anagrams', AnagramRouter);
 app.use('/images', ImageRouter);
+app.use('/jigsaw', JigsawRouter);
 app.use('/lockedPuzzle', DescriptionRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
