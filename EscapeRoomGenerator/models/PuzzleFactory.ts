@@ -7,13 +7,38 @@ import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import {Jigsaw} from "./Jigsaw";
 
 export class PuzzleFactory{
+    private static anagramCounter = 0;
+    private static lettersCounter = 0;
+    private static operatorCounter = 0;
+    private static slideCounter = 0;
+
     ////THE BUG IS HERE... DO NOT ADD THE OBSERVERS BEFORE MAKING SURE THAT THE PUZZLE IT ACCEPTED IN THE RECURSION
     static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
-            [1, () => new Anagram(difficulty, dependentPuzzles)], //false converging
-            [1, () => new LettersMathPuzzle(dependentPuzzles)], //false converging
-            [1, () => new OperatorMathPuzzle(difficulty, dependentPuzzles)], //false converging
-            [1, () => new SlidePuzzle(difficulty, dependentPuzzles)], //false converging
+            [100 - (this.anagramCounter/100), () =>
+                {
+                    this.anagramCounter++;
+                    return new Anagram(difficulty, dependentPuzzles);
+                }
+            ],            
+            [100 - (this.lettersCounter/100), () =>
+                {
+                    this.lettersCounter++;
+                    return new LettersMathPuzzle(dependentPuzzles);
+                }
+            ],
+            [100 - (this.operatorCounter/100), () =>
+                {
+                    this.operatorCounter++;
+                    return new OperatorMathPuzzle(difficulty, dependentPuzzles);
+                }
+            ],
+            [100 - (this.slideCounter/100), () => 
+                {
+                    this.slideCounter++;
+                    return new SlidePuzzle(difficulty, dependentPuzzles);
+                }
+            ],
             //Add Mastermind
         ])();
     }
