@@ -76,7 +76,7 @@ export class EscapeRoom {
         return {
             id: this.id, 
             rooms: this.rooms.filter((room) => !room.isLocked)
-            .map((room) => room.strip()),
+                             .map((room) => room.strip()),
             timer: this.timer,
             theme: this.theme
         }
