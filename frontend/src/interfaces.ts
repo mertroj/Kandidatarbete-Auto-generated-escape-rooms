@@ -49,3 +49,22 @@ export interface Position {
     x: number;
     y: number;
 }
+
+export interface JigsawPiece {
+    id: string;
+    rowIndex: number;
+    colIndex: number;
+    correct: boolean;
+    bottom: any;
+    right: any;
+    left: any;
+    top: any;
+
+    setCorrect(correct: boolean): void;
+}
+
+export interface JigsawPuzzle extends Puzzle{
+    pieces: JigsawPiece[];
+    size: {rows: number, columns: number};
+
+}
