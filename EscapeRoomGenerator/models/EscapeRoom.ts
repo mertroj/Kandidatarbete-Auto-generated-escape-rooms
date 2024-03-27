@@ -21,7 +21,6 @@ export class EscapeRoom {
         EscapeRoom.escapeRooms[this.id] = this
         this.timer = new Timer()
         this.timer.start()
-        console.log(this.rooms);
     }
 
     static get(gameId: string) : EscapeRoom | null {
