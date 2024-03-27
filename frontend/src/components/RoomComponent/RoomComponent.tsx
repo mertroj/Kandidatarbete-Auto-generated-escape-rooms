@@ -6,7 +6,7 @@ import OperatorMathPuzzle from "../Puzzles/OperatorMathPuzzle";
 import './RoomComponent.css'
 import { useEffect, useState } from 'react';
 import Jigsaw from "../Puzzles/Jigsaw";
-import SlidePuzzle from '../Puzzles/slidePuzzle';
+import SlidePuzzle from '../Puzzles/SlidePuzzle';
 import LockedPuzzle from '../Puzzles/LockedPuzzle';
 
 interface RoomComponentProps {
