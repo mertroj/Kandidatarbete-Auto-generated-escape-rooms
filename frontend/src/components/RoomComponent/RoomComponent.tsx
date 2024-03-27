@@ -57,7 +57,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
         });
         if(allSolved){ //means that nodes is full of nulls
             console.log(nodes);
-            nodes.push(<div key={room.id} className='empty-room'>Nothing to do here! Go elsewhere</div>);
+            //nodes.push(<div key={room.id} className='empty-room'>Nothing to do here! Go elsewhere</div>);
         }
         setPuzzles(nodes);
     }, [room])

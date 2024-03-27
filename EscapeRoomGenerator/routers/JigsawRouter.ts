@@ -101,3 +101,7 @@ JigsawRouter.patch('/setCorrect', (req: setCorrectRequest, res: Response) => {
         res.status(500).send("Internal server error");
     }
 });
+
+JigsawRouter.post('/create', (req: Request, res: Response) => {
+    res.status(200).send(new Jigsaw(2, []));
+});

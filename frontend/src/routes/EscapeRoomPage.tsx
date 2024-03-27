@@ -1,12 +1,13 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { EscapeRoom, Room } from "../interfaces"
+import { EscapeRoom, JigsawPuzzle, Room } from "../interfaces"
 import Hinting from "../components/Hinting/hinting";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
 import Navbar from '../components/Navbar/Navbar';
 import {Row} from "react-bootstrap";
 import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
+import Jigsaw from "../components/Puzzles/Jigsaw";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
@@ -16,6 +17,10 @@ function EscapeRoomPage() {
     const [currentRoom, setCurrentRoom] = useState<Room>()
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
+
+    const [showPuzzle, setShowPuzzle] = useState(false);
+    const [puzzleData, setPuzzleData] = useState<JigsawPuzzle | null>(null);
+
 
     function checkEscapeRoomDone(): boolean {
         if (escapeRoom){
@@ -27,6 +32,11 @@ function EscapeRoomPage() {
                 }
             } return true;
         } return false;
+    }
+
+    async function createJigsawPuzzle(): Promise<JigsawPuzzle> {
+        const response = await axios.post<JigsawPuzzle>('http://localhost:8080/jigsaw/create');
+        return response.data;
     }
 
     async function fetchImage() {
@@ -91,7 +101,12 @@ function EscapeRoomPage() {
 
     useEffect(() => {
         if (checkEscapeRoomDone()) {
-            navigate(resultScreenUrl);
+            //navigate(resultScreenUrl);
+            createJigsawPuzzle().then((puzzle) => {
+                setPuzzleData(puzzle);
+                setShowPuzzle(true);
+            });
+
         }
     }, [escapeRoom]);
     
@@ -114,6 +129,7 @@ function EscapeRoomPage() {
                 {currentRoom ? 
                     <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
             </div>
+            {showPuzzle && puzzleData && <Jigsaw key={'end'} puzzle={puzzleData} onSolve={()=>navigate(resultScreenUrl)} />}
 
             <div className="panel-container">
                 <Hinting hintsList={hintsList} />
