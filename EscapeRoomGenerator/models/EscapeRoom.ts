@@ -21,6 +21,7 @@ export class EscapeRoom {
         EscapeRoom.escapeRooms[this.id] = this
         this.timer = new Timer()
         this.timer.start()
+        console.log(this.rooms);
     }
 
     static get(gameId: string) : EscapeRoom | null {
@@ -32,8 +33,7 @@ export class EscapeRoom {
         });
         return {
             id: gameId, 
-            rooms: EscapeRoom.escapeRooms[gameId].rooms
-                        .filter((room) => !room.isLocked),
+            rooms: EscapeRoom.escapeRooms[gameId].rooms,
             timer: EscapeRoom.escapeRooms[gameId].timer,
             theme: EscapeRoom.escapeRooms[gameId].theme
         }
@@ -42,8 +42,11 @@ export class EscapeRoom {
 
 function checkForUnlocked(room: Room): void {
     if (room.isLocked) {
-        room.slots.some((slot) => {
-            if(!slot.isLocked) room.isLocked = false;
+        room.slots.forEach((slot) => {
+            if(!slot.isLocked) {
+                room.isLocked = false;
+                return;
+            }
         });
     }
 }
