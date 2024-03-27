@@ -7,6 +7,8 @@ import './RoomComponent.css'
 import { useEffect, useState } from 'react';
 import Jigsaw from "../Puzzles/Jigsaw";
 import SlidePuzzle from '../Puzzles/SlidePuzzle';
+import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzle';
+import LockedPuzzleComponent from '../Puzzles/LockedPuzzle';
 
 interface RoomComponentProps {
     room: Room;
@@ -18,33 +20,27 @@ function RoomComponent (roomProps: RoomComponentProps) {
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
-        let spanNodes: JSX.Element[] = [];
-        let nodes = room.slots.map((puzzle) => {
-            if(!puzzle.solved && !puzzle.isLocked){
-                console.log('trying to render puzzle:', room.slots);
-                if (puzzle.type === 'anagram')
-                    return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
+        let nodes = room.puzzles.map((puzzle) => {
+            console.log('trying to render puzzle:', room.puzzles);
+            if (puzzle.solved)
+                return <SolvedPuzzleComponent/>
+                
+            if (puzzle.isLocked)
+                return <LockedPuzzleComponent/>
 
-                if (puzzle.type === 'lettersMathPuzzle')
-                    return <LettersMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
+            if (puzzle.type === 'anagram')
+                return <Anagram key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
+            
+            if (puzzle.type === 'lettersMathPuzzle')
+                return <LettersMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
 
-                if (puzzle.type === 'operatorMathPuzzle')
-                    return <OperatorMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
-
-                if (puzzle.type === 'slidePuzzle')
-                    return <SlidePuzzle key={puzzle.id} puzzle={puzzle as SlidePuzzles} onSolve={updateRoom}/>
-
-            if (puzzle.type === 'jigsawpuzzle')
-                return <Jigsaw key={puzzle.id} puzzle={puzzle as JigsawPuzzle} onSolve={updateRoom}/>
+            if (puzzle.type === 'operatorMathPuzzle') 
+                return <OperatorMathPuzzle key={puzzle.id} addHint={addHint} puzzle={puzzle} onSolve={updateRoom}/>
+                
+            if (puzzle.type === 'slidePuzzle') 
+                return <SlidePuzzle key={puzzle.id} puzzle={puzzle as SlidePuzzles} onSolve={updateRoom}/>
 
             return <p>Invalid puzzle</p>
-                return <p>Invalid puzzle</p>
-            }else if(puzzle.isLocked){ //definitely not solved since it is locked
-                return null; //TODO: Check if endPuzzle for example or converging and do something else
-            }else{  //puzzle is solved
-                return null;
-                //return <p>Puzzle solved</p> //maybe change to null in order to be skipped when rendering
-            }
         })
         setPuzzles(nodes);
     }, [room])

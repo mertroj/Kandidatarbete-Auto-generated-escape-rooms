@@ -13,7 +13,7 @@ export interface Room {
     up: string;
     down: string;
     is_unlocked: boolean;
-    slots: Puzzle[]
+    puzzles: Puzzle[]
 }
 
 export interface Puzzle {
