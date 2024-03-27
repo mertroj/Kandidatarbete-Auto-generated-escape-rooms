@@ -21,10 +21,9 @@ function RoomComponent (roomProps: RoomComponentProps) {
 
     useEffect(() => {
         let nodes = room.puzzles.map((puzzle) => {
-            console.log('trying to render puzzle:', room.puzzles);
             if (puzzle.solved)
                 return <SolvedPuzzleComponent/>
-                
+
             if (puzzle.isLocked)
                 return <LockedPuzzleComponent/>
 

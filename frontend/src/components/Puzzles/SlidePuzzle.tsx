@@ -49,13 +49,12 @@ function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
                 throw new Error('Invalid move request with no direction and autoMove = false');
             }
             if (response.data.isSuccessful) {
-                console.log(response.data.puzzle);
                 setPuzzle(response.data.puzzle);
             }else{
-                console.log('Invalid move');
+                // TODO: error handling for 'Invalid move'
             }
         }catch(error: any){
-            console.log(error);
+            console.error(error);
         }
     }
     async function handleSubmit(){ //closes the Popup if the answer is correct
@@ -78,10 +77,10 @@ function SlidePuzzle ({puzzle, onSolve}: SlidePuzzleProps) {
             if (response.data.isSuccessful) {
                 setPuzzle(response.data.puzzle);
             }else{
-                console.log('No more hints. Question already answered.'); //Alert instead? Should not be needed later on
+                // TODO: 'No more hints. Question already answered. Alert instead? Should not be needed later on
             }
         }catch(error: any){
-            console.log(error);
+            console.error(error);
         }
     }
 
