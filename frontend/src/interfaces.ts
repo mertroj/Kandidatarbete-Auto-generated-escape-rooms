@@ -12,8 +12,8 @@ export interface Room {
     right: string;
     up: string;
     down: string;
-    is_unlocked: boolean;
-    puzzles: Puzzle[]
+    isLocked: boolean;
+    puzzles: Puzzle[];
 }
 
 export interface AnagramPuzzle {

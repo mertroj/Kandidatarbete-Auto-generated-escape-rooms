@@ -1,6 +1,4 @@
-import { Anagram } from "../models/Anagram";
 import express, { Request, Response } from "express";
-import path from "path";
 import { EscapeRoom } from "../models/EscapeRoom";
 
 export const DescriptionRouter = express.Router();

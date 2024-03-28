@@ -3,6 +3,8 @@ import { Room } from './Room';
 import {Timer} from "./Timer";
 import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
+import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
+import { Puzzle } from './Puzzles/Puzzle';
 
 
 export class EscapeRoom {
@@ -41,6 +43,10 @@ export class EscapeRoom {
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
+        let graph = puzzleTreePopulator(totalTime, difficulty);
+        let nodes = graph.nodes();
+        let avgNodesPerRoom = Math.floor(nodes.length / nrOfRooms);
+        let remainingNodes = nodes.length % nrOfRooms;
 
         while (rooms.length < nrOfRooms) {
             let pos_i = randomIntRange(0, possible_locations.length);
@@ -48,7 +54,10 @@ export class EscapeRoom {
     
             if (visited.has(`${pos[0]},${pos[1]}`)) continue;
 
-            rooms.push(new Room(...pos, difficulty));        
+            let roomNodes = nodes.splice(0, avgNodesPerRoom + (remainingNodes > 0 ? 1 : 0));
+            if (remainingNodes > 0) remainingNodes--;
+
+            rooms.push(new Room(...pos, roomNodes.map((node) => graph.node(node) as Puzzle)));        
             visited.add(`${pos[0]},${pos[1]}`);
 
             around(pos).forEach((pos) => {
@@ -87,7 +96,7 @@ export class EscapeRoom {
 
 function checkForUnlocked(room: Room): void {
     if (room.isLocked) {
-        room.slots.forEach((slot) => {
+        room.puzzles.forEach((slot) => {
             if(!slot.isLocked) {
                 room.isLocked = false;
                 return;

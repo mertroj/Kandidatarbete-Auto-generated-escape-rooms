@@ -1,14 +1,13 @@
 import axios from "axios";
+import {Button, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { EscapeRoom, JigsawPuzzle, Room } from "../interfaces"
-import Hinting from "../components/Hinting/hinting";
+import HintingComponent from "../components/Hinting/hinting";
+import { EscapeRoom, JigsawPuzzle, Room } from "../interfaces";
+import PopupComponent from "../components/PopupComponent/Popup";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
-import Navbar from '../components/Navbar/Navbar';
-import {Button, Row} from "react-bootstrap";
+import JigsawComponent from "../components/Puzzles/JigsawPuzzleComponent";
 import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
-import Jigsaw from "../components/Puzzles/Jigsaw";
-import Popup from "../components/PopupComponent/Popup";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
@@ -19,16 +18,14 @@ function EscapeRoomPage() {
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
-    const [showPuzzle, setShowPuzzle] = useState(false);
+    const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [puzzleData, setPuzzleData] = useState<JigsawPuzzle | null>(null);
-
     const [showNotification, setShowNotification] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
 
     function checkEscapeRoomDone(): boolean {
         if (escapeRoom){
             for (let room of escapeRoom?.rooms || []) {
-                for (let slot of room.slots) {
+                for (let slot of room.puzzles) {
                     if (!slot.solved) {
                         return false;
                     }
@@ -111,7 +108,7 @@ function EscapeRoomPage() {
             //navigate(resultScreenUrl);
             createJigsawPuzzle().then((puzzle) => {
                 setPuzzleData(puzzle);
-                setShowPuzzle(true);
+                setShowEndPuzzle(true);
             });
 
         }
@@ -136,9 +133,9 @@ function EscapeRoomPage() {
                 {currentRoom ?
                     <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
             </div>}
-            {showPuzzle && puzzleData && <Jigsaw key={'end'} puzzle={puzzleData} onSolve={handleSolve} />}
+            {showEndPuzzle && puzzleData && <JigsawComponent key={'end'} puzzle={puzzleData} onSolve={handleSolve} />}
             {!showNotification && <div className="panel-container">
-                <Hinting hintsList={hintsList}/>
+                <HintingComponent hintsList={hintsList}/>
                 <NavigationPanel
                     gameId={gameId}
                     currentRoom={currentRoom}
@@ -150,7 +147,7 @@ function EscapeRoomPage() {
                 />
             </div>}
             {showNotification ?
-                <Popup
+                <PopupComponent
                     isOpen={showNotification}
                     onOpen={() => setShowNotification(true)}
                     onClose={() => setShowNotification(false)}
