@@ -33,9 +33,11 @@ export class EscapeRoom {
         if (EscapeRoom.escapeRooms[gameId] === undefined) {
             return null;
         }
-        EscapeRoom.escapeRooms[gameId].rooms.map((room) => {
-            checkForUnlocked(room);
+
+        EscapeRoom.escapeRooms[gameId].rooms.forEach((room) => {
+            room.checkForUnlockedPuzzle();
         });
+        
         return EscapeRoom.escapeRooms[gameId];
     }
     
@@ -96,15 +98,3 @@ export class EscapeRoom {
         }
     }
 }
-
-function checkForUnlocked(room: Room): void {
-    if (room.isLocked) {
-        room.puzzles.forEach((slot) => {
-            if(!slot.isLocked) {
-                room.isLocked = false;
-                return;
-            }
-        });
-    }
-}
-

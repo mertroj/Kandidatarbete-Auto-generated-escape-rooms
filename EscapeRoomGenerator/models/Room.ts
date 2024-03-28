@@ -31,6 +31,12 @@ export class Room {
         return Room.rooms[roomId];
     }
 
+    checkForUnlockedPuzzle(): void {
+        if (this.isLocked) {
+            this.isLocked = this.puzzles.every((puzzle) => puzzle.isLocked)
+        }
+    }
+
     strip() {
         return {
             id: this.id,
