@@ -59,6 +59,7 @@ function EscapeRoomPage() {
 
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
+            console.log(response.data)
             setEscapeRoom(response.data);
             if(!currentRoom){
                 setCurrentRoom(response.data.rooms[0]);
@@ -72,22 +73,18 @@ function EscapeRoomPage() {
     }
 
     function moveLeft() {
-        console.log('left');
         setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
         fetchImage();;
     }
     function moveRight() {
-        console.log('right');
         setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
         fetchImage();;
     }
     function moveUp() {
-        console.log('up');
         setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
         fetchImage();;
     }
     function moveDown() {
-        console.log('down');
         setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
         fetchImage();;
     }

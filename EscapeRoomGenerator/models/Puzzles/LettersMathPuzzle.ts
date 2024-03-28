@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomIntRange, removeDuplicates } from './Helpers';
-import { Observer, Puzzle } from './Puzzle';
-import { shuffleArray } from './Helpers';
+import { randomIntRange, removeDuplicates } from '../Helpers';
+import { Observable, Observer } from './ObserverPattern';
+import { shuffleArray } from '../Helpers';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-export class LettersMathPuzzle implements Puzzle{
+export class LettersMathPuzzle implements Observable, Observer {
     private static puzzles: {[key: string]: [LettersMathPuzzle, string, number, string[]]} = {}
 
     id: string = uuidv4();
@@ -152,6 +152,19 @@ export class LettersMathPuzzle implements Puzzle{
         let originalMapped = parseInt(original.split('').map(letter => mapping.get(letter)).join(''));
         let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
         return originalMapped - remainder === shuffledMapped;
+    }
+
+    strip() {
+        return {
+            type: this.type,
+            id: this.id,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+
+            question: this.question,
+            description: this.description,
+        }
     }
 }
 

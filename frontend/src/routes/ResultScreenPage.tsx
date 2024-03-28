@@ -44,7 +44,7 @@ function ResultScreenPage() {
 
             setHintUsed(0);
             rooms.forEach((room) => {
-                room.slots.forEach((slot: PuzzleProps) => {
+                room.puzzles.forEach((slot: PuzzleProps) => {
                     setHintUsed(prevHintUsed => prevHintUsed + slot.hintLevel);
                 });
             });

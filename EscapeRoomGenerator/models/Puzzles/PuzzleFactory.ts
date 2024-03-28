@@ -1,10 +1,9 @@
 import { Anagram } from "./Anagram";
-import { frequencies, repeat } from "./Helpers";
+import { frequencies, repeat } from "../Helpers";
 import { LettersMathPuzzle } from "./LettersMathPuzzle";
 import { OperatorMathPuzzle } from "./OperatorMathPuzzle";
 import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
-import {Jigsaw} from "./Jigsaw";
 
 export class PuzzleFactory{
     private static anagramCounter = 0;

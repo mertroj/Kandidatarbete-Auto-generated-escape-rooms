@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { randomInt, randomIntRange } from './Helpers'
-import { Observer, Puzzle } from './Puzzle';
+import { randomInt, randomIntRange } from '../Helpers'
+import { Observable, Observer } from './ObserverPattern';
 
-const anagramsData = require('../anagrams.json')
+const anagramsData = require('../../anagrams.json')
 
-export class Anagram implements Puzzle {
+export class Anagram implements Observable, Observer {
     private static puzzles: {[key: string]: Anagram} = {}
 
     private difficulty: number;
@@ -101,5 +101,18 @@ export class Anagram implements Puzzle {
     
         const anagramData = possibleAnagrams[randomInt(possibleAnagrams.length)];
         return anagramData[0]
+    }
+
+    strip() {
+        return {
+            type: this.type,
+            id: this.id,
+            solved: this.solved,
+            isLocked: this.isLocked,
+            hintLevel: this.hintLevel,
+            
+            question: this.question,
+            description: this.description,
+        }
     }
 }
