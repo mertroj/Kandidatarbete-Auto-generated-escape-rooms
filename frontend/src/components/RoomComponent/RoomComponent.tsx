@@ -22,7 +22,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
-        let hasLockedPuzzle: boolean = !room.puzzles.every((puzzle) => !puzzle.isLocked);
+        let hasLockedPuzzle: boolean = room.puzzles.some((puzzle) => puzzle.isLocked);
         let nodes: JSX.Element[] = [];
         room.puzzles.forEach((puzzle) => {
             if (puzzle.isLocked)
@@ -68,7 +68,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
         })
         if (hasLockedPuzzle)
             nodes.push(<LockedPuzzleComponent
-                key={"locked"} 
+                key={"lockedIn"+room.id} 
             />)
         setPuzzles(nodes);
     }, [room])
