@@ -11,7 +11,7 @@ import {Timer} from "./models/Timer";
 import { JigsawRouter } from "./routers/JigsawRouter";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
-
+import { DescriptionRouter } from "./routers/DescriptionRouter";
 
 const app: Express = express();
 const port: number = 8080;
@@ -24,6 +24,7 @@ app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter);
 app.use('/images', ImageRouter);
 app.use('/jigsaw', JigsawRouter);
+app.use('/lockedPuzzle', DescriptionRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     if (req.query.players === undefined) {

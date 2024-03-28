@@ -1,7 +1,8 @@
 export interface EscapeRoom {
     timer: Timer;
     id: string;
-    rooms: Room[]
+    rooms: Room[];
+    endPuzzle: Puzzle;
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle
@@ -12,14 +13,14 @@ export interface Room {
     right: string;
     up: string;
     down: string;
-    is_unlocked: boolean;
-    puzzles: Puzzle[]
+    isLocked: boolean;
+    puzzles: Puzzle[];
 }
 
 export interface AnagramPuzzle {
     id: string;
     type: string;
-    solved: boolean;
+    isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
 
@@ -30,7 +31,7 @@ export interface AnagramPuzzle {
 export interface LettersMathPuzzle {
     id: string;
     type: string;
-    solved: boolean;
+    isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
 
@@ -41,7 +42,7 @@ export interface LettersMathPuzzle {
 export interface OperatorsMathPuzzle {
     id: string;
     type: string;
-    solved: boolean;
+    isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
 
@@ -60,7 +61,7 @@ export interface Timer {
 export interface SlidePuzzle {
     id: string;
     type: string;
-    solved: boolean;
+    isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
 
@@ -95,7 +96,7 @@ export interface JigsawPiece {
 export interface JigsawPuzzle {
     id: string;
     type: string;
-    solved: boolean;
+    isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
 

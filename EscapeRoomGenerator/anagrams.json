@@ -580,7 +580,7 @@
         ],
         [
             "pots",
-            "post; spot; stop; tops"
+            "post; spot; stop"
         ],
         [
             "race",
@@ -619,10 +619,6 @@
             "lure"
         ],
         [
-            "runs",
-            "urns"
-        ],
-        [
             "ruts",
             "rust"
         ],
@@ -636,15 +632,11 @@
         ],
         [
             "saps",
-            "pass; spas"
+            "pass"
         ],
         [
-            "scab",
-            "cabs"
-        ],
-        [
-            "scar",
-            "arcs; cars"
+            "cabs",
+            "scab"
         ],
         [
             "ears",
@@ -656,7 +648,7 @@
         ],
         [
             "sham",
-            "hams; mash"
+            "mash"
         ],
         [
             "huts",
@@ -671,8 +663,8 @@
             "nags; snag"
         ],
         [
-            "soak",
-            "oaks"
+            "oaks",
+            "soak"
         ],
         [
             "sobs",
@@ -680,7 +672,7 @@
         ],
         [
             "soil",
-            "oils; silo"
+            "silo"
         ],
         [
             "sole",
@@ -688,11 +680,7 @@
         ],
         [
             "sore",
-            "ores; roes; rose"
-        ],
-        [
-            "sour",
-            "ours"
+            "roes; rose"
         ],
         [
             "sown",
@@ -700,11 +688,11 @@
         ],
         [
             "step",
-            "pest; pets"
+            "pest"
         ],
         [
             "stew",
-            "west; wets"
+            "west"
         ],
         [
             "surf",
@@ -756,7 +744,7 @@
         ],
         [
             "tubs",
-            "bust; tubs"
+            "bust"
         ],
         [
             "tugs",
@@ -792,7 +780,7 @@
         ],
         [
             "wand",
-            "dawns"
+            "dawn"
         ],
         [
             "ward",
@@ -804,7 +792,7 @@
         ],
         [
             "west",
-            "stew; wets"
+            "stew"
         ],
         [
             "wigs",

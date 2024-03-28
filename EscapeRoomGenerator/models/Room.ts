@@ -1,8 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Graph } from 'graphlib';
-import { puzzleTreePopulator } from './puzzles/PuzzleTreePopulator';
-import { Puzzle } from './puzzles/Puzzle';
-
+import { Puzzle } from './Puzzles/Puzzle';
 
 export class Room {
     private static rooms : {[Key: string]: Room} = {};
@@ -15,9 +12,9 @@ export class Room {
     up: string;
     down: string;
     isLocked: boolean;
-    graph: Graph;
+    puzzles: Puzzle[];
 
-    constructor(x: number, y: number, difficulty: number) {
+    constructor(x: number, y: number, puzzles: Puzzle[]) {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
@@ -25,13 +22,19 @@ export class Room {
         this.right = '';
         this.up = '';
         this.down = '';
-        this.isLocked = true;
-        this.graph = puzzleTreePopulator(20, difficulty);
+        this.isLocked = puzzles.every((puzzle) => puzzle.isLocked);
+        this.puzzles = puzzles;
         Room.rooms[this.id] = this;
     }
 
     static get(roomId: string): Room {
-        return Room.rooms[roomId]
+        return Room.rooms[roomId];
+    }
+
+    checkForUnlockedPuzzle(): void {
+        if (this.isLocked) {
+            this.isLocked = this.puzzles.every((puzzle) => puzzle.isLocked)
+        }
     }
 
     strip() {
@@ -42,7 +45,7 @@ export class Room {
             up: this.up,
             down: this.down,
             isLocked: this.isLocked,
-            puzzles: this.graph.nodes().map((node) => (this.graph.node(node) as Puzzle).strip())
+            puzzles: this.puzzles.map((puzzle) => puzzle.strip())
         }
     }
 }

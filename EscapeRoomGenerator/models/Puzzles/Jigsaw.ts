@@ -15,7 +15,7 @@ export class Jigsaw implements Observable, Observer {
     estimatedTime: number;
     hintLevel: number = 0;
     question: string = "";
-    solved: boolean = false;
+    isSolved: boolean = false;
     type: string = 'jigsawpuzzle';
     isLocked: boolean = false;
 
@@ -54,7 +54,7 @@ export class Jigsaw implements Observable, Observer {
                 return false;
             }
         }
-        this.solved = true;
+        this.isSolved = true;
         return true;
     }
 
@@ -82,7 +82,7 @@ export class Jigsaw implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
-            solved: this.solved,
+            isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
             

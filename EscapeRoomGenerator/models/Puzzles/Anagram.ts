@@ -16,7 +16,7 @@ export class Anagram implements Observable, Observer {
     description: string = 'Find the hidden word';
     hintLevel: number = 0;
     estimatedTime: number;
-    solved: boolean = false;
+    isSolved: boolean = false;
     isLocked: boolean = false;
 
     constructor(difficulty: number, dependentPuzzlez: string[]) {
@@ -77,7 +77,7 @@ export class Anagram implements Observable, Observer {
         } else {
             res = answers.toLowerCase() === answerLowerCase;
         }
-        if (!this.solved) this.solved = res;
+        if (!this.isSolved) this.isSolved = res;
         if (res) this.notifyObservers();
         return res
     }
@@ -107,7 +107,7 @@ export class Anagram implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
-            solved: this.solved,
+            isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
             

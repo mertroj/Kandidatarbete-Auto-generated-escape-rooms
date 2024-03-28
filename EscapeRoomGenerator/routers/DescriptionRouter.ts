@@ -1,17 +1,16 @@
 import express, { Request, Response } from "express";
-import path from "path";
 import { EscapeRoom } from "../models/EscapeRoom";
 
-export const ImageRouter = express.Router();
-const imagesData = require('../themedImages.json');
+export const DescriptionRouter = express.Router();
+const descriptionData = require('../lockedPuzzleDescriptions.json');
 
-interface ImageRequest extends Request {
+interface DescriptionRequest extends Request{
     query: {
         gameId: string;
     }
 }
 
-ImageRouter.get("/themeImage", async (req: ImageRequest, res: Response) => {
+DescriptionRouter.get("/description", async (req: DescriptionRequest, res: Response) => {
     try{
         if (req.query.gameId === undefined || req.query.gameId === "") {
             res.status(400).send("The gameId parameter is missing");
@@ -23,9 +22,9 @@ ImageRouter.get("/themeImage", async (req: ImageRequest, res: Response) => {
             res.status(404).send("The gameId parameter is invalid");
             return;
         }
-        const images = imagesData[escapeRoom.theme];
-        const randomImage = images[Math.floor(Math.random() * images.length)];
-        res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
+        const descriptions: string[] = descriptionData[escapeRoom.theme];
+        const randomDescription: string = descriptions[Math.floor(Math.random() * descriptions.length)];
+        res.status(200).send(randomDescription);
     } catch (error) {
         res.status(500).send("Internal server error");
     }

@@ -13,7 +13,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     question: string;
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
-    solved: boolean = false;
+    isSolved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
     isLocked: boolean = false;
     private observers: Observer[] = [];
@@ -100,7 +100,7 @@ export class LettersMathPuzzle implements Observable, Observer {
 
     checkAnswer(answer: string): boolean {
         let res = this.getPossibleAnswers().includes(answer);
-        if (!this.solved) this.solved = res
+        if (!this.isSolved) this.isSolved = res
         if (res) this.notifyObservers();
         return res
     }
@@ -158,7 +158,7 @@ export class LettersMathPuzzle implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
-            solved: this.solved,
+            isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
 

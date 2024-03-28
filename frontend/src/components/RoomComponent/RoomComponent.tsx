@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle} from '../../interfaces';
+import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle} from '../../interfaces';
 // import JigsawPuzzleComponent from "../Puzzles/JigsawPuzzleComponent";
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
@@ -14,6 +14,7 @@ interface RoomComponentProps {
     room: Room;
     addHint: Function;
     updateRoom: Function;
+    
 }
 
 function RoomComponent (roomProps: RoomComponentProps) {
@@ -21,50 +22,54 @@ function RoomComponent (roomProps: RoomComponentProps) {
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
-        let nodes = room.puzzles.map((puzzle) => {
-            if (puzzle.solved)
-                return <SolvedPuzzleComponent
-                    key={puzzle.id} 
-                />
-
+        let hasLockedPuzzle: boolean = !room.puzzles.every((puzzle) => !puzzle.isLocked);
+        let nodes: JSX.Element[] = [];
+        room.puzzles.forEach((puzzle) => {
             if (puzzle.isLocked)
-                return <LockedPuzzleComponent
+                return
+                
+            else if (puzzle.isSolved)
+                nodes.push(<SolvedPuzzleComponent
                     key={puzzle.id} 
-                />
+                />)
 
-            if (puzzle.type === 'anagram')
-                return <AnagramComponent 
+            else if (puzzle.type === 'anagram')
+                nodes.push(<AnagramComponent 
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as AnagramPuzzle} 
                     onSolve={updateRoom}
-                />
-            
-            if (puzzle.type === 'lettersMathPuzzle')
-                return <LettersMathPuzzleComponent 
+                />)
+                
+            else if (puzzle.type === 'lettersMathPuzzle')
+                nodes.push(<LettersMathPuzzleComponent 
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as LettersMathPuzzle} 
                     onSolve={updateRoom}
-                />
+                />)
 
-            if (puzzle.type === 'operatorMathPuzzle') 
-                return <OperatorMathPuzzleComponent 
+            else if (puzzle.type === 'operatorMathPuzzle') 
+                nodes.push(<OperatorMathPuzzleComponent 
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as OperatorsMathPuzzle} 
                     onSolve={updateRoom}
-                />
-                
-            if (puzzle.type === 'slidePuzzle') 
-                return <SlidePuzzleComponent 
+                />)
+                        
+            else if (puzzle.type === 'slidePuzzle') 
+                nodes.push(<SlidePuzzleComponent 
                     key={puzzle.id} 
                     puzzle={puzzle as SlidePuzzle} 
                     onSolve={updateRoom}
-                />
+                />)
 
-            return <p>Invalid puzzle</p>
+            else nodes.push(<p>Invalid puzzle</p>)
         })
+        if (hasLockedPuzzle)
+            nodes.push(<LockedPuzzleComponent
+                key={"locked"} 
+            />)
         setPuzzles(nodes);
     }, [room])
     return (

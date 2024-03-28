@@ -17,7 +17,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
     question: string;
     description: string = "What is the sequence of operators used in the following expression?"
     hintLevel : number = 0;
-    solved: boolean = false;
+    isSolved: boolean = false;
     estimatedTime: number;
     isLocked: boolean;
 
@@ -100,7 +100,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
         return {
             type: this.type,
             id: this.id,
-            solved: this.solved,
+            isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
 
