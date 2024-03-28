@@ -55,8 +55,8 @@ export class OperatorMathPuzzle implements Observable, Observer {
         }
         let answerRes = eval(expression) as number
         let res: boolean = answerRes === this.answer;
-        if (!this.solved && res) this.notifyObservers();
-        if (!this.solved) this.solved = res
+        if (!this.isSolved && res) this.notifyObservers();
+        if (!this.isSolved) this.isSolved = res
         return res
     }
     addObserver(observer: Observer): void {
