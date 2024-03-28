@@ -22,7 +22,7 @@ function EscapeRoomPage() {
     const [showNotification, setShowNotification] = useState(false);
 
     function checkEscapeRoomDone(): boolean {
-        return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.solved)) : false
+        return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false
     }
 
     async function fetchImage() {

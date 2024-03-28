@@ -11,7 +11,7 @@ export class SlidePuzzle implements Observer, Observable{
     type: string = "slidePuzzle";
     question: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
     description: string = "The last squares are the ones to be empty, the rest should be in order";
-    solved: boolean = false;
+    isSolved: boolean = false;
     hintLevel: number = 0;
     estimatedTime: number;
     pieces: (Piece | null)[][];
@@ -62,7 +62,7 @@ export class SlidePuzzle implements Observer, Observable{
             }
             previousNumber = tempNumber;
         }
-        this.solved = true; //can be set to true even if it was true before
+        this.isSolved = true; //can be set to true even if it was true before
         this.notifyObservers();
         return true;
     }
@@ -160,7 +160,7 @@ export class SlidePuzzle implements Observer, Observable{
         return {
             type: this.type,
             id: this.id,
-            solved: this.solved,
+            isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
 

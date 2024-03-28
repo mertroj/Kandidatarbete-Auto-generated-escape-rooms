@@ -28,7 +28,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
             if (puzzle.isLocked)
                 return
                 
-            else if (puzzle.solved)
+            else if (puzzle.isSolved)
                 nodes.push(<SolvedPuzzleComponent
                     key={puzzle.id} 
                 />)
