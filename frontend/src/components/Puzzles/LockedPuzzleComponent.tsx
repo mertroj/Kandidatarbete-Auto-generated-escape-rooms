@@ -22,7 +22,7 @@ function LockedPuzzleComponent () {
 
     return (
         <div className='puzzle text-center'>
-            {description}
+            <b>{description}</b>
         </div>
     );
 }
