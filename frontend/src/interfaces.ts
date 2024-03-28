@@ -1,7 +1,8 @@
 export interface EscapeRoom {
     timer: Timer;
     id: string;
-    rooms: Room[]
+    rooms: Room[];
+    endPuzzle: Puzzle;
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle

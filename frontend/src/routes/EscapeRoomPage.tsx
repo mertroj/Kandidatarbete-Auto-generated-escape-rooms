@@ -19,7 +19,6 @@ function EscapeRoomPage() {
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
-    const [puzzleData, setPuzzleData] = useState<JigsawPuzzle | null>(null);
     const [showNotification, setShowNotification] = useState(false);
 
     function checkEscapeRoomDone(): boolean {
@@ -30,13 +29,8 @@ function EscapeRoomPage() {
                         return false;
                     }
                 }
-            }return true;
+            } return true;
         } return false;
-    }
-
-    async function createJigsawPuzzle(): Promise<JigsawPuzzle> {
-        const response = await axios.post<JigsawPuzzle>('http://localhost:8080/jigsaw/create');
-        return response.data;
     }
 
     async function fetchImage() {
@@ -47,6 +41,16 @@ function EscapeRoomPage() {
             setBackgroundImageURL(objectURL);
         } catch (error) {
             console.error('Error fetching image:', error);
+        }
+    }
+
+    function getEndPuzzleComponent() {
+        //safe to use '!' since we checked for null in the render
+        switch (escapeRoom?.endPuzzle.type) { 
+            case 'jigsawpuzzle':
+                return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
+            default:
+                return null;
         }
     }
 
@@ -104,13 +108,9 @@ function EscapeRoomPage() {
     }, [gameId]);
 
     useEffect(() => {
-        if (checkEscapeRoomDone()) {
+        if (checkEscapeRoomDone() && escapeRoom) {
             //navigate(resultScreenUrl);
-            createJigsawPuzzle().then((puzzle) => {
-                setPuzzleData(puzzle);
-                setShowEndPuzzle(true);
-            });
-
+            setShowEndPuzzle(true);
         }
     }, [escapeRoom]);
 
@@ -128,12 +128,16 @@ function EscapeRoomPage() {
                     height:'auto',
                     zIndex:'-1'
                 }}/>
-            {!showNotification && <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
-                {/*<Navbar/>*/}
-                {currentRoom ?
-                    <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
-            </div>}
-            {showEndPuzzle && puzzleData && <JigsawComponent key={'end'} puzzle={puzzleData} onSolve={handleSolve} />}
+            {!showNotification && !showEndPuzzle &&
+                <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
+                    {/*<Navbar/>*/}
+                    {currentRoom ?
+                        <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
+                </div>
+            }
+            { 
+                showEndPuzzle && escapeRoom && getEndPuzzleComponent()
+            }
             {!showNotification && <div className="panel-container">
                 <HintingComponent hintsList={hintsList}/>
                 <NavigationPanel
