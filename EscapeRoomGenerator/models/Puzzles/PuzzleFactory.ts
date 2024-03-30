@@ -5,14 +5,16 @@ import { OperatorMathPuzzle } from "./OperatorMathPuzzle";
 import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { Jigsaw } from "./Jigsaw";
+import { MastermindPuzzle } from "./MastermindPuzzles";
 
 export class PuzzleFactory{
     private static anagramCounter = 0;
     private static lettersCounter = 0;
     private static operatorCounter = 0;
     private static slideCounter = 0;
+    private static mastermindCounter = 0;
 
-    //1000 gives more granularity than 100 whitout affecting the relative probabilities since the weight are relative, not absolute
+    //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
     static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
             [1000 - (this.anagramCounter/1000), () =>
@@ -39,7 +41,12 @@ export class PuzzleFactory{
                     return new SlidePuzzle(difficulty, dependentPuzzles);
                 }
             ],
-            //Add Mastermind
+            [1000 - (this.mastermindCounter/1000), () =>
+                {
+                    this.mastermindCounter++;
+                    return new MastermindPuzzle(difficulty, dependentPuzzles);
+                }
+            ]
         ])();
     }
     static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{

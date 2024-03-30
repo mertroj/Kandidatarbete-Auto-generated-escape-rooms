@@ -1,38 +1,56 @@
-import { MastermindPuzzle } from "../models/MastermindPuzzles";
+import { MastermindPuzzle } from "../models/Puzzles/MastermindPuzzles";
 import express, { Request, Response } from "express";
 
 export const MastermindPuzzleRouter = express.Router();
 
-
-MastermindPuzzleRouter.get("/info", async (req: Request, res: Response) => {
-    const puzzleId = String(req.query.puzzleId)
-    const puzzle = MastermindPuzzle.get(puzzleId)
-    if (puzzle === undefined) {
-        res.status(400).send("The puzzleId parameter is missing or invalid")
-        return
-    }
-    res.send(puzzle);
-});
-
 MastermindPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {
-    const puzzleId = String(req.body.puzzleId)
-    const puzzle = MastermindPuzzle.get(puzzleId)
+    if (req.body.puzzleId === undefined) {
+        res.status(400).send("The puzzleId parameter is missing");
+        return;
+    }else if (req.body.answer === undefined || req.body.answer === '') {
+        res.status(400).send("The answer parameter is missing");
+        return;
+    }
+    const puzzleId = String(req.body.puzzleId);
+    const puzzle = MastermindPuzzle.get(puzzleId);
     const submittedAnswer: string  = String(req.body.answer);
     if (puzzle === undefined) {
-        res.status(400).send("The puzzleId parameter is missing or invalid")
-    } else if (submittedAnswer === '') {
-        res.status(400).send("No answer provided");
+        res.status(404).send("The puzzleId parameter is invalid");
+        return;
+    } else if (submittedAnswer.length !== puzzle.length) {
+        res.status(404).send("The answer parameter is invalid");
+        return;
     } else {
-        res.send(puzzle.checkAnswer(submittedAnswer));
+        res.status(200).send(puzzle.checkAnswer(submittedAnswer));
     }
 });
 
 MastermindPuzzleRouter.get("/hint", async (req: Request, res: Response) => {
-    const puzzleId = String(req.query.puzzleId)
-    const puzzle = MastermindPuzzle.get(puzzleId)
-    if (puzzle === undefined) {
-        res.status(400).send("The puzzleId parameter is missing or invalid")
-        return
+    if (req.query.puzzleId === undefined) {
+        res.status(400).send("The puzzleId parameter is missing");
+        return;
     }
-    res.send(puzzle.getHint());
+    const puzzleId = String(req.query.puzzleId);
+    const puzzle = MastermindPuzzle.get(puzzleId);
+    if (puzzle === undefined) {
+        res.status(404).send("The puzzleId parameter is invalid");
+        return;
+    }
+    res.status(200).send(puzzle.getHint());
+});
+
+MastermindPuzzleRouter.get("/previousGuesses", async (req: Request, res: Response) => {
+    if (req.query.puzzleId === undefined) {
+        res.status(400).send("The puzzleId parameter is missing");
+        return;
+    }
+    const puzzleId = String(req.query.puzzleId);
+    const puzzle = MastermindPuzzle.get(puzzleId);
+    if (puzzle === undefined) {
+        res.status(404).send("The puzzleId parameter is invalid");
+        return;
+    }
+    const previousGuessesArray = Array.from(puzzle.previousGuesses.entries());
+    console.log(previousGuessesArray);
+    res.status(200).send(previousGuessesArray);
 });
