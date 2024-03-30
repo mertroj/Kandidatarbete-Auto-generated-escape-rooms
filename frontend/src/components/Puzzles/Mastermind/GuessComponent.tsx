@@ -24,18 +24,18 @@ function GuessComponent({length, guess, feedback, animation}: {length: number, g
             if (!animation) {
                 setBackgroundColor(feedback.split('').map(getColor));
             } else {
-            let timeoutId: NodeJS.Timeout;
-            for (let i = 0; i < length; i++) {
-                timeoutId = setTimeout(() => {
-                    setBackgroundColor(prevState => {
-                        const newState = [...prevState];
-                        newState[i] = getColor(feedback[i]);
-                        return newState;
-                    });
-                }, ((i + 1) * animationDuration) / 2);
+                let timeoutId: NodeJS.Timeout;
+                for (let i = 0; i < length; i++) {
+                    timeoutId = setTimeout(() => {
+                        setBackgroundColor(prevState => {
+                            const newState = [...prevState];
+                            newState[i] = getColor(feedback[i]);
+                            return newState;
+                        });
+                    }, ((i + 1) * animationDuration) / 2);
+                }
+                return () => clearTimeout(timeoutId);
             }
-            return () => clearTimeout(timeoutId);
-        }
         }
     }, [feedback]);
 

@@ -51,6 +51,5 @@ MastermindPuzzleRouter.get("/previousGuesses", async (req: Request, res: Respons
         return;
     }
     const previousGuessesArray = Array.from(puzzle.previousGuesses.entries());
-    console.log(previousGuessesArray);
     res.status(200).send(previousGuessesArray);
 });

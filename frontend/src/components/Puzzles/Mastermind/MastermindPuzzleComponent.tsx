@@ -14,6 +14,7 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
     const length = puzzle.length;
+    const correct = Array(length).fill(0);
 
     async function fetchGuesses(){
         try{
@@ -28,10 +29,17 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
     }
     async function handleGuess(guess: string){
         try{
-            console.log('guess: ' + guess);
-            await axios.post('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
-            await fetchGuesses();
-            // change background color of boxes based on response
+            const response = await axios.post<Number[]>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
+            if (response.data.length === correct.length && response.data.every((value, index) => value === correct[index])) {
+                await fetchGuesses();
+                setTimeout(async () => {
+                    setIsShowing(false);
+                    onSolve();
+                    await fetchGuesses();
+                }, 500*length);
+            } else {
+                await fetchGuesses();
+            }
         }catch(error){
             console.error(error + currentInput);
         }
@@ -66,10 +74,6 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
             window.removeEventListener('keyup', handleKeyUp);
         };
     }, [isShowing]);
-
-    useEffect(() => {
-        console.log('amount of previous guesses: ' + previousGuesses.size);
-    }, [previousGuesses]);
 
     useEffect(() => {
         currentInputRef.current = currentInput;
