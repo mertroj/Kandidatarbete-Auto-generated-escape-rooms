@@ -5,6 +5,7 @@ import  { EscapeRoom } from './models/EscapeRoom'
 import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
+import { MastermindPuzzleRouter } from "./routers/MastermindPuzzleRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
+app.use('/mastermindPuzzle' , MastermindPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/anagrams', AnagramRouter);
 app.use('/images', ImageRouter);

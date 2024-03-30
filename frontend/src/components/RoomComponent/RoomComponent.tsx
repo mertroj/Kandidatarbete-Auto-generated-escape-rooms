@@ -6,6 +6,7 @@ import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, Opera
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
 import LockedPuzzleComponent from '../Puzzles/LockedPuzzleComponent';
+import MastermindPuzzle from "../Puzzles/MastermindPuzzle";
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
