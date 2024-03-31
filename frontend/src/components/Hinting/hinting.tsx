@@ -11,7 +11,7 @@ function Hinting ({hintsList} : {hintsList : string[]}) {
 
     useEffect(() => {
         let i = 0;
-        setHintNodes(hintsList.reverse().map(hint => <p key={i++}>{hint}</p>))
+        setHintNodes(hintsList.map(hint => <p key={i++}>{hint}</p>))
     }, [hintsList])
 
     return (

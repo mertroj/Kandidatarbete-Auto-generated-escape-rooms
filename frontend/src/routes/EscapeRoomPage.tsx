@@ -47,12 +47,11 @@ function EscapeRoomPage() {
     }
 
     function addHint(hint: string) {
-        setHintsList(hintsList => [...hintsList, hint]);
+        setHintsList(hintsList => [hint, ...hintsList])
     }
 
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
-            console.log(response.data)
             setEscapeRoom(response.data);
             if(!currentRoom){
                 setCurrentRoom(response.data.rooms[0]);
