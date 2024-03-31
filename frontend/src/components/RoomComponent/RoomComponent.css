@@ -7,6 +7,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     justify-content: space-between;
+    position: relative;
 }
 .empty-room{
     background-color: rgb(240, 240, 240);

@@ -5,11 +5,12 @@
     top: 10%;
     left: 10%;
     right: 10%;
-    bottom: auto; /* Changed from 10% to auto */
-    max-height: 80%; /* Added max-height */
-    overflow-y: auto; /* Added overflow-y */
-
+    bottom: 10%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-sizing: border-box; /* Added to include padding and border in element's total width and height */
 }
+
 .overlay-background{
     top: 0;
     left: 0;
@@ -19,6 +20,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: fixed;
+    position: absolute; /* Changed from fixed to absolute */
     background-color: rgba(0, 0, 0, 0.26);
 }

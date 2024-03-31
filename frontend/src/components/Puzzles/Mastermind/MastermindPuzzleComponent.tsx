@@ -15,6 +15,7 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
     const currentInputRef = useRef(currentInput);
     const length = puzzle.length;
     const correct = Array(length).fill(0);
+    let notSolved = true;
 
     async function fetchGuesses(){
         try{
@@ -31,6 +32,7 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
         try{
             const response = await axios.post<Number[]>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
             if (response.data.length === correct.length && response.data.every((value, index) => value === correct[index])) {
+                notSolved = false;
                 await fetchGuesses();
                 setTimeout(async () => {
                     setIsShowing(false);
@@ -109,7 +111,9 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
                                 {puzzle.question}
                             </div>
                             {guessComponents}
-                            <Guess length={length} guess={currentInput} animation={false}/>
+                            {notSolved &&
+                                <Guess length={length} guess={currentInput} animation={false}/>
+                            }
                         </div>
                     </>
                 }
