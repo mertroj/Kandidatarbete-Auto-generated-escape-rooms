@@ -46,6 +46,14 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
             console.error(error + currentInput);
         }
     }
+    async function getHint() {
+        try{
+            const response = await axios.get(`http://localhost:8080/mastermindPuzzle/hint/?puzzleId=${puzzle.id}`);
+            addHint(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     useEffect(() => {
         fetchGuesses();
@@ -96,30 +104,33 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
         }
     }
 
-    return (
-        <div className='puzzle'>
-            <PopupComponent
-                trigger={<Button variant='outline-primary'>Placeholder text for mastermind puzzle</Button>}
-                isOpen={isShowing}
-                onOpen={() => setIsShowing(true)}
-                onClose={() => setIsShowing(false)}
-                children=
-                {
-                    <>
+return (
+    <div className='puzzle'>
+        <PopupComponent
+            trigger={<Button variant='outline-primary'>Placeholder text for mastermind puzzle</Button>}
+            isOpen={isShowing}
+            onOpen={() => setIsShowing(true)}
+            onClose={() => setIsShowing(false)}
+            children=
+            {
+                <div className='d-flex flex-column position-relative'> {/* Added position-relative */}
+                    <Button variant="danger" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</Button>
+                    <div className='flex-grow-1'> {/* Added flex-grow-1 */}
                         <div className='text-center d-flex align-items-center flex-column'>
                             <div className='mb-4'>
-                                {puzzle.question}
+                                <h5>{puzzle.question}</h5>
                             </div>
                             {guessComponents}
                             {notSolved &&
                                 <Guess length={length} guess={currentInput} animation={false}/>
                             }
                         </div>
-                    </>
-                }
-            />
-        </div>
-    );
+                    </div>
+                </div>
+            }
+        />
+    </div>
+);
 }
 
 export default MastermindPuzzleComponent;

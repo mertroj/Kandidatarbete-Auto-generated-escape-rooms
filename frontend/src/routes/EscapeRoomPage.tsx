@@ -122,7 +122,6 @@ function EscapeRoomPage() {
                 }}/>
             {!showNotification && !showEndPuzzle &&
                 <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
-                    {/*<Navbar/>*/}
                     {currentRoom ?
                         <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
                 </div>

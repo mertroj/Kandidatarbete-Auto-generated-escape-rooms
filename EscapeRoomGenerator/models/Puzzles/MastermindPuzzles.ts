@@ -32,9 +32,9 @@ export class MastermindPuzzle implements Observable, Observer {
     previousGuesses: Map<number, [string, string]> = new Map();
     private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
     private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
-    private hints: string[] = ['The solution is: ', 
+    private hints: string[] = ['After each guess some numbers change colours, maybe that means something', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
-                            'After each guess some numbers change colours, maybe that means something'];
+                            'The solution is: '];
 
     solution: Number[];
     
