@@ -50,7 +50,7 @@ export class PuzzleFactory{
         ])();
     }
     static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
-        let puzzle = new SlidePuzzle(difficulty, dependentPuzzles);
+        let puzzle = new SlidePuzzle(difficulty, dependentPuzzles); //TODO: Add more types of converging puzzles
         return puzzle;
     }
     static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
