@@ -27,7 +27,7 @@ export interface AnagramPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -38,7 +38,7 @@ export interface LettersMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -49,7 +49,7 @@ export interface OperatorsMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -68,7 +68,7 @@ export interface SlidePuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: number;
 
     question: string;
     description: string;
@@ -103,7 +103,7 @@ export interface JigsawPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: number;
 
     question: string;
     description: string;

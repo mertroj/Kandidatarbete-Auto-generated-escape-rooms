@@ -16,7 +16,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
     type: string = "operatorMathPuzzle"
     question: string;
     description: string = "What is the sequence of operators used in the following expression?"
-    hintLevel : number = 0;
+    hints: string[] = [];
     isSolved: boolean = false;
     estimatedTime: number;
     isLocked: boolean;
@@ -38,11 +38,13 @@ export class OperatorMathPuzzle implements Observable, Observer {
     }
 
     getHint(): string{
-        if(this.hintLevel < this.numberOfOperands-1){
-            return 'The next operations is ' + this.operands[this.hintLevel++];
-        }else{
+        if (this.hints.length === this.numberOfOperands)
             return 'No more hints.'
-        }
+
+        let hint = 'The next operation is ' + this.operands[this.hints.length];
+
+        this.hints.push(hint)
+        return hint
     }
 
     checkAnswer(answer: string): boolean {
@@ -87,7 +89,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
         let question: string[] = [];
         question.push(this.numbers[0].toString());
         for (let i = 1; i < this.numberOfOperands; i++) {
-            question.push(this.hintLevel < i ? "□" : this.operands[i-1]);
+            question.push(this.hints.length < i ? "□" : this.operands[i-1]);
             question.push(this.numbers[i].toString());
         }
         question.push("=");
@@ -102,7 +104,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
 
             question: this.formulateQuestion(),
             description: this.description,

@@ -14,7 +14,7 @@ export class Anagram implements Observable, Observer {
     type: string = 'anagram';
     question: string;
     description: string = 'Find the hidden word';
-    hintLevel: number = 0;
+    hints: string[] = [];
     estimatedTime: number;
     isSolved: boolean = false;
     isLocked: boolean = false;
@@ -53,15 +53,16 @@ export class Anagram implements Observable, Observer {
     getHint(): string {
         const answers = this.getAnswers();
     
-        if (this.hintLevel === this.question.length) {
+        if (this.hints.length === this.question.length) {
             return 'No more hints.';
         }
         if (!answers.length) return '';
     
-        const hint = `I know the ${this.hintLevel == 0 ? 'first' : 'next'} letter is ${answers[this.hintLevel]}, but what's the rest?`;
-        this.hintLevel++;
+        const hint = `I know the ${this.hints.length === 0 ? 'first' : 'next'} letter is ${answers[this.hints.length]}, but what's the rest?`;
     
-        return hint;
+        this.hints.push(hint)
+
+        return hint
     }
     
     checkAnswer(answer: string): boolean {
@@ -109,7 +110,7 @@ export class Anagram implements Observable, Observer {
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
             
             question: this.question,
             description: this.description,
