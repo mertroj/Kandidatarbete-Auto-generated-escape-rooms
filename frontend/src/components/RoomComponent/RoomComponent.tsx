@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle} from '../../interfaces';
+import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle} from '../../interfaces';
 // import JigsawPuzzleComponent from "../Puzzles/JigsawPuzzleComponent";
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
 import LockedPuzzleComponent from '../Puzzles/LockedPuzzleComponent';
+import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleComponent";
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
@@ -61,6 +62,14 @@ function RoomComponent (roomProps: RoomComponentProps) {
                 nodes.push(<SlidePuzzleComponent 
                     key={puzzle.id} 
                     puzzle={puzzle as SlidePuzzle} 
+                    onSolve={updateRoom}
+                />)
+
+            else if (puzzle.type === 'mastermindPuzzle')
+                nodes.push(<MastermindPuzzleComponent 
+                    key={puzzle.id}
+                    addHint={addHint}
+                    puzzle={puzzle as MastermindPuzzle}
                     onSolve={updateRoom}
                 />)
 

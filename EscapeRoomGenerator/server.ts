@@ -5,6 +5,7 @@ import  { EscapeRoom } from './models/EscapeRoom'
 import cors from "cors";
 import { LettersMathPuzzleRouter } from "./routers/LettersMathPuzzleRouter";
 import { AnagramRouter } from "./routers/AnagramRouter";
+import { MastermindPuzzleRouter } from "./routers/MastermindPuzzleRouter";
 import { OperatorMathPuzzleRouter } from "./routers/OperatorMathPuzzleRouter";
 import { SlidePuzzleRouter } from "./routers/SlidePuzzleRouter";
 import {Timer} from "./models/Timer";
@@ -18,13 +19,14 @@ const port: number = 8080;
 
 app.use(express.json());
 app.use(cors());
-app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
+app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
+app.use('/mastermindPuzzle' , MastermindPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
-app.use('/anagrams', AnagramRouter);
-app.use('/images', ImageRouter);
-app.use('/jigsaw', JigsawRouter);
 app.use('/lockedPuzzle', DescriptionRouter);
+app.use('/anagrams', AnagramRouter);
+app.use('/jigsaw', JigsawRouter);
+app.use('/images', ImageRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     if (req.query.players === undefined) {

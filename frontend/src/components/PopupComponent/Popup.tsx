@@ -26,10 +26,10 @@ function Popup (popupProps: PopupProps) {
 
             {popupProps.isOpen && (
                 <div>
-                    <div className='overlay-background'>
+                    <div className='overlay-background' onClick={popupProps.onClose}>
                     </div>
                     <div className='overlay'>
-                        <div className='bg-light'>
+                        <div className='bg-light sticky-top'>
                             <Navbar className='p-0 justify-content-end'>
                                 <Button style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={popupProps.onClose} type='button' variant='outline-danger'></Button>
                             </Navbar>
