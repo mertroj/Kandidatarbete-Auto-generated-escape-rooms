@@ -112,7 +112,7 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
                                             }
                                         }
                                         onMouseEnter={(e) => {
-                                            if (updatedPuzzle.hintLevel === 0){ 
+                                            if (updatedPuzzle.hints === 0){ 
                                                 e.currentTarget.style.cursor = 'pointer';
                                                 e.currentTarget.style.backgroundColor = 'DodgerBlue';
                                                 if (cell !== null) e.currentTarget.style.color = 'white';
@@ -120,22 +120,22 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
                                             
                                         }}
                                         onMouseLeave={(e) => {
-                                            if (updatedPuzzle.hintLevel === 0){ 
+                                            if (updatedPuzzle.hints === 0){ 
                                                 e.currentTarget.style.cursor = 'default';
                                                 e.currentTarget.style.backgroundColor = 'white';
                                                 if (cell !== null) e.currentTarget.style.color = 'black';
                                             }
                                         }}
                                         onClick={(e) => {
-                                            if (updatedPuzzle.hintLevel === 0){
+                                            if (updatedPuzzle.hints === 0){
                                                 handleClick(i, j, e, true);
                                             }
                                         }}
                                     >
-                                        <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
-                                        <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
-                                        <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
-                                        <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(updatedPuzzle.hintLevel === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
+                                        <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
+                                        <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
+                                        <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
+                                        <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
                                         {cell !== null ? cell.number : 0}
                                     </div>
                                 </Col>

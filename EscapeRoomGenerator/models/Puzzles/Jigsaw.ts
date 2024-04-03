@@ -13,7 +13,7 @@ export class Jigsaw implements Observable, Observer {
 
     description: string = "Solve the jigsaw puzzle";
     estimatedTime: number;
-    hintLevel: number = 0;
+    hints: string[] = [];
     question: string = "";
     isSolved: boolean = false;
     type: string = 'jigsawpuzzle';
@@ -84,7 +84,7 @@ export class Jigsaw implements Observable, Observer {
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
             
             question: this.question,
             description: this.description,

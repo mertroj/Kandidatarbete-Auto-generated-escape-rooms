@@ -12,7 +12,7 @@ export class SlidePuzzle implements Observer, Observable{
     question: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
     description: string = "The last squares are the ones to be empty, the rest should be in order";
     isSolved: boolean = false;
-    hintLevel: number = 0;
+    hints: number = 0;
     estimatedTime: number;
     pieces: (Piece | null)[][];
     isLocked: boolean = false;
@@ -52,7 +52,7 @@ export class SlidePuzzle implements Observer, Observable{
     checkAnswer(): boolean {
         let previousNumber: number = 0; //numbers start at 1
         let flattenedPieces = this.pieces.flat();
-        for (let i = 0; i < flattenedPieces.length - (1+this.hintLevel); i++){ 
+        for (let i = 0; i < flattenedPieces.length - (1+this.hints); i++){ 
             if (flattenedPieces[i] === null){ //if there is a null not at the last space
                 return false;
             }
@@ -70,20 +70,20 @@ export class SlidePuzzle implements Observer, Observable{
     //TODO: Implement hint system
     getHint(): boolean{
         //replace the biggest number with the null piece
-        if (this.hintLevel < 2){
-            for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-                for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-                    if (this.pieces[i][j] === null){
-                        continue;
-                    }else if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hintLevel)){
-                        this.pieces[i][j] = null;
-                        this.hintLevel++;
-                        return true;
-                    }
+        if (this.hints === 2) return false
+
+        for (let i = 0; i < this.rows; i++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
+            for (let j = 0; j < this.cols; j++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
+                if (this.pieces[i][j] === null) continue;
+
+                if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hints)){
+                    this.pieces[i][j] = null;
+                    this.hints++;
+                    return true;
                 }
             }
         }
-        return false;
+        return false
     }
 
     private init(): (Piece | null)[][] {
@@ -162,7 +162,7 @@ export class SlidePuzzle implements Observer, Observable{
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
 
             question: this.question,
             description: this.description,

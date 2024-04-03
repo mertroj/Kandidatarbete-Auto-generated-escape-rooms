@@ -12,7 +12,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     type: string = "lettersMathPuzzle";
     question: string;
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
-    hintLevel: number = 0;
+    hints: string[] = [];
     isSolved: boolean = false;
     estimatedTime: number = 3; //Average based on tests
     isLocked: boolean = false;
@@ -90,12 +90,14 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     getHint(): string{
-        if(this.hintLevel < 4){
-            const number: string = this.getMainAnswer().toString()[this.hintLevel++];
-            const letter: string = this.getLetters().charAt(Number(number));
-            return 'The letter ' + letter + ' is ' + number;
-        }
-        return 'No more hints.';
+        if (this.hints.length === 4) 
+            return 'No more hints.';
+
+        const number: string = this.getMainAnswer().toString()[this.hints.length];
+        const letter: string = this.getLetters().charAt(Number(number));
+        let hint = 'The letter ' + letter + ' is ' + number;
+        this.hints.push(hint)
+        return hint
     }
 
     checkAnswer(answer: string): boolean {
@@ -160,7 +162,7 @@ export class LettersMathPuzzle implements Observable, Observer {
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
 
             question: this.question,
             description: this.description,

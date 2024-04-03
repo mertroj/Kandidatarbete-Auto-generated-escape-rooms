@@ -2,7 +2,7 @@ import { Row, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {EscapeRoom, Room} from "../interfaces";
+import {EscapeRoom, Puzzle, Room} from "../interfaces";
 import {useParams, Link} from 'react-router-dom';
 
 function ResultScreenPage() {
@@ -11,7 +11,7 @@ function ResultScreenPage() {
     const [formattedTimeTaken, setFormattedTimeTaken] = useState<string>('00:00:00');
 
     interface PuzzleProps {
-        hintLevel: number;
+        hints: number;
     }
     interface TimerProps{
         elapsedTime: number;
@@ -39,16 +39,12 @@ function ResultScreenPage() {
     const fetchEscapeRoom = async () => {
         try {
             const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
-
             const rooms: Room[] = response.data.rooms;
-
-            setHintUsed(0);
-            rooms.forEach((room) => {
-                room.puzzles.forEach((slot: PuzzleProps) => {
-                    setHintUsed(prevHintUsed => prevHintUsed + slot.hintLevel);
-                });
-            });
-
+            setHintUsed(rooms.reduce((acc, room) => acc + room.puzzles.reduce((acc, puzzle) => {
+                if (typeof puzzle.hints === "number") 
+                    return acc + puzzle.hints
+                return acc + puzzle.hints.length
+            }, 0), 0));
         } catch (error) {
             console.error('Error fetching data:', error);
         }

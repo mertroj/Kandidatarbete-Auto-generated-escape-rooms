@@ -12,9 +12,9 @@ import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 function EscapeRoomPage() {
     const {gameId} = useParams()
     const navigate = useNavigate();
-    const [hintsList, setHintsList] = useState<string[]>([])
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
     const [currentRoom, setCurrentRoom] = useState<Room>()
+    const [hintsUpdatedFlag, setHintsUpdatedFlag] = useState(false)
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
@@ -46,18 +46,16 @@ function EscapeRoomPage() {
         }
     }
 
-    function addHint(hint: string) {
-        setHintsList(hintsList => [hint, ...hintsList])
+    function addHint(hint: string, puzzleId: string) {
+        let puzzle = currentRoom?.puzzles.find((puzzle) => puzzle.id == puzzleId);
+        if (!puzzle || typeof puzzle.hints == "number") return;
+        puzzle.hints.push(hint)
+        setHintsUpdatedFlag(!hintsUpdatedFlag)
     }
 
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
             setEscapeRoom(response.data);
-            if(!currentRoom){
-                setCurrentRoom(response.data.rooms[0]);
-            }else{
-                setCurrentRoom(response.data.rooms.find((room) => room.id === currentRoom.id));
-            }
         }).catch((error) => {
             console.error(error);
             window.location.pathname = '/';
@@ -99,6 +97,12 @@ function EscapeRoomPage() {
     }, [gameId]);
 
     useEffect(() => {
+        if (currentRoom){
+            setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom.id));
+        }else{
+            setCurrentRoom(escapeRoom?.rooms[0]);
+        }
+
         if (checkEscapeRoomDone() && escapeRoom) {
             //navigate(resultScreenUrl);
             setShowEndPuzzle(true);
@@ -128,8 +132,11 @@ function EscapeRoomPage() {
             { 
                 showEndPuzzle && escapeRoom && getEndPuzzleComponent()
             }
-            {!showNotification && <div className="panel-container">
-                <HintingComponent hintsList={hintsList}/>
+            {!showNotification && currentRoom && <div style={{height: "100vh"}} className="panel-container">
+                <HintingComponent 
+                    currentRoom={currentRoom}
+                    hintsUpdatedFlag={hintsUpdatedFlag}
+                />
                 <NavigationPanel
                     gameId={gameId}
                     currentRoom={currentRoom}
