@@ -24,14 +24,20 @@ function RoomComponent (roomProps: RoomComponentProps) {
 
     useEffect(() => {
         let hasLockedPuzzle: boolean = room.puzzles.some((puzzle) => puzzle.isLocked);
+        let solvedPuzzles: JSX.Element[] = [];
         let nodes: JSX.Element[] = [];
         room.puzzles.forEach((puzzle) => {
             if (puzzle.isLocked)
                 return
                 
             else if (puzzle.isSolved)
-                nodes.push(<SolvedPuzzleComponent
+                solvedPuzzles.push(<SolvedPuzzleComponent
                     key={puzzle.id} 
+                    style={{
+                        position: 'absolute',
+                        top: `${solvedPuzzles.length * 10}px`,
+                        left: `${solvedPuzzles.length * 10}px`
+                    }}
                 />)
 
             else if (puzzle.type === 'anagram')
@@ -79,6 +85,13 @@ function RoomComponent (roomProps: RoomComponentProps) {
             nodes.push(<LockedPuzzleComponent
                 key={"lockedIn"+room.id} 
             />)
+        if (solvedPuzzles.length > 0){
+            nodes.push(
+                <div className="solved-puzzles-container">
+                    {solvedPuzzles}
+                </div>
+            );
+        }
         setPuzzles(nodes);
     }, [room])
     return (

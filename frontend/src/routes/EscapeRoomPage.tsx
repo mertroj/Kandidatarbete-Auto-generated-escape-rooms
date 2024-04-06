@@ -1,6 +1,7 @@
 import axios from "axios";
 import {Button, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
+import './EscapeRoomPage.css';
 import { useParams, useNavigate } from "react-router-dom";
 import HintingComponent from "../components/Hinting/hinting";
 import { EscapeRoom, JigsawPuzzle, Room } from "../interfaces";
@@ -8,6 +9,7 @@ import PopupComponent from "../components/PopupComponent/Popup";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
 import JigsawComponent from "../components/Puzzles/JigsawPuzzleComponent";
 import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
+import FeedbackComponent from "../components/Feedback/FeedbackComponent";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
@@ -17,10 +19,16 @@ function EscapeRoomPage() {
     const [currentRoom, setCurrentRoom] = useState<Room>()
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
-
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
+    const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: string}>>([]);
+    let feedbackId = 0;
 
+    interface escapeRoomFetchResponse{
+        escapeRoom: EscapeRoom,
+        solvedPuzzles: string[],
+        unlockedPuzzles: string[]
+    }
     function checkEscapeRoomDone(): boolean {
         return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false
     }
@@ -50,14 +58,29 @@ function EscapeRoomPage() {
         setHintsList(hintsList => [...hintsList, hint]);
     }
 
+    function notifySolvedPuzzles(solvedPuzzles: string[]){
+        setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!'}]);
+    }
+    function notifyUnlockedPuzzles(unlockedPuzzles: string[], er: EscapeRoom){
+        setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!'}]);
+
+    }
+
     function fetchEscapeRoom() {
-        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
-            console.log(response.data)
-            setEscapeRoom(response.data);
+        axios.get<escapeRoomFetchResponse>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
+            console.log(response.data.escapeRoom)
+            let er = response.data.escapeRoom;
+            setEscapeRoom(er);
             if(!currentRoom){
-                setCurrentRoom(response.data.rooms[0]);
+                setCurrentRoom(er.rooms[0]);
             }else{
-                setCurrentRoom(response.data.rooms.find((room) => room.id === currentRoom.id));
+                setCurrentRoom(er.rooms.find((room) => room.id === currentRoom.id));
+            }
+            if(response.data.solvedPuzzles.length !== 0){
+                notifySolvedPuzzles(response.data.solvedPuzzles);
+            }
+            if(response.data.unlockedPuzzles.length !== 0){
+                notifyUnlockedPuzzles(response.data.unlockedPuzzles, er);
             }
         }).catch((error) => {
             console.error(error);
@@ -106,6 +129,13 @@ function EscapeRoomPage() {
         }
     }, [escapeRoom]);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setFeedbackList(feedbackList => feedbackList.slice(1));
+        }, 3000); // wait for 3 seconds
+        return () => clearTimeout(timer);
+    }, [feedbackList]);
+
     return (
         <div className="d-flex w-100">
             <img
@@ -120,6 +150,11 @@ function EscapeRoomPage() {
                     height:'auto',
                     zIndex:'-1'
                 }}/>
+        <div className="feedback-container">
+            {feedbackList.map((feedback) => 
+                <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor="#5cb85c"/>
+            )}
+        </div>
             {!showNotification && !showEndPuzzle &&
                 <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
                     {currentRoom ?

@@ -2,6 +2,7 @@ import {Edge, Graph, alg} from "graphlib";
 import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
+import { PuzzleManager } from "../PuzzleManager";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
@@ -14,7 +15,7 @@ class TimeoutError extends Error {
     }
 }
 
-export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
+export function puzzleTreePopulator(estimatedTime: number, difficulty: number, manager: PuzzleManager): Graph {
     let puzzleBox: Puzzle[];
     let counter = 0;
     while(true){
@@ -69,7 +70,8 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }else{ //if the node is a normal node but has which can still have incoming edges
                 puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
             }
-            addObservers(puzzleBox[i], incomingPuzzles);
+            //addObservers(puzzleBox[i], incomingPuzzles);
+            manager.addPuzzle(puzzleBox[i]);
             graph.setNode(nodeId, puzzleBox[i]);
         }catch(e){
             if(e instanceof TimeoutError){
