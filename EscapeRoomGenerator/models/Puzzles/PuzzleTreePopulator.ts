@@ -2,6 +2,8 @@ import {Edge, Graph, alg} from "graphlib";
 import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
+import { Theme } from "../Theme";
+import { Jigsaw } from "./Jigsaw";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
@@ -14,7 +16,7 @@ class TimeoutError extends Error {
     }
 }
 
-export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
+export async function puzzleTreePopulator(estimatedTime: number, difficulty: number, theme: Theme): Promise<Graph> {
     let puzzleBox: Puzzle[];
     let counter = 0;
     while(true){
@@ -43,7 +45,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
         throw new Error("Diverging tree does not have as many nodes as required");
     }
     graph.removeNode('startNode');
-    let sortedGraph = alg.topsort(graph); //Topological sort of the graph
+    let sortedGraph = alg.topsort(graph); //Topological sort of the graph in order to generate dependentPuzzles first
 
     //let nodes = graph.nodes();
     for (let i = 0; i < sortedGraph.length; i++){
@@ -55,7 +57,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }
             const incomingPuzzles: Puzzle[] = incomingEdges.map((edge) => (graph.node(edge.v) as Puzzle));
             const incomingPuzzlesIds: string[] = incomingPuzzles.map(puzzle => puzzle.id);
-            if(nodeId === 'startNode'){
+            if(nodeId === 'startNode'){ //TODO: remove this since we remove startNode before the loop
                 continue;
             }
             if(nodeId === '0'){ //if the node is the final node
@@ -80,7 +82,15 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }
         }
     }
-    
+    let promises = graph.nodes().map(async nodeId => {
+        let puzzle = graph.node(nodeId) as Puzzle;
+        if(nodeId === '0' || puzzle instanceof Jigsaw) {
+            return;
+        }
+        await puzzle.applyTheme(theme);
+    });
+    await Promise.all(promises);
+
     return graph;
 }
 

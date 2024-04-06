@@ -11,6 +11,12 @@ export function randomInt(max: number) : number {
 export function randomIntRange(min: number, max: number) : number {
     return Math.floor(Math.random() * (max-min)) + min;
 }
+export function randomFloatRange(min: number, max: number) : number {
+    return Math.random() * (max-min) + min;
+}
+export function randomFloat(max: number) : number {
+    return Math.random() * max;
+}
 export function choice<t>(array: t[]): t {
     return array[randomInt(array.length)];
 }

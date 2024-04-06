@@ -5,28 +5,41 @@ import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
 import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
 import { Puzzle } from './Puzzles/Puzzle';
+import { generateEndingText, generateIntroText } from './ChatGPTTextGenerator';
+import { Direction } from './Direction';
 
 
 export class EscapeRoom {
     private static escapeRooms: {[key: string]: EscapeRoom} = {};
 
     id: string = uuidv4();
-    rooms: Room[];
+    rooms!: Room[];
     timer: Timer = new Timer();
-    endPuzzle: Puzzle;
+    endPuzzle!: Puzzle;
     theme: Theme;
+    startText!: string;
+    endText!: string;
+    currentRoom!: Room;
 
-    constructor(players: number, difficulty: number, theme: Theme) {
+    private constructor(theme: Theme) { //for synchronous creation operations
         this.theme = theme;
-        let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
-
-        [this.rooms, this.endPuzzle] = EscapeRoom.createRooms(totalTime, difficulty);
-        EscapeRoom.connectRooms(this.rooms);
-        this.rooms[0].isLocked = false;
 
         this.timer.start();
         EscapeRoom.escapeRooms[this.id] = this;
+    }
+    static async create(players: number, difficulty: number, theme: Theme): Promise<EscapeRoom> {
+        let instance = new EscapeRoom(theme);
+        let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
+
+        instance.startText = await generateIntroText(theme);
+        instance.endText = await generateEndingText(theme);
+
+        [instance.rooms, instance.endPuzzle] = await EscapeRoom.createRooms(totalTime, difficulty, theme);
+        EscapeRoom.connectRooms(instance.rooms);
+        instance.rooms[0].isLocked = false;
+        instance.currentRoom = instance.rooms[0];
+        return instance;
     }
 
     static get(gameId: string) : EscapeRoom | null {
@@ -41,12 +54,12 @@ export class EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
     }
     
-    static createRooms(totalTime: number, difficulty: number): [Room[], Puzzle] {
+    static async createRooms(totalTime: number, difficulty: number, theme: Theme): Promise<[Room[], Puzzle]> {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
-        let graph = puzzleTreePopulator(totalTime, difficulty);
+        let graph = await puzzleTreePopulator(totalTime, difficulty, theme);
         let nodes = graph.nodes();
         let avgNodesPerRoom = Math.floor((nodes.length - 1) / nrOfRooms);
         let remainingNodes = (nodes.length - 1) % nrOfRooms;
@@ -88,11 +101,29 @@ export class EscapeRoom {
         })
     }
 
+    move(dir: Direction): void {
+        switch (dir) {
+            case Direction.LEFT:
+                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.left) as Room;
+                break;
+            case Direction.RIGHT:
+                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.right) as Room;
+                break;
+            case Direction.UP:
+                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.up) as Room;
+                break;
+            case Direction.DOWN:
+                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.down) as Room;
+                break;
+        }
+    }
+
     strip() {
         return {
             id: this.id, 
             rooms: this.rooms.map((room) => room.strip()),
             endPuzzle: this.endPuzzle.strip(),
+            currentRoom: this.currentRoom.strip(),
             timer: this.timer,
             theme: this.theme
         }

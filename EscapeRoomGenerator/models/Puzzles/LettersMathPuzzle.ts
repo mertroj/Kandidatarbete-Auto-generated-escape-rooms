@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from '../Helpers';
 import { Observable, Observer } from './ObserverPattern';
 import { shuffleArray } from '../Helpers';
+import { Theme } from '../Theme';
+import { generateThemedPuzzleText } from '../ChatGPTTextGenerator';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -152,6 +154,9 @@ export class LettersMathPuzzle implements Observable, Observer {
         let originalMapped = parseInt(original.split('').map(letter => mapping.get(letter)).join(''));
         let shuffledMapped = parseInt(shuffled.split('').map(letter => mapping.get(letter)).join(''));
         return originalMapped - remainder === shuffledMapped;
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

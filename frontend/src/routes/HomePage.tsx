@@ -5,25 +5,25 @@ import axios from 'axios';
 
 
 function HomePage() {
-    const [gameCode, setGameCode] = useState('')
+    const [gameId, setGameId] = useState('');
 
     const startEscapeRoom = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme')
+        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme');
         axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
-            window.location.pathname = '/escaperoom/' + res.data
+            window.location.pathname = '/escaperoom/' + res.data + '/start'
         }).catch((error) => {
-            console.error(error)
+            console.error(error);
         })
     }
 
     const joinGameTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setGameCode(e.currentTarget.value)
+        setGameId(e.currentTarget.value);
     }
     const joinGame = () => {
-        window.location.pathname = '/escaperoom/' + gameCode
+        window.location.pathname = '/escaperoom/' + gameId;
     }
 
 

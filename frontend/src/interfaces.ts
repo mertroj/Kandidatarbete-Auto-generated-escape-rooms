@@ -3,6 +3,7 @@ export interface EscapeRoom {
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
+    currentRoom: Room;
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;

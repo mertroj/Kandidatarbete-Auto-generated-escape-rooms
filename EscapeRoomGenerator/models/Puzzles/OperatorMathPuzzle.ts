@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { choice, randomIntRange, repeat } from '../Helpers'
 import { Observable, Observer } from './ObserverPattern';
+import {generateThemedPuzzleText } from '../ChatGPTTextGenerator';
+import { Theme } from '../Theme';
 
 
 export class OperatorMathPuzzle implements Observable, Observer {
@@ -38,11 +40,11 @@ export class OperatorMathPuzzle implements Observable, Observer {
     }
 
     getHint(): string{
+        let message = 'No more hints.';
         if(this.hintLevel < this.numberOfOperands-1){
-            return 'The next operations is ' + this.operands[this.hintLevel++];
-        }else{
-            return 'No more hints.'
+            message = `The ${this.hintLevel === 0 ? 'first': 'next'} operations is ` + this.operands[this.hintLevel++];
         }
+        return message;
     }
 
     checkAnswer(answer: string): boolean {
@@ -94,6 +96,9 @@ export class OperatorMathPuzzle implements Observable, Observer {
         question.push(this.answer.toString());
 
         return question.join(' ')
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

@@ -17,12 +17,17 @@ function EscapeRoomPage() {
     const [currentRoom, setCurrentRoom] = useState<Room>()
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
-
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
+    const [endingText, setEndingText] = useState<string>('');
 
     function checkEscapeRoomDone(): boolean {
         return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false
+    }
+
+    async function fetchEndingText(){
+        const response = await axios.post(`http://localhost:8080/chatGPT/endingText`);
+        setEndingText(response.data);
     }
 
     async function fetchImage() {
@@ -37,7 +42,6 @@ function EscapeRoomPage() {
     }
 
     function getEndPuzzleComponent() {
-        //safe to use '!' since we checked for null in the render
         switch (escapeRoom?.endPuzzle.type) { 
             case 'jigsawpuzzle':
                 return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
@@ -52,13 +56,9 @@ function EscapeRoomPage() {
 
     function fetchEscapeRoom() {
         axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
-            console.log(response.data)
+            console.log(response.data);
             setEscapeRoom(response.data);
-            if(!currentRoom){
-                setCurrentRoom(response.data.rooms[0]);
-            }else{
-                setCurrentRoom(response.data.rooms.find((room) => room.id === currentRoom.id));
-            }
+            setCurrentRoom(response.data.currentRoom);
         }).catch((error) => {
             console.error(error);
             window.location.pathname = '/';
@@ -66,20 +66,44 @@ function EscapeRoomPage() {
     }
 
     function moveLeft() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
-        fetchImage();;
+        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/move/?gameId=' + gameId + '&direction=left').then((response) => {
+            setEscapeRoom(response.data);
+            setCurrentRoom(response.data.currentRoom);
+        }).catch((error) => {
+            console.error(error);
+        })
+        //setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
+        fetchImage();
     }
     function moveRight() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
-        fetchImage();;
+        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/move/?gameId=' + gameId + '&direction=right').then((response) => {
+            setEscapeRoom(response.data);
+            setCurrentRoom(response.data.currentRoom);
+        }).catch((error) => {
+            console.error(error);
+        })
+        //setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
+        fetchImage();
     }
     function moveUp() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
-        fetchImage();;
+        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/move/?gameId=' + gameId + '&direction=up').then((response) => {
+            setEscapeRoom(response.data);
+            setCurrentRoom(response.data.currentRoom);
+        }).catch((error) => {
+            console.error(error);
+        })
+        //setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
+        fetchImage();
     }
     function moveDown() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
-        fetchImage();;
+        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/move/?gameId=' + gameId + '&direction=down').then((response) => {
+            setEscapeRoom(response.data);
+            setCurrentRoom(response.data.currentRoom);
+        }).catch((error) => {
+            console.error(error);
+        })
+        //setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
+        fetchImage();
     }
 
     function handleSolve() {
@@ -105,6 +129,30 @@ function EscapeRoomPage() {
             setShowEndPuzzle(true);
         }
     }, [escapeRoom]);
+
+    useEffect(() => {
+        const getEndingText = async () => {
+            await fetchEndingText();
+        };
+        if(showNotification){
+            getEndingText();
+        }
+    }, [showNotification]);
+
+    useEffect(() => {
+        //Add current page to the history stack
+        const unblock = window.history.pushState(null, "", window.location.href);
+
+        //When navigating back, add current page to the history stack again
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+        };
+
+        //When done with the page, remove the back navigation listnere/preventer
+        return () => {
+            window.onpopstate = null;
+        };
+    }, []);
 
     return (
         <div className="d-flex w-100">
@@ -152,9 +200,9 @@ function EscapeRoomPage() {
                     }
                     children={
                         <div className={'text-center'}>
-                                I think I see a way out!
+                            {endingText}
                             <Row className={'mt-5'}>
-                                <Button variant='outline-success' onClick={() => navigate(resultScreenUrl)}>Go towards the light</Button>
+                                <Button variant='outline-success' onClick={() => navigate(resultScreenUrl)}>Leave</Button>
                             </Row>
                         </div>
                     }

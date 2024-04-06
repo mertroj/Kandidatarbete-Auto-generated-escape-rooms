@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomInt, randomIntRange } from '../Helpers'
 import { Observable, Observer } from './ObserverPattern';
+import { Theme } from '../Theme';
+import { generateThemedPuzzleText } from '../ChatGPTTextGenerator';
 
 const anagramsData = require('../../anagrams.json')
 
@@ -101,6 +103,9 @@ export class Anagram implements Observable, Observer {
     
         const anagramData = possibleAnagrams[randomInt(possibleAnagrams.length)];
         return anagramData[0]
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

@@ -1,3 +1,5 @@
+import { generateThemedPuzzleText } from "../ChatGPTTextGenerator";
+import { Theme } from "../Theme";
 import { Observable, Observer } from "./ObserverPattern";
 import { Puzzle } from "./Puzzle";
 import { v4 as uuidv4 } from 'uuid';
@@ -103,6 +105,12 @@ export class MastermindPuzzle implements Observable, Observer {
         this.previousGuesses.set(this.previousGuesses.size, [answer, bools.join('')]);
         return bools;
     }
+    async applyTheme(theme: Theme): Promise<void> {
+        for (let i = 0; i < this.hints.length - 1; i++){
+            this.hints[i] = await generateThemedPuzzleText(this.hints[i], theme);
+        }
+    }
+
     strip() {
         return {
             id: this.id,
