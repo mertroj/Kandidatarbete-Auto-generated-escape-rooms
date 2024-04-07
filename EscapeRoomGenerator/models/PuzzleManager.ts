@@ -23,7 +23,5 @@ export class PuzzleManager implements Observer{
                 }
             }
         }
-        console.log('solved: ',this.solvedPuzzlesQueue);
-        console.log('unlocked: ', this.unLockedPuzzlesQueue);
     }
 }

@@ -47,7 +47,6 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
     }
     async function checkAnswer() {
         try {
-            console.log("checking answer", puzzle.id);
             const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data) {
                 onSolve();
@@ -58,7 +57,6 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
     }
     async function patchCorrect(id: string, isCorrect: boolean) {
         try {
-            console.log("patching correct", puzzle.id);
             const response = await axios.patch(`http://localhost:8080/jigsaw/setCorrect`, {pieceId: id, puzzleId: puzzle.id, isCorrect: isCorrect});
 
         } catch (error) {
