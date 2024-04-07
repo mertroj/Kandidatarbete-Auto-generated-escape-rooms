@@ -21,7 +21,7 @@ function EscapeRoomPage() {
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
-    const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: string}>>([]);
+    const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: string, bgCol:string}>>([]);
     let feedbackId = 0;
 
     interface escapeRoomFetchResponse{
@@ -59,11 +59,15 @@ function EscapeRoomPage() {
     }
 
     function notifySolvedPuzzles(solvedPuzzles: string[]){
-        setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!'}]);
+        for(let i = 0; i < solvedPuzzles.length; i++){
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!', bgCol:'#5cb85c'}]);
+        }
     }
     function notifyUnlockedPuzzles(unlockedPuzzles: string[], er: EscapeRoom){
-        setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!'}]);
-
+        for(let i = 0; i < unlockedPuzzles.length; i++){
+            let room = er.rooms.find((room) => room.puzzles.find((puzzle) => puzzle.id === unlockedPuzzles[i]));
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!', bgCol: '#dc3545'}]);
+        }
     }
 
     function fetchEscapeRoom() {
@@ -152,7 +156,7 @@ function EscapeRoomPage() {
                 }}/>
         <div className="feedback-container">
             {feedbackList.map((feedback) => 
-                <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor="#5cb85c"/>
+                <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor={feedback.bgCol}/>
             )}
         </div>
             {!showNotification && !showEndPuzzle &&
