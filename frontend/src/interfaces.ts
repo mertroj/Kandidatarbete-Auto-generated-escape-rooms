@@ -112,7 +112,8 @@ export interface MastermindPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
     question: string;
     length: number;
+    previousGuesses: number[][];
 }
