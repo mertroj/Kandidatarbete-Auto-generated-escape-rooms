@@ -9,11 +9,11 @@ function GuessComponent({length, guess, feedback, animation}: {length: number, g
     const getColor = (feedbackChar: string) => {
         switch (feedbackChar) {
             case '0':
-                return 'green';
+                return 'grey';
             case '1':
                 return 'yellow';
             case '2':
-                return 'grey';
+                return 'green';
             default:
                 return 'transparent'; // default color
         }
