@@ -3,7 +3,9 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 import { OperatorsMathPuzzle } from '../../interfaces';
+import withClickAudio from '../withClickAudioComponent';
 
+const AudioClickButton = withClickAudio('button');
 interface OperatorMathPuzzleProps {
     addHint: Function;
     puzzle: OperatorsMathPuzzle;
@@ -44,11 +46,11 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
             <div>
                 <form action="" onSubmit={handleSubmit}>
                     <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
-                    <button className='w-100' type='submit'>Test answer</button>
+                    <AudioClickButton className='w-100' type='submit'>Test answer</AudioClickButton>
                 </form>
-                <button className="w-100" onClick={async() => getHint()}>
+                <AudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
-                </button>
+                </AudioClickButton>
             </div>
         </div>
         

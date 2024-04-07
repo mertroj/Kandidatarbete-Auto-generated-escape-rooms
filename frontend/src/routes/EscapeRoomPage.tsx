@@ -136,7 +136,7 @@ function EscapeRoomPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setFeedbackList(feedbackList => feedbackList.slice(1));
-        }, 3000); // wait for 3 seconds
+        }, 3500); // wait for 3 seconds
         return () => clearTimeout(timer);
     }, [feedbackList]);
 
@@ -155,8 +155,8 @@ function EscapeRoomPage() {
                     zIndex:'-1'
                 }}/>
         <div className="feedback-container">
-            {feedbackList.map((feedback) => 
-                <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor={feedback.bgCol}/>
+            {feedbackList.map((feedback, index) => 
+                <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor={feedback.bgCol} delay={index*0.5}/>
             )}
         </div>
             {!showNotification && !showEndPuzzle &&
