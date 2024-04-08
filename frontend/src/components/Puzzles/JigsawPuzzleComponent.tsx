@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
+import correctSound from '../../assets/sounds/correct-answer.wav';
 import {useParams} from "react-router-dom";
 import axios from "axios";
 
 //TODO:  Fix the bug with the pieces not always being drawn.
-
+const correctAudio = new Audio(correctSound);
 function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -49,6 +50,7 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
         try {
             const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data) {
+                correctAudio.play();
                 onSolve();
             }
         } catch (error) {

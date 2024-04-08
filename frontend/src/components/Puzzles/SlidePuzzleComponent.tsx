@@ -4,7 +4,14 @@ import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
 import './slidePuzzle.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
+import correctSound from '../../assets/sounds/correct-answer.wav';
+import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
+import withClickAudio from '../withClickAudioComponent';
 
+const HintAudioClickButton = withClickAudio(Button, hintClickSound);
+const correctAudio = new Audio(correctSound);
+const incorrectAudio = new Audio(incorrectSound);
 interface PatchResponse {
     isSuccessful: boolean;
     puzzle: SlidePuzzle;
@@ -61,11 +68,11 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
         try{
             const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data){
-                alert('Correct!');
                 onSolve();
+                correctAudio.play();
                 setIsOpen(false);
             }else{
-                alert('Incorrect');
+                incorrectAudio.play();
             }
         }catch(error: any){
             console.error(error);
@@ -149,7 +156,7 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
                         </Row>
                         <Row className="justify-content-md-center">
                             <Col xs="auto">
-                                <Button variant="danger" className='mt-1' onClick={() => handleHintRequest()}>Get help</Button>
+                                <HintAudioClickButton variant="primary" className='mt-1' onClick={() => handleHintRequest()}>Get help</HintAudioClickButton>
                             </Col>
                         </Row>
                     </Row>

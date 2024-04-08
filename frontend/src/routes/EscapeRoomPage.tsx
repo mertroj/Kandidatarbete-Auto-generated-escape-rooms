@@ -58,15 +58,14 @@ function EscapeRoomPage() {
         setHintsList(hintsList => [...hintsList, hint]);
     }
 
-    function notifySolvedPuzzles(solvedPuzzles: string[]){
+    function notifySolvedPuzzles(solvedPuzzles: string[]) {
         for(let i = 0; i < solvedPuzzles.length; i++){
-            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!', bgCol:'#5cb85c'}]);
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!', bgCol:'#00C851'}]);
         }
     }
-    function notifyUnlockedPuzzles(unlockedPuzzles: string[], er: EscapeRoom){
+    function notifyUnlockedPuzzles(unlockedPuzzles: string[]){
         for(let i = 0; i < unlockedPuzzles.length; i++){
-            let room = er.rooms.find((room) => room.puzzles.find((puzzle) => puzzle.id === unlockedPuzzles[i]));
-            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!', bgCol: '#dc3545'}]);
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!', bgCol: '#0d6efd'}]);
         }
     }
 
@@ -80,12 +79,13 @@ function EscapeRoomPage() {
             }else{
                 setCurrentRoom(er.rooms.find((room) => room.id === currentRoom.id));
             }
-            if(response.data.solvedPuzzles.length !== 0){
+            if(response.data.unlockedPuzzles.length !== 0){
+                notifyUnlockedPuzzles(response.data.unlockedPuzzles);
+                notifySolvedPuzzles(response.data.solvedPuzzles);
+            }else{
                 notifySolvedPuzzles(response.data.solvedPuzzles);
             }
-            if(response.data.unlockedPuzzles.length !== 0){
-                notifyUnlockedPuzzles(response.data.unlockedPuzzles, er);
-            }
+
         }).catch((error) => {
             console.error(error);
             window.location.pathname = '/';

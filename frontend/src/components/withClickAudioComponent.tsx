@@ -1,18 +1,20 @@
 import React from 'react';
-import clickSound from '../assets/click.wav';
-const audio = new Audio(clickSound);
+import defaultClick from '../assets/sounds/navigation-click.wav';
 
 //we create a higher order component here (HOC)
-function withClickAudio(WrappedComponent: React.ElementType) {
+function withClickAudio(WrappedComponent: React.ElementType, clickSound: string = defaultClick) {
+    const audio = new Audio(clickSound);
+
     return (props: any) => {
         const { onClick, ...rest } = props;
 
         const handleClick = (event: React.MouseEvent) => {
-            audio.play();
 
             if (onClick) {
+                audio.play();
                 onClick(event);
             }
+            console.log('click', clickSound);
         };
 
         return <WrappedComponent {...rest} onClick={handleClick} />;

@@ -3,7 +3,14 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 import { LettersMathPuzzle } from '../../interfaces';
+import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
+import correctSound from '../../assets/sounds/correct-answer.wav';
+import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
+import withClickAudio from '../withClickAudioComponent';
 
+const HintAudioClickButton = withClickAudio('button', hintClickSound);
+const correctAudio = new Audio(correctSound);
+const incorrectAudio = new Audio(incorrectSound);
 interface LettersMathPuzzleProps {
     addHint: Function;
     puzzle: LettersMathPuzzle;
@@ -18,10 +25,10 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
         try{
             const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
-                alert('Correct!');
+                correctAudio.play();
                 onSolve();
             }else{
-                alert('Incorrect!');
+                incorrectAudio.play();
             }
         } catch (error) {
             console.error(error);
@@ -46,9 +53,9 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
                     <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
                     <button className='w-100' type='submit'>Test answer</button>
                 </form>
-                <button className="w-100" onClick={async() => getHint()}>
+                <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
-                </button>
+                </HintAudioClickButton>
             </div>
         </div>
         

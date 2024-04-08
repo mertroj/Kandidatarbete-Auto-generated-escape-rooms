@@ -6,7 +6,14 @@ import '../puzzles.css';
 import { MastermindPuzzle } from '../../../interfaces';
 import { Button, Container } from 'react-bootstrap';
 import Guess from './GuessComponent';
+import correctSound from '../../../assets/sounds/correct-answer.wav';
+import incorrectSound from '../../../assets/sounds/incorrect-answer.wav';
+import hintClickSound from '../../../assets/sounds/arcade-hint-click.wav';
+import withClickAudio from '../../withClickAudioComponent';
 
+const HintAudioClickButton = withClickAudio(Button, hintClickSound);
+const correctAudio = new Audio(correctSound);
+const incorrectAudio = new Audio(incorrectSound);
 function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Function, puzzle: MastermindPuzzle, onSolve: Function}) {
     const [previousGuesses, setPreviousGuesses] = useState<Map<number, [string, string]>>(new Map());
     const [submittedAnswer, setSubmittedAnswer] = useState<string>();
@@ -37,10 +44,12 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
                 setTimeout(async () => {
                     setIsShowing(false);
                     onSolve();
+                    correctAudio.play();
                     await fetchGuesses();
                 }, 500*length);
             } else {
                 await fetchGuesses();
+                incorrectAudio.play();
             }
         }catch(error){
             console.error(error + currentInput);
@@ -118,7 +127,7 @@ return (
             children=
             {
                 <div className='d-flex flex-column position-relative'>
-                    <Button variant="danger" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</Button>
+                    <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
                     <div className='flex-grow-1'>
                         <div className='text-center d-flex align-items-center flex-column'>
                             <div className='mb-4'>
