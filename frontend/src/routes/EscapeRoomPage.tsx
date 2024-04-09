@@ -10,6 +10,7 @@ import RoomComponent from "../components/RoomComponent/RoomComponent";
 import JigsawComponent from "../components/Puzzles/JigsawPuzzleComponent";
 import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 import FeedbackComponent from "../components/Feedback/FeedbackComponent";
+import {FeedbackMessages} from "../interfaces";
 
 function EscapeRoomPage() {
     const {gameId} = useParams()
@@ -21,7 +22,7 @@ function EscapeRoomPage() {
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
-    const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: string, bgCol:string}>>([]);
+    const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: FeedbackMessages, bgCol:string}>>([]);
     let feedbackId = 0;
 
     interface escapeRoomFetchResponse{
@@ -60,19 +61,19 @@ function EscapeRoomPage() {
 
     function notifySolvedPuzzles(solvedPuzzles: string[]) {
         for(let i = 0; i < solvedPuzzles.length; i++){
-            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle solved!', bgCol:'#00C851'}]);
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: FeedbackMessages.CORRECT, bgCol:'#00C851'}]);
         }
     }
     function notifyUnlockedPuzzles(unlockedPuzzles: string[]){
         for(let i = 0; i < unlockedPuzzles.length; i++){
-            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!', bgCol: '#0d6efd'}]);
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: FeedbackMessages.UNLOCKED, bgCol: '#0d6efd'}]);
         }
     }
     function handleGeneralPuzzleSubmit(res: boolean){
         if (res) {
-            fetchEscapeRoom()
+            fetchEscapeRoom();
         } else {
-            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Incorrect answer!', bgCol: '#ff4444'}]);
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: FeedbackMessages.INCORRECT, bgCol: '#ff4444'}]);
         }
     }
 
