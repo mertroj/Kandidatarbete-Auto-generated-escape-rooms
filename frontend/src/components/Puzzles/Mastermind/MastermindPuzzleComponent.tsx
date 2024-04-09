@@ -14,7 +14,7 @@ import withClickAudio from '../../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
-function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Function, puzzle: MastermindPuzzle, onSolve: Function}) {
+function MastermindPuzzleComponent ({addHint, puzzle, onSubmit}: {addHint : Function, puzzle: MastermindPuzzle, onSubmit: Function}) {
     const [previousGuesses, setPreviousGuesses] = useState<Map<number, [string, string]>>(new Map());
     const [submittedAnswer, setSubmittedAnswer] = useState<string>();
     const [isShowing, setIsShowing] = useState<boolean>(false);
@@ -43,13 +43,15 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
                 await fetchGuesses();
                 setTimeout(async () => {
                     setIsShowing(false);
-                    onSolve();
+                    onSubmit(true);
                     correctAudio.play();
                     await fetchGuesses();
                 }, 500*length);
             } else {
-                await fetchGuesses();
+                incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
+                await fetchGuesses();
+                onSubmit(false);
             }
         }catch(error){
             console.error(error + currentInput);

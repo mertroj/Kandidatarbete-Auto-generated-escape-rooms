@@ -14,12 +14,12 @@ import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent"
 interface RoomComponentProps {
     room: Room;
     addHint: Function;
-    updateRoom: Function;
+    onSubmit: Function;
     
 }
 
 function RoomComponent (roomProps: RoomComponentProps) {
-    const {room, addHint, updateRoom} = roomProps;
+    const {room, addHint, onSubmit} = roomProps;
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
@@ -45,7 +45,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as AnagramPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
                 
             else if (puzzle.type === 'lettersMathPuzzle')
@@ -53,7 +53,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as LettersMathPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else if (puzzle.type === 'operatorMathPuzzle') 
@@ -61,14 +61,14 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as OperatorsMathPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
                         
             else if (puzzle.type === 'slidePuzzle') 
                 nodes.push(<SlidePuzzleComponent 
                     key={puzzle.id} 
                     puzzle={puzzle as SlidePuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else if (puzzle.type === 'mastermindPuzzle')
@@ -76,7 +76,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id}
                     addHint={addHint}
                     puzzle={puzzle as MastermindPuzzle}
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else nodes.push(<p>Invalid puzzle</p>)

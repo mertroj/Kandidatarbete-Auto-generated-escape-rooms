@@ -14,10 +14,10 @@ const incorrectAudio = new Audio(incorrectSound);
 interface OperatorMathPuzzleProps {
     addHint: Function;
     puzzle: OperatorsMathPuzzle;
-    onSolve: Function;
+    onSubmit: Function;
 }
 function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = operatorMathPuzzleProps;
+    const {puzzle, addHint, onSubmit} = operatorMathPuzzleProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,9 +26,11 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
             const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSolve();
+                onSubmit(true);
             }else{
+                incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
+                onSubmit(false);
             }
         } catch (error) {
             console.error(error);

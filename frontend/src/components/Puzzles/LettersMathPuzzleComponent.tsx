@@ -14,10 +14,10 @@ const incorrectAudio = new Audio(incorrectSound);
 interface LettersMathPuzzleProps {
     addHint: Function;
     puzzle: LettersMathPuzzle;
-    onSolve: Function;
+    onSubmit: Function;
 }
 function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
+    const {puzzle, addHint, onSubmit} = lettersMathPuzzleProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,9 +26,11 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
             const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSolve();
+                onSubmit(true);
             }else{
+                incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
+                onSubmit(false);
             }
         } catch (error) {
             console.error(error);

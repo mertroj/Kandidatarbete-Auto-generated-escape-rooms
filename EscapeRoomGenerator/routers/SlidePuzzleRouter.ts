@@ -86,7 +86,7 @@ SlidePuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        res.status(200).send({isSuccessful: puzzle.getHint(), puzzle: puzzle});
+        res.status(200).send({isSuccessful: puzzle.getHint(), puzzle: puzzle.strip()});
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }

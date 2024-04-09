@@ -68,6 +68,13 @@ function EscapeRoomPage() {
             setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Puzzle Unlocked!', bgCol: '#0d6efd'}]);
         }
     }
+    function handleGeneralPuzzleSubmit(res: boolean){
+        if (res) {
+            fetchEscapeRoom()
+        } else {
+            setFeedbackList(feedbackList => [...feedbackList, {id: feedbackId++, message: 'Incorrect answer!', bgCol: '#ff4444'}]);
+        }
+    }
 
     function fetchEscapeRoom() {
         axios.get<escapeRoomFetchResponse>('http://localhost:8080/escaperoom/?gameId=' + gameId).then((response) => {
@@ -80,8 +87,8 @@ function EscapeRoomPage() {
                 setCurrentRoom(er.rooms.find((room) => room.id === currentRoom.id));
             }
             if(response.data.unlockedPuzzles.length !== 0){
-                notifyUnlockedPuzzles(response.data.unlockedPuzzles);
                 notifySolvedPuzzles(response.data.solvedPuzzles);
+                notifyUnlockedPuzzles(response.data.unlockedPuzzles);
             }else{
                 notifySolvedPuzzles(response.data.solvedPuzzles);
             }
@@ -136,7 +143,7 @@ function EscapeRoomPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setFeedbackList(feedbackList => feedbackList.slice(1));
-        }, 3500); // wait for 3 seconds
+        }, 2000); // wait for fadeOut time (2s)
         return () => clearTimeout(timer);
     }, [feedbackList]);
 
@@ -162,7 +169,7 @@ function EscapeRoomPage() {
             {!showNotification && !showEndPuzzle &&
                 <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
                     {currentRoom ?
-                        <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
+                        <RoomComponent room={currentRoom} addHint={addHint} onSubmit={handleGeneralPuzzleSubmit}/> : null}
                 </div>
             }
             { 

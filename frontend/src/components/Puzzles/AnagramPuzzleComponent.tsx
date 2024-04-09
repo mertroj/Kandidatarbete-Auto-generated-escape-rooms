@@ -14,11 +14,11 @@ const incorrectAudio = new Audio(incorrectSound);
 interface AnagramProps {
     addHint: Function;
     puzzle: AnagramPuzzle;
-    onSolve: Function;
+    onSubmit: Function;
 }
 
 function AnagramPuzzleComponent (anagramProps: AnagramProps) {
-    const {puzzle, addHint, onSolve} = anagramProps;
+    const {puzzle, addHint, onSubmit} = anagramProps;
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -27,9 +27,11 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
             const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSolve();
+                onSubmit(true);
             }else{
+                incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
+                onSubmit(false);
             }
         } catch (error) {
             console.error(error);
