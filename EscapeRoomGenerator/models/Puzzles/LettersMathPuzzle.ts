@@ -14,7 +14,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hintLevel: number = 0;
     isSolved: boolean = false;
-    estimatedTime: number = 3; //Average based on tests
+    estimatedTime: number = 7; //Average based on tests
     isLocked: boolean = false;
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
@@ -41,7 +41,7 @@ export class LettersMathPuzzle implements Observable, Observer {
         let firstTerm: number;
         let letters: string = shuffleArray<string>((allLetters).split('')).join('');
         do {
-            firstTerm = randomIntRange(1001, 10000);
+            firstTerm = randomIntRange(101, 1000);
             answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same four digits as the answer.
             remainder = firstTerm - Number(answerSlice);
         } while(!this.checkTermsValidity(remainder, firstTerm, Number(answerSlice))); //valid if shuffled number is less than the answer
@@ -71,7 +71,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     private checkTermsValidity(remainder: number, firstTerm: number, firstTermsShuffled: number): boolean {
-        return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
+        return remainder <= 0 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
     }
 
     addObserver(observer: Observer): void {
