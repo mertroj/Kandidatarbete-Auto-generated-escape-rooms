@@ -9,9 +9,9 @@ function withClickAudio(WrappedComponent: React.ElementType, clickSound: string 
         const { onClick, ...rest } = props;
 
         const handleClick = (event: React.MouseEvent) => {
-
+            audio.currentTime = 0;
+            audio.play();
             if (onClick) {
-                audio.play();
                 onClick(event);
             }
             console.log('click', clickSound);
