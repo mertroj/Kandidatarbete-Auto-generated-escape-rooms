@@ -12,12 +12,11 @@ const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface LettersMathPuzzleProps {
-    addHint: Function;
     puzzle: LettersMathPuzzle;
-    onSubmit: Function;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
 }
-function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzleProps) {
-    const {puzzle, addHint, onSubmit} = lettersMathPuzzleProps;
+function LettersMathPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: LettersMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,11 +25,12 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
             const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSubmit(true);
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -40,7 +40,10 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
     async function getHint() {
         try{
             const response = await axios.get(`http://localhost:8080/lettersMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            let hint: string = response.data;
+            if (hint === "No more hints.") return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

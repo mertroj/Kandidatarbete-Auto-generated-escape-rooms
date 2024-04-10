@@ -7,10 +7,10 @@ export class Room {
     id: string;
     x: number;
     y: number;
-    left: string;
-    right: string;
-    up: string;
-    down: string;
+    left: number = -1;
+    right: number = -1;
+    up: number = -1;
+    down: number = -1;
     isLocked: boolean;
     puzzles: Puzzle[];
 
@@ -18,10 +18,6 @@ export class Room {
         this.id = uuidv4();
         this.x = x;
         this.y = y;
-        this.left = '';
-        this.right = '';
-        this.up = '';
-        this.down = '';
         this.isLocked = puzzles.every((puzzle) => puzzle.isLocked);
         this.puzzles = puzzles;
         Room.rooms[this.id] = this;

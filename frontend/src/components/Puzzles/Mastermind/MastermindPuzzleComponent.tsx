@@ -14,45 +14,42 @@ import withClickAudio from '../../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
-function MastermindPuzzleComponent ({addHint, puzzle, onSubmit}: {addHint : Function, puzzle: MastermindPuzzle, onSubmit: Function}) {
-    const [previousGuesses, setPreviousGuesses] = useState<Map<number, [string, string]>>(new Map());
-    const [submittedAnswer, setSubmittedAnswer] = useState<string>();
+
+interface MasterMindPuzzleProps {
+    puzzle: MastermindPuzzle;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+}
+
+function MastermindPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: MasterMindPuzzleProps) {
     const [isShowing, setIsShowing] = useState<boolean>(false);
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
     const length = puzzle.length;
-    const correct = Array(length).fill(0);
-    let notSolved = true;
 
-    async function fetchGuesses(){
-        try{
-            const response = await axios.get<[[number, [string, string]]]>('http://localhost:8080/mastermindPuzzle/previousGuesses?puzzleId=' + puzzle.id);
-            if (response.status !== 200) throw new Error('Failed to fetch previous guesses: ' + response.statusText);
-            const previousGuessesMap = new Map(response.data);
-            setPreviousGuesses(previousGuessesMap);
-            setCurrentInput('');
-        }catch(error){
-            console.error(error);
-        }
-    }
     async function handleGuess(guess: string){
         try{
-            const response = await axios.post<Number[]>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
-            if (response.data.length === correct.length && response.data.every((value, index) => value === correct[index])) {
-                notSolved = false;
-                await fetchGuesses();
+            const response = await axios.post<string>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
+            let bools = String(response.data)
+
+            puzzle.previousGuesses.push([guess, bools]);
+            setCurrentInput('')
+            updateRoom();
+
+            if (bools === '2'.repeat(length)) {
+                puzzle.isSolved = true;
                 setTimeout(async () => {
                     setIsShowing(false);
-                    onSubmit(true);
                     correctAudio.play();
-                    await fetchGuesses();
+                    updateRoom();
                 }, 500*length);
             } else {
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                await fetchGuesses();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
+
+
         }catch(error){
             console.error(error + currentInput);
         }
@@ -60,15 +57,14 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSubmit}: {addHint : Func
     async function getHint() {
         try{
             const response = await axios.get(`http://localhost:8080/mastermindPuzzle/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            let hint : string = response.data;
+            if (hint === 'No more hints.') return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
     }
-
-    useEffect(() => {
-        fetchGuesses();
-    }, []);
 
     useEffect(() => {
         const handleKeyUp = (event: KeyboardEvent) => {
@@ -87,65 +83,57 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSubmit}: {addHint : Func
             }
         };
 
-        if (isShowing) {
-            window.addEventListener('keyup', handleKeyUp);
-        }
-
-        return () => {
-            window.removeEventListener('keyup', handleKeyUp);
-        };
+        if (isShowing) window.addEventListener('keyup', handleKeyUp);
+        return () => window.removeEventListener('keyup', handleKeyUp);
     }, [isShowing]);
 
     useEffect(() => {
         currentInputRef.current = currentInput;
     }, [currentInput]);
 
-    let guessComponents = [];
-    for (let i = 0; i < previousGuesses.size; i++) {
-        if (previousGuesses.has(i)) {
-            guessComponents.push(
-                <Guess 
-                    key={i}
-                    length={length}
-                    guess={previousGuesses.get(i)![0]} //safe since we set the indexes to be the keys in the backend, and we checked with .has(i)
-                    feedback={previousGuesses.get(i)![1]}
-                    animation={i === previousGuesses.size - 1}
-                />
-            );
-        }
-    }
 
-return (
-    <div className='puzzle'>
-        <PopupComponent
-            trigger={
-                <Button variant='outline-primary'>
-                    Placeholder text for mastermind puzzle. To be chosen depending on the theme
-                </Button>
-            }
-            isOpen={isShowing}
-            onOpen={() => setIsShowing(true)}
-            onClose={() => setIsShowing(false)}
-            children=
-            {
-                <div className='d-flex flex-column position-relative'>
-                    <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
-                    <div className='flex-grow-1'>
-                        <div className='text-center d-flex align-items-center flex-column'>
-                            <div className='mb-4'>
-                                <h5>{puzzle.question}</h5>
+    return (
+        <div className='puzzle'>
+            <PopupComponent
+                trigger={
+                    <Button variant='outline-primary'>
+                        Placeholder text for mastermind puzzle. To be chosen depending on the theme
+                    </Button>
+                }
+                isOpen={isShowing}
+                onOpen={() => setIsShowing(true)}
+                onClose={() => setIsShowing(false)}
+                children=
+                {
+                    <div className='d-flex flex-column position-relative'>
+                        <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
+                        <div className='flex-grow-1'>
+                            <div className='text-center d-flex align-items-center flex-column'>
+                                <div className='mb-4'>
+                                    <h5>{puzzle.question}</h5>
+                                </div>
+                                {
+                                    puzzle.previousGuesses.map((guess, guessI) => {
+                                        return <Guess 
+                                            key={guessI}
+                                            length={length}
+                                            guess={guess[0]}
+                                            feedback={guess[1]}
+                                            animation={guessI === puzzle.previousGuesses.length - 1}
+                                        />
+                                    })
+                                }
+                                
+                                {!puzzle.isSolved &&
+                                    <Guess length={length} guess={currentInput} animation={false}/>
+                                }
                             </div>
-                            {guessComponents}
-                            {notSolved &&
-                                <Guess length={length} guess={currentInput} animation={false}/>
-                            }
                         </div>
                     </div>
-                </div>
-            }
-        />
-    </div>
-);
+                }
+            />
+        </div>
+    );
 }
 
 export default MastermindPuzzleComponent;

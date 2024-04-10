@@ -12,12 +12,17 @@ const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface OperatorMathPuzzleProps {
-    addHint: Function;
     puzzle: OperatorsMathPuzzle;
-    onSubmit: Function;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
 }
-function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
-    const {puzzle, addHint, onSubmit} = operatorMathPuzzleProps;
+
+interface HintI {
+    hint: string;
+    question: string;
+}
+
+function OperatorMathPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -26,11 +31,12 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
             const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSubmit(true);
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -39,8 +45,11 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<HintI>(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
+            if (response.data.hint === "No more hints.") return;
+            puzzle.hints.push(response.data.hint);
+            puzzle.question = response.data.question
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

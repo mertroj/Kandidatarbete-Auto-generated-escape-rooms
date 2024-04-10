@@ -12,13 +12,12 @@ const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface AnagramProps {
-    addHint: Function;
     puzzle: AnagramPuzzle;
-    onSubmit: Function;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
 }
 
-function AnagramPuzzleComponent (anagramProps: AnagramProps) {
-    const {puzzle, addHint, onSubmit} = anagramProps;
+function AnagramPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: AnagramProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -27,11 +26,12 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
             const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 correctAudio.play();
-                onSubmit(true);
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -39,8 +39,11 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
     }
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<string>(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
+            let hint: string = response.data;
+            if (hint === "No more hints.") return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

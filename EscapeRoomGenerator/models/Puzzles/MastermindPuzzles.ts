@@ -8,7 +8,7 @@ export class MastermindPuzzle implements Observable, Observer {
     id: string = uuidv4();
     type: string = 'mastermindPuzzle';
     question: string;
-    hintLevel: number = 0;
+    hints: string[] = [];
     isSolved: boolean = false;
     isLocked: boolean = false;
     estimatedTime: number = 3; //TODO - Testing
@@ -49,16 +49,22 @@ export class MastermindPuzzle implements Observable, Observer {
     }
 
     getHint(): string{
-        if(this.hintLevel < 2){
-            return this.possibleHints[this.hintLevel++];
+        if(this.hints.length < 2){
+            let hint = this.possibleHints[this.hints.length];
+            this.hints.push(hint);
+            return hint;
         }
-        else if(this.hintLevel === 2){
-            return this.possibleHints[this.hintLevel++] + this.solution;
+        
+        if(this.hints.length === 2){
+            let hint = this.possibleHints[2] + this.solution.map(x => String(x)).join('');
+            this.hints.push(hint);
+            return hint;
         }
+        
         return 'No more hints.';
     }
 
-    checkAnswer(answer: string): number[]{
+    checkAnswer(answer: string): string{
         let numAns = answer.split('').map((x) => parseInt(x));
         let bools: number[] = new Array(this.length).fill(0); //Base value 0 for incorrect
         let incorrectNums: number[] = [];
@@ -84,7 +90,7 @@ export class MastermindPuzzle implements Observable, Observer {
         }
 
         this.previousGuesses.push([answer, bools.join('')]);
-        return bools;
+        return bools.join('');
     }
     strip() {
         return {
@@ -92,7 +98,7 @@ export class MastermindPuzzle implements Observable, Observer {
             type: this.type,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hints: this.possibleHints.slice(0, this.hintLevel),
+            hints: this.hints,
             length: this.length,
             question: this.question,
             previousGuesses: this.previousGuesses

@@ -3,6 +3,7 @@ export interface EscapeRoom {
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
+    theme: string;
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
@@ -14,10 +15,10 @@ export enum FeedbackMessages{
 
 export interface Room {
     id: string;
-    left: string;
-    right: string;
-    up: string;
-    down: string;
+    left: number;
+    right: number;
+    up: number;
+    down: number;
     isLocked: boolean;
     puzzles: Puzzle[];
 }
@@ -120,5 +121,5 @@ export interface MastermindPuzzle {
     hints: string[];
     question: string;
     length: number;
-    previousGuesses: number[][];
+    previousGuesses: [string, string][];
 }

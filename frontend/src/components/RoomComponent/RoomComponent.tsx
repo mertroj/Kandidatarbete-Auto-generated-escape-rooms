@@ -13,90 +13,79 @@ import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent"
 
 interface RoomComponentProps {
     room: Room;
-    addHint: Function;
-    onSubmit: Function;
-    
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
 }
 
-function RoomComponent (roomProps: RoomComponentProps) {
-    const {room, addHint, onSubmit} = roomProps;
-    const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
+function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponentProps) {
 
-    useEffect(() => {
-        let hasLockedPuzzle: boolean = room.puzzles.some((puzzle) => puzzle.isLocked);
-        let solvedPuzzles: JSX.Element[] = [];
-        let nodes: JSX.Element[] = [];
-        room.puzzles.forEach((puzzle) => {
-            if (puzzle.isLocked)
-                return
-                
-            else if (puzzle.isSolved)
-                solvedPuzzles.push(<SolvedPuzzleComponent
-                    key={puzzle.id} 
-                    style={{
-                        position: 'absolute',
-                        top: `${solvedPuzzles.length * 10}px`,
-                        left: `${solvedPuzzles.length * 10}px`
-                    }}
-                />)
-
-            else if (puzzle.type === 'anagram')
-                nodes.push(<AnagramComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as AnagramPuzzle} 
-                    onSubmit={onSubmit}
-                />)
-                
-            else if (puzzle.type === 'lettersMathPuzzle')
-                nodes.push(<LettersMathPuzzleComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as LettersMathPuzzle} 
-                    onSubmit={onSubmit}
-                />)
-
-            else if (puzzle.type === 'operatorMathPuzzle') 
-                nodes.push(<OperatorMathPuzzleComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as OperatorsMathPuzzle} 
-                    onSubmit={onSubmit}
-                />)
-                        
-            else if (puzzle.type === 'slidePuzzle') 
-                nodes.push(<SlidePuzzleComponent 
-                    key={puzzle.id} 
-                    puzzle={puzzle as SlidePuzzle} 
-                    onSubmit={onSubmit}
-                />)
-
-            else if (puzzle.type === 'mastermindPuzzle')
-                nodes.push(<MastermindPuzzleComponent 
-                    key={puzzle.id}
-                    addHint={addHint}
-                    puzzle={puzzle as MastermindPuzzle}
-                    onSubmit={onSubmit}
-                />)
-
-            else nodes.push(<p>Invalid puzzle</p>)
-        })
-        if (hasLockedPuzzle)
-            nodes.push(<LockedPuzzleComponent
-                key={"lockedIn"+room.id} 
-            />)
-        if (solvedPuzzles.length > 0){
-            nodes.push(
-                <div className="solved-puzzles-container">
-                    {solvedPuzzles}
-                </div>
-            );
-        }
-        setPuzzles(nodes);
-    }, [room])
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
-            {puzzles}
+            {
+                room.puzzles.map((puzzle) => {
+                    if (puzzle.isLocked) return null;
+                        
+                    if (puzzle.isSolved) return null;
+        
+                    if (puzzle.type === 'anagram')
+                        return <AnagramComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as AnagramPuzzle} 
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                        />
+                        
+                    if (puzzle.type === 'lettersMathPuzzle')
+                        return <LettersMathPuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as LettersMathPuzzle} 
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                        />
+        
+                    if (puzzle.type === 'operatorMathPuzzle') 
+                        return <OperatorMathPuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as OperatorsMathPuzzle} 
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                        />
+                                
+                    if (puzzle.type === 'slidePuzzle') 
+                        return <SlidePuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as SlidePuzzle} 
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                        />
+        
+                    if (puzzle.type === 'mastermindPuzzle')
+                        return <MastermindPuzzleComponent 
+                            key={puzzle.id}
+                            puzzle={puzzle as MastermindPuzzle}
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                        />
+        
+                    else return <p>Invalid puzzle</p>
+                })
+            }
+            {room.puzzles.some((puzzle) => puzzle.isLocked) && <LockedPuzzleComponent key={"lockedIn"+room.id} />}
+            {<div className="solved-puzzles-container">
+                {
+                    room.puzzles.filter((puzzle) => puzzle.isSolved).map((puzzle, i) => {
+                        return <SolvedPuzzleComponent
+                                key={puzzle.id}
+                                style={{
+                                    position: 'absolute',
+                                    top: `${i * 10}px`,
+                                    left: `${i * 10}px`
+                                }}
+                            />
+                    })
+                }
+            </div>
+            }
         </div>
     );
 }

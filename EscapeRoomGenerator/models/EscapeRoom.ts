@@ -74,19 +74,11 @@ export class EscapeRoom {
     }
     
     static connectRooms(rooms: Room[]): void {
-        let r: Room | undefined;
         rooms.forEach((room) => {
-            r = rooms.find((r) => r.x === room.x-1 && r.y === room.y);
-            if (r) room.left = r.id;
-    
-            r = rooms.find((r) => r.x === room.x+1 && r.y === room.y);
-            if (r) room.right = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y-1);
-            if (r) room.up = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y+1);
-            if (r) room.down = r.id;
+            room.left = rooms.findIndex((r) => r.x === room.x-1 && r.y === room.y);
+            room.right = rooms.findIndex((r) => r.x === room.x+1 && r.y === room.y);
+            room.up = rooms.findIndex((r) => r.x === room.x && r.y === room.y-1);
+            room.down = rooms.findIndex((r) => r.x === room.x && r.y === room.y+1);
         })
     }
 
