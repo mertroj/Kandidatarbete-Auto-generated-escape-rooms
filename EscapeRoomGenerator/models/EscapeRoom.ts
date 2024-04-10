@@ -5,6 +5,7 @@ import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
 import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
 import { Puzzle } from './Puzzles/Puzzle';
+import { PuzzleManager } from './PuzzleManager';
 
 
 export class EscapeRoom {
@@ -15,13 +16,14 @@ export class EscapeRoom {
     timer: Timer = new Timer();
     endPuzzle: Puzzle;
     theme: Theme;
+    puzzleManager: PuzzleManager = new PuzzleManager();
 
     constructor(players: number, difficulty: number, theme: Theme) {
         this.theme = theme;
         let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
 
-        [this.rooms, this.endPuzzle] = EscapeRoom.createRooms(totalTime, difficulty);
+        [this.rooms, this.endPuzzle] = EscapeRoom.createRooms(totalTime, difficulty, this.puzzleManager);
         EscapeRoom.connectRooms(this.rooms);
         this.rooms[0].isLocked = false;
 
@@ -41,12 +43,12 @@ export class EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
     }
     
-    static createRooms(totalTime: number, difficulty: number): [Room[], Puzzle] {
+    static createRooms(totalTime: number, difficulty: number, manager: PuzzleManager): [Room[], Puzzle] {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
-        let graph = puzzleTreePopulator(totalTime, difficulty);
+        let graph = puzzleTreePopulator(totalTime, difficulty, manager);
         let nodes = graph.nodes();
         let avgNodesPerRoom = Math.floor((nodes.length - 1) / nrOfRooms);
         let remainingNodes = (nodes.length - 1) % nrOfRooms;

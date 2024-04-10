@@ -2,7 +2,9 @@ import { Row } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import axios from 'axios';
-
+import clickSound from '../assets/sounds/navigation-click.wav';
+import withClickAudio from '../components/withClickAudioComponent';
+const NavigationAudioClickButton = withClickAudio('button', clickSound);
 
 function HomePage() {
     const [gameCode, setGameCode] = useState('')
@@ -13,7 +15,7 @@ function HomePage() {
         const formData = new FormData(form);
         const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme')
         axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
-            window.location.pathname = '/escaperoom/' + res.data
+            window.location.pathname = '/escaperoom/' + res.data;
         }).catch((error) => {
             console.error(error)
         })
@@ -82,11 +84,11 @@ function HomePage() {
                         <option value="pharoah's_tomb">Pharoah's Tomb</option>
                     </select>
                 </div>
-                <button className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</button>
+                <NavigationAudioClickButton className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</NavigationAudioClickButton>
             </form>
             <div className='fixed-bottom mb-5'>
                 <input type="text" placeholder='Enter gamecode here' onChange={(e) => joinGameTextChange(e)}/>
-                <button onClick={joinGame}>Join game</button>
+                <NavigationAudioClickButton onClick={joinGame}>Join game</NavigationAudioClickButton>
             </div>
         </div>
 

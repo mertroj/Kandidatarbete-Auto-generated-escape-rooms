@@ -6,6 +6,11 @@ export interface EscapeRoom {
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
+export enum FeedbackMessages{
+    CORRECT = "Puzzle Solved!",
+    INCORRECT = "Incorrect answer!",
+    UNLOCKED = "Puzzle Unlocked!",
+}
 
 export interface Room {
     id: string;

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavigationPanel.css';
 import { EscapeRoom, Room } from '../../interfaces';
+import clickSound from '../../assets/sounds/navigation-click.wav';
+import withClickAudio from '../withClickAudioComponent';
 
 type NavigationPanelProps = {
     gameId?: string;
@@ -13,6 +15,7 @@ type NavigationPanelProps = {
     moveDown: () => void;
 };
 
+const NavigationAudioClickButton = withClickAudio('button', clickSound);
 function NavigationPanel (props: NavigationPanelProps) {
     const { gameId, currentRoom, escapeRoom, moveLeft, moveRight, moveUp, moveDown } = props;
 
@@ -26,16 +29,16 @@ function NavigationPanel (props: NavigationPanelProps) {
             {currentRoom && escapeRoom ? (
                 <div className="d-flex justify-content-center">
                     {currentRoom.left ? (
-                        <button onClick={moveLeft} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button>
+                        <NavigationAudioClickButton onClick={moveLeft} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.left)}>Move Left</NavigationAudioClickButton>
                     ) : null}
                     {currentRoom.right ? (
-                        <button onClick={moveRight} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button>
+                        <NavigationAudioClickButton onClick={moveRight} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.right)}>Move Right</NavigationAudioClickButton>
                     ) : null}
                     {currentRoom.up ? (
-                        <button onClick={moveUp} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button>
+                        <NavigationAudioClickButton onClick={moveUp} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.up)}>Move Up</NavigationAudioClickButton>
                     ) : null}
                     {currentRoom.down ? (
-                        <button onClick={moveDown} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button>
+                        <NavigationAudioClickButton onClick={moveDown} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.down)}>Move Down</NavigationAudioClickButton>
                     ) : null}
                 </div>
             ) : null}

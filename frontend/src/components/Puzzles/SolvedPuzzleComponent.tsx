@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 
-function SolvedPuzzleComponent () {
+function SolvedPuzzleComponent ({style}: {style: React.CSSProperties}) {
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle' style={style}>
             <b>Solved</b>
         </div>
     );

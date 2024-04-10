@@ -51,7 +51,7 @@ export class Anagram implements Observable, Observer {
     }
 
     getHint(): string {
-        const answers = this.getAnswers()
+        const answers = this.getAnswers();
     
         if (this.hintLevel === this.question.length) {
             return 'No more hints.';
@@ -61,11 +61,11 @@ export class Anagram implements Observable, Observer {
         const hint = `I know the ${this.hintLevel == 0 ? 'first' : 'next'} letter is ${answers[this.hintLevel]}, but what's the rest?`;
         this.hintLevel++;
     
-        return hint
+        return hint;
     }
     
     checkAnswer(answer: string): boolean {
-        const answers = this.getAnswers()
+        const answers = this.getAnswers();
         const answerLowerCase = answer.toLowerCase();
     
         let res: boolean;
@@ -79,7 +79,7 @@ export class Anagram implements Observable, Observer {
         }
         if (!this.isSolved) this.isSolved = res;
         if (res) this.notifyObservers();
-        return res
+        return res;
     }
 
     getQuestion(): string {
