@@ -38,18 +38,3 @@ MastermindPuzzleRouter.get("/hint", async (req: Request, res: Response) => {
     }
     res.status(200).send(puzzle.getHint());
 });
-
-MastermindPuzzleRouter.get("/previousGuesses", async (req: Request, res: Response) => {
-    if (req.query.puzzleId === undefined) {
-        res.status(400).send("The puzzleId parameter is missing");
-        return;
-    }
-    const puzzleId = String(req.query.puzzleId);
-    const puzzle = MastermindPuzzle.get(puzzleId);
-    if (puzzle === undefined) {
-        res.status(404).send("The puzzleId parameter is invalid");
-        return;
-    }
-    const previousGuessesArray = Array.from(puzzle.previousGuesses.entries());
-    res.status(200).send(previousGuessesArray);
-});

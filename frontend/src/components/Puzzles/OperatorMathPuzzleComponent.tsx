@@ -5,12 +5,16 @@ import './puzzles.css'
 import { OperatorsMathPuzzle } from '../../interfaces';
 
 interface OperatorMathPuzzleProps {
-    addHint: Function;
     puzzle: OperatorsMathPuzzle;
-    onSolve: Function;
+    updateRoom: () => void;
 }
-function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = operatorMathPuzzleProps;
+
+interface HintI {
+    hint: string;
+    question: string;
+}
+
+function OperatorMathPuzzleComponent ({puzzle, updateRoom}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -19,7 +23,8 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
             const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 alert('Correct!');
-                onSolve();
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 alert('Incorrect!');
             }
@@ -30,8 +35,11 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<HintI>(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
+            if (response.data.hint === "No more hints.") return;
+            puzzle.hints.push(response.data.hint);
+            puzzle.question = response.data.question
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

@@ -1,60 +1,65 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './hinting.css';
-import { Room } from '../../interfaces';
+import { EscapeRoom, Room } from '../../interfaces';
 
 interface HintingProps {
+    escapeRoom: EscapeRoom;
     currentRoom: Room;
-    hintsUpdatedFlag: boolean;
 }
 
-function Hinting ({currentRoom, hintsUpdatedFlag} : HintingProps) {
-    const [hints, setHints] = useState<JSX.Element[]>();
-    const [showHints, setShowHints] = useState<Set<string>>(new Set())
+function Hinting ({escapeRoom, currentRoom} : HintingProps) {
+    const [showHints, setShowHints] = useState<boolean[]>(new Array(currentRoom.puzzles.length).fill(true));
 
-    function toggleShowHints(puzzleId: string): void {
-        if (showHints.has(puzzleId)){
-            showHints.delete(puzzleId);
-        } else {
-            showHints.add(puzzleId);
-        }
-        setShowHints(new Set(showHints));
+    function toggleShowHints(puzzleI: number): void {
+        showHints[puzzleI] = !showHints[puzzleI]
+        setShowHints([...showHints]);
     }
 
-    useEffect(() => {
-        let puzzleI = 0;
-        let hintI: number;
-        let puzzleHints: JSX.Element[] = [];
-        currentRoom.puzzles.forEach((puzzle) => {
-            puzzleI++;
-            if (puzzle.isLocked) return;
-            if (typeof puzzle.hints == "number") return;
-            if (puzzle.hints.length === 0) return;
-            hintI = 0;
-            puzzleHints.push(<div key={puzzle.id}>
-                <div onClick={() => toggleShowHints(puzzle.id)} className='d-flex flex-row justify-content-between'>
-                    <h6 className=''>
-                        Puzzle {puzzleI} - {puzzle.hints.length} {puzzle.hints.length == 1 ? 'hint' : 'hints'}
-                    </h6>
-                    <h6>{showHints.has(puzzle.id) ? 'v' : '>'}</h6>
-                </div>
-                {showHints.has(puzzle.id) && <div>
-                    {puzzle.hints.map((hint) => <p key={hintI++}>{hint}</p>)}
-                </div>}
-            </div>);
-        });
-
-        setHints(puzzleHints);
-        // setHintNodes(hints.map(hint => <p key={i++}>{hint}</p>))
-    }, [currentRoom, showHints, hintsUpdatedFlag]);
+    function totalHintsUsed(): number {
+        return escapeRoom?.rooms.reduce((total, room) => total + room.puzzles.reduce((acc, puzzle) => 
+            acc + (typeof puzzle.hints === 'number' ? puzzle.hints : puzzle.hints.length)
+        , 0), 0);
+    }
 
     return (
 
         <div className={'hint-window d-flex flex-column text-center'}>
             <h2>Hints list:</h2>
             <div className='hint-container overflow-y-scroll'>
-                {hints}
+                {
+                    currentRoom.puzzles.map((puzzle, puzzleI) => {
+                        if (puzzle.isLocked || puzzle.isSolved) return null;
+                        // console.log(puzzle.hints)
+            
+                        if (typeof puzzle.hints === "number"){
+                            if (puzzle.hints > 0){
+                                return <div className='d-flex' key={puzzleI}>
+                                    <h6>
+                                        {`Puzzle ${puzzleI} - ${puzzle.hints} ${puzzle.hints === 1 ? 'hint' : 'hints'}`}
+                                    </h6>
+                                </div>
+                            } else return null;
+                        }
+                        if (puzzle.hints.length !== 0) {
+                            return <div key={puzzleI}>
+                                <div onClick={() => toggleShowHints(puzzleI)} className='d-flex flex-row justify-content-between hint-dropdown-button'>
+                                    <h6>
+                                        Puzzle {puzzleI} - {puzzle.hints.length} {puzzle.hints.length === 1 ? 'hint' : 'hints'}
+                                    </h6>
+                                    <h6>{showHints[puzzleI] ? 'v' : '>'}</h6>
+                                </div>
+                                <div className={'puzzle-hints-wrapper ' + (showHints[puzzleI] ? 'show-hints ' : '')}>
+                                    <div className={'overflow-hidden'}>
+                                        {(puzzle.hints).map((hint, hintI) => <p key={hintI}>{hint}</p>)}
+                                    </div>
+                                </div>
+                            </div>
+                        };
+                    })
+                }
             </div>
+            <h6 className='mt-auto'>Total hints used: {totalHintsUsed()}</h6>
         </div>
     );
 }

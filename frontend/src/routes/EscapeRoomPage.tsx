@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Button, Row} from "react-bootstrap";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HintingComponent from "../components/Hinting/hinting";
 import { EscapeRoom, JigsawPuzzle, Room } from "../interfaces";
@@ -10,11 +10,11 @@ import JigsawComponent from "../components/Puzzles/JigsawPuzzleComponent";
 import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 
 function EscapeRoomPage() {
-    const {gameId} = useParams()
+    const {gameId} = useParams();
     const navigate = useNavigate();
-    const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>()
-    const [currentRoom, setCurrentRoom] = useState<Room>()
-    const [hintsUpdatedFlag, setHintsUpdatedFlag] = useState(false)
+    const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>();
+    const [currentRoom, setCurrentRoom] = useState<Room>();
+    const [currentRoomIdx, setCurrentRoomIdx] = useState(0);
     const [backgroundImageURL, setBackgroundImageURL] = useState<string>('');
     const resultScreenUrl = `/escaperoom/${gameId}/result`;
 
@@ -22,7 +22,7 @@ function EscapeRoomPage() {
     const [showNotification, setShowNotification] = useState(false);
 
     function checkEscapeRoomDone(): boolean {
-        return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false
+        return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false;
     }
 
     async function fetchImage() {
@@ -36,21 +36,8 @@ function EscapeRoomPage() {
         }
     }
 
-    function getEndPuzzleComponent() {
-        //safe to use '!' since we checked for null in the render
-        switch (escapeRoom?.endPuzzle.type) { 
-            case 'jigsawpuzzle':
-                return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
-            default:
-                return null;
-        }
-    }
-
-    function addHint(hint: string, puzzleId: string) {
-        let puzzle = currentRoom?.puzzles.find((puzzle) => puzzle.id == puzzleId);
-        if (!puzzle || typeof puzzle.hints == "number") return;
-        puzzle.hints.push(hint)
-        setHintsUpdatedFlag(!hintsUpdatedFlag)
+    function update(): void {
+        setEscapeRoom(structuredClone(escapeRoom))
     }
 
     function fetchEscapeRoom() {
@@ -62,21 +49,9 @@ function EscapeRoomPage() {
         })
     }
 
-    function moveLeft() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
-        fetchImage();;
-    }
-    function moveRight() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.right));
-        fetchImage();;
-    }
-    function moveUp() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.up));
-        fetchImage();;
-    }
-    function moveDown() {
-        setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.down));
-        fetchImage();;
+    function move(roomIdx: number) {
+        setCurrentRoomIdx(roomIdx);
+        fetchImage();
     }
 
     function handleSolve() {
@@ -84,6 +59,16 @@ function EscapeRoomPage() {
         // setTimeout(() => {
         //     navigate(resultScreenUrl);
         // }, 4000); // wait for 4 seconds
+    }
+
+    function getEndPuzzleComponent() {
+        //safe to use '!' since we checked for null in the render
+        switch (escapeRoom?.endPuzzle.type) { 
+            case 'jigsawpuzzle':
+                return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
+            default:
+                return null;
+        }
     }
 
     useEffect(() => {
@@ -97,23 +82,20 @@ function EscapeRoomPage() {
     }, [gameId]);
 
     useEffect(() => {
-        if (currentRoom){
-            setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom.id));
-        }else{
-            setCurrentRoom(escapeRoom?.rooms[0]);
-        }
+        if (escapeRoom)
+            setCurrentRoom(escapeRoom.rooms[currentRoomIdx]);
 
         if (checkEscapeRoomDone() && escapeRoom) {
             //navigate(resultScreenUrl);
             setShowEndPuzzle(true);
         }
-    }, [escapeRoom]);
+    }, [escapeRoom, currentRoomIdx]);
 
     return (
         <div className="d-flex w-100">
             <img
                 src={backgroundImageURL}
-                alt="background image"
+                alt="background"
                 style={{
                     opacity:'60%',
                     position:'absolute',
@@ -125,37 +107,36 @@ function EscapeRoomPage() {
                 }}/>
             {!showNotification && !showEndPuzzle &&
                 <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
-                    {currentRoom ?
-                        <RoomComponent room={currentRoom} addHint={addHint} updateRoom={fetchEscapeRoom}/> : null}
-                </div>
-            }
-            { 
-                showEndPuzzle && escapeRoom && getEndPuzzleComponent()
-            }
-            {!showNotification && currentRoom && <div style={{height: "100vh"}} className="panel-container">
-                <HintingComponent 
-                    currentRoom={currentRoom}
-                    hintsUpdatedFlag={hintsUpdatedFlag}
-                />
-                <NavigationPanel
-                    gameId={gameId}
-                    currentRoom={currentRoom}
-                    escapeRoom={escapeRoom}
-                    moveLeft={moveLeft}
-                    moveRight={moveRight}
-                    moveUp={moveUp}
-                    moveDown={moveDown}
-                />
-            </div>}
-            {showNotification ?
+                    {currentRoom && 
+                        <RoomComponent 
+                            room={currentRoom} 
+                            updateRoom={update}
+                        />
+                    }
+                </div>}
+            {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
+            {!showNotification && escapeRoom && currentRoom && 
+                <div 
+                    style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
+                    className="panel-container"
+                >
+                    <HintingComponent 
+                        escapeRoom={escapeRoom}
+                        currentRoom={currentRoom}
+                    />
+                    <NavigationPanel
+                        gameId={gameId}
+                        currentRoom={currentRoom}
+                        escapeRoom={escapeRoom}
+                        move={move}
+                    />
+                </div>}
+            {showNotification && 
                 <PopupComponent
                     isOpen={showNotification}
                     onOpen={() => setShowNotification(true)}
                     onClose={() => setShowNotification(false)}
-                    trigger={
-                        <div>
-                        </div>
-                    }
+                    trigger={<div></div>}
                     children={
                         <div className={'text-center'}>
                                 I think I see a way out!
@@ -164,7 +145,7 @@ function EscapeRoomPage() {
                             </Row>
                         </div>
                     }
-                /> : null}
+                />}
         </div>
     );
 }

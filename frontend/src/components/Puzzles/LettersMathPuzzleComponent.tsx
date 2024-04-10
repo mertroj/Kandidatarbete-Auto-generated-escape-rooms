@@ -5,12 +5,10 @@ import './puzzles.css'
 import { LettersMathPuzzle } from '../../interfaces';
 
 interface LettersMathPuzzleProps {
-    addHint: Function;
     puzzle: LettersMathPuzzle;
-    onSolve: Function;
+    updateRoom: () => void;
 }
-function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzleProps) {
-    const {puzzle, addHint, onSolve} = lettersMathPuzzleProps;
+function LettersMathPuzzleComponent ({puzzle, updateRoom}: LettersMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -19,7 +17,8 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
             const response = await axios.post(`http://localhost:8080/lettersMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 alert('Correct!');
-                onSolve();
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 alert('Incorrect!');
             }
@@ -31,7 +30,10 @@ function LettersMathPuzzleComponent (lettersMathPuzzleProps: LettersMathPuzzlePr
     async function getHint() {
         try{
             const response = await axios.get(`http://localhost:8080/lettersMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            let hint: string = response.data;
+            if (hint === "No more hints.") return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

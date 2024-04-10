@@ -13,77 +13,61 @@ import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent"
 
 interface RoomComponentProps {
     room: Room;
-    addHint: Function;
-    updateRoom: Function;
-    
+    updateRoom: () => void;
 }
 
-function RoomComponent (roomProps: RoomComponentProps) {
-    const {room, addHint, updateRoom} = roomProps;
-    const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
+function RoomComponent ({room, updateRoom}: RoomComponentProps) {
 
-    useEffect(() => {
-        let hasLockedPuzzle: boolean = room.puzzles.some((puzzle) => puzzle.isLocked);
-        let nodes: JSX.Element[] = [];
-        room.puzzles.forEach((puzzle) => {
-            if (puzzle.isLocked)
-                return
-                
-            else if (puzzle.isSolved)
-                nodes.push(<SolvedPuzzleComponent
-                    key={puzzle.id} 
-                />)
-
-            else if (puzzle.type === 'anagram')
-                nodes.push(<AnagramComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as AnagramPuzzle} 
-                    onSolve={updateRoom}
-                />)
-                
-            else if (puzzle.type === 'lettersMathPuzzle')
-                nodes.push(<LettersMathPuzzleComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as LettersMathPuzzle} 
-                    onSolve={updateRoom}
-                />)
-
-            else if (puzzle.type === 'operatorMathPuzzle') 
-                nodes.push(<OperatorMathPuzzleComponent 
-                    key={puzzle.id} 
-                    addHint={addHint} 
-                    puzzle={puzzle as OperatorsMathPuzzle} 
-                    onSolve={updateRoom}
-                />)
-                        
-            else if (puzzle.type === 'slidePuzzle') 
-                nodes.push(<SlidePuzzleComponent 
-                    key={puzzle.id} 
-                    puzzle={puzzle as SlidePuzzle} 
-                    onSolve={updateRoom}
-                />)
-
-            else if (puzzle.type === 'mastermindPuzzle')
-                nodes.push(<MastermindPuzzleComponent 
-                    key={puzzle.id}
-                    addHint={addHint}
-                    puzzle={puzzle as MastermindPuzzle}
-                    onSolve={updateRoom}
-                />)
-
-            else nodes.push(<p>Invalid puzzle</p>)
-        })
-        if (hasLockedPuzzle)
-            nodes.push(<LockedPuzzleComponent
-                key={"lockedIn"+room.id} 
-            />)
-        setPuzzles(nodes);
-    }, [room])
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
-            {puzzles}
+            {
+                room.puzzles.map((puzzle) => {
+                    if (puzzle.isLocked) return null;
+                        
+                    if (puzzle.isSolved)
+                        return <SolvedPuzzleComponent
+                            key={puzzle.id} 
+                        />
+        
+                    if (puzzle.type === 'anagram')
+                        return <AnagramComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as AnagramPuzzle} 
+                            updateRoom={updateRoom}
+                        />
+                        
+                    if (puzzle.type === 'lettersMathPuzzle')
+                        return <LettersMathPuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as LettersMathPuzzle} 
+                            updateRoom={updateRoom}
+                        />
+        
+                    if (puzzle.type === 'operatorMathPuzzle') 
+                        return <OperatorMathPuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as OperatorsMathPuzzle} 
+                            updateRoom={updateRoom}
+                        />
+                                
+                    if (puzzle.type === 'slidePuzzle') 
+                        return <SlidePuzzleComponent 
+                            key={puzzle.id} 
+                            puzzle={puzzle as SlidePuzzle} 
+                            updateRoom={updateRoom}
+                        />
+        
+                    if (puzzle.type === 'mastermindPuzzle')
+                        return <MastermindPuzzleComponent 
+                            key={puzzle.id}
+                            puzzle={puzzle as MastermindPuzzle}
+                            updateRoom={updateRoom}
+                        />
+        
+                    else return <p>Invalid puzzle</p>
+                })
+            }
+            {room.puzzles.some((puzzle) => puzzle.isLocked) && <LockedPuzzleComponent key={"lockedIn"+room.id} />}
         </div>
     );
 }

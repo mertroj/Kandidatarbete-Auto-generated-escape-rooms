@@ -5,13 +5,11 @@ import './puzzles.css'
 import { AnagramPuzzle } from '../../interfaces';
 
 interface AnagramProps {
-    addHint: Function;
     puzzle: AnagramPuzzle;
-    onSolve: Function;
+    updateRoom: () => void;
 }
 
-function AnagramPuzzleComponent (anagramProps: AnagramProps) {
-    const {puzzle, addHint, onSolve} = anagramProps;
+function AnagramPuzzleComponent ({puzzle, updateRoom}: AnagramProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -20,7 +18,8 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
             const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             if(response.data){
                 alert('Correct!');
-                onSolve();
+                puzzle.isSolved = true
+                updateRoom();
             }else{
                 alert('Incorrect!');
             }
@@ -30,8 +29,11 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
     }
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<string>(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
+            let hint: string = response.data;
+            if (hint === "No more hints.") return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }

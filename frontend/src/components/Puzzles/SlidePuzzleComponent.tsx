@@ -21,9 +21,9 @@ enum Direction {
 }
 interface SlidePuzzleProps {
     puzzle: SlidePuzzle;
-    onSolve: Function;
+    updateRoom: () => void;
 }
-function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
+function SlidePuzzleComponent ({puzzle, updateRoom}: SlidePuzzleProps) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -62,7 +62,8 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
             const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data){
                 alert('Correct!');
-                onSolve();
+                puzzle.isSolved = true
+                updateRoom();
                 setIsOpen(false);
             }else{
                 alert('Incorrect');
