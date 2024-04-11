@@ -12,8 +12,11 @@ export class Cell{
     flip(): void{
         this.isFlipped = !this.isFlipped;
     }
-
-    match(): void{
-        this.isMatched = true;
+    strip(){
+        return {
+            value: this.value,
+            isFlipped: this.isFlipped
+        }
     }
+
 }

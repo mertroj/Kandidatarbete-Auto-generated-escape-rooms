@@ -5,7 +5,7 @@ export interface EscapeRoom {
     endPuzzle: Puzzle;
 }
 
-export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
 
 export interface Room {
     id: string;
@@ -37,6 +37,22 @@ export interface LettersMathPuzzle {
 
     question: string;
     description: string;
+}
+
+export interface MemoryPuzzle {
+    id: string;
+    type: string;
+    isSolved: boolean;
+    isLocked: boolean;
+    hintLevel: number;
+    question: string;
+    description: string;
+    cellsMatrix: Cell[][];
+}
+
+export interface Cell{
+    value: number;
+    isFlipped: boolean;
 }
 
 export interface OperatorsMathPuzzle {
