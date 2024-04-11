@@ -1,0 +1,25 @@
+.cell{
+    position: relative;
+    display: flex;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 0.5em;
+    width: 4em;
+    height: 4em;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 0.5em 0;
+    background-color: lightslategrey;
+}
+
+.symbol {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0.5em;
+}
+
+.cell-col {
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+}

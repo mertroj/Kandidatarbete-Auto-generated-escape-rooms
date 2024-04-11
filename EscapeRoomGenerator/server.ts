@@ -13,6 +13,7 @@ import { JigsawRouter } from "./routers/JigsawRouter";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
 import { DescriptionRouter } from "./routers/DescriptionRouter";
+import { MemoryPuzzleRouter } from "./routers/MemoryPuzzleRouter";
 
 const app: Express = express();
 const port: number = 8080;
@@ -22,6 +23,7 @@ app.use(cors());
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/mastermindPuzzle' , MastermindPuzzleRouter);
+app.use('/memoryPuzzles', MemoryPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/lockedPuzzle', DescriptionRouter);
 app.use('/anagrams', AnagramRouter);

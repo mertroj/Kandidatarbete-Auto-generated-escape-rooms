@@ -3,7 +3,7 @@ import { SlidePuzzle } from "../models/Puzzles/SlidePuzzle/SlidePuzzle";
 import { Position } from "../models/Puzzles/SlidePuzzle/Position";
 import { MemoryPuzzle } from "../models/Puzzles/MemoryPuzzle/MemoryPuzzle";
 
-export const SlidePuzzleRouter = express.Router();
+export const MemoryPuzzleRouter = express.Router();
 
 interface FlipCellRequest extends Request{
     body: {
@@ -11,9 +11,10 @@ interface FlipCellRequest extends Request{
         puzzleId: string;
     }
 }
-interface CheckAnswerRequest extends Request{
-    body: {
+interface getImageRequest extends Request{
+    query: {
         puzzleId: string;
+        fileLocation: string;
     }
 }
 interface HintRequest extends Request{
@@ -22,7 +23,7 @@ interface HintRequest extends Request{
     }
 }
 
-SlidePuzzleRouter.patch('/flipCell', (req: FlipCellRequest, res: Response) => {
+MemoryPuzzleRouter.patch('/flipCell', (req: FlipCellRequest, res: Response) => {
     try{
         let puzzleId = req.body.puzzleId;
         let pos = req.body.pos;
@@ -44,32 +45,39 @@ SlidePuzzleRouter.patch('/flipCell', (req: FlipCellRequest, res: Response) => {
             return;
         }
         puzzle.flipPiece(pos[0], pos[1]);
-        res.status(200).send({puzzle: puzzle.strip()});
+        res.status(200).send({
+            isSolved: puzzle.checkAnswer(), 
+            puzzle: puzzle.strip()
+        });
 
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
 });
 
-SlidePuzzleRouter.post('/checkAnswer', (req: CheckAnswerRequest, res: Response) => {
+MemoryPuzzleRouter.get('/symbol', (req: getImageRequest, res: Response) => {
     try{
-        if (req.body.puzzleId === undefined) {
+        const puzzleId = req.query.puzzleId;
+        if (puzzleId === undefined) {
             res.status(400).send("The puzzleId parameter is missing");
             return;
         }
-        const puzzleId = req.body.puzzleId;
+        if (req.query.fileLocation === undefined || req.query.fileLocation === "") {
+            res.status(400).send("The fileName parameter is missing");
+            return;
+        }
         const puzzle = MemoryPuzzle.get(puzzleId);
         if (puzzle === undefined) {
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        res.status(200).send(puzzle.checkAnswer());
+        res.status(200).sendFile(req.query.fileLocation);
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
 });
 
-SlidePuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
+MemoryPuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
     try{
         const puzzleId = req.query.puzzleId;
         if (puzzleId === undefined) {

@@ -53,6 +53,7 @@ export interface MemoryPuzzle {
     question: string;
     description: string;
     cellsMatrix: Cell[][];
+    valuesToSymbols: Array<[number, string]>;
 }
 
 export interface Cell{

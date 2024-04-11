@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle} from '../../interfaces';
+import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle, MemoryPuzzle} from '../../interfaces';
 // import JigsawPuzzleComponent from "../Puzzles/JigsawPuzzleComponent";
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
@@ -10,6 +10,7 @@ import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleCom
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
+import MemoryPuzzleComponent from '../Puzzles/Memory/MemoryPuzzleComponent';
 
 interface RoomComponentProps {
     room: Room;
@@ -68,6 +69,12 @@ function RoomComponent (roomProps: RoomComponentProps) {
                 nodes.push(<SlidePuzzleComponent 
                     key={puzzle.id} 
                     puzzle={puzzle as SlidePuzzle} 
+                    onSubmit={onSubmit}
+                />)
+            else if (puzzle.type === 'memoryPuzzle') 
+                nodes.push(<MemoryPuzzleComponent 
+                    key={puzzle.id} 
+                    puzzle={puzzle as MemoryPuzzle} 
                     onSubmit={onSubmit}
                 />)
 
