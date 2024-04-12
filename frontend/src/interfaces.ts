@@ -45,6 +45,7 @@ export interface OperatorsMathPuzzle {
     isSolved: boolean;
     isLocked: boolean;
     hintLevel: number;
+    numberOfOperands: number;
 
     question: string;
     description: string;

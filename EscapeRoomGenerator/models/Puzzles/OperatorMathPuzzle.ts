@@ -6,7 +6,7 @@ import { Observable, Observer } from './ObserverPattern';
 export class OperatorMathPuzzle implements Observable, Observer {
     private static puzzles: {[key:string]: OperatorMathPuzzle} = {}
     
-    private numberOfOperands: number;
+    numberOfOperands: number;
     private numbers: number[];
     private operands: string;
     private answer: number;
@@ -32,6 +32,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
         this.question = this.formulateQuestion();
         OperatorMathPuzzle.puzzles[this.id] = this;
     }
+
 
     static get(puzzleId: string): OperatorMathPuzzle {
         return OperatorMathPuzzle.puzzles[puzzleId]
@@ -108,4 +109,5 @@ export class OperatorMathPuzzle implements Observable, Observer {
             description: this.description,
         }
     }
+
 }
