@@ -13,6 +13,7 @@ const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface OperatorMathPuzzleProps {
     puzzle: OperatorsMathPuzzle;
+    i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
 }
@@ -22,7 +23,7 @@ interface HintI {
     question: string;
 }
 
-function OperatorMathPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: OperatorMathPuzzleProps) {
+function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -56,7 +57,8 @@ function OperatorMathPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer
     }
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle-card'>
+            <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>

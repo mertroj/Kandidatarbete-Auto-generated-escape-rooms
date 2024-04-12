@@ -17,11 +17,12 @@ const incorrectAudio = new Audio(incorrectSound);
 
 interface MasterMindPuzzleProps {
     puzzle: MastermindPuzzle;
+    i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
 }
 
-function MastermindPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: MasterMindPuzzleProps) {
+function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: MasterMindPuzzleProps) {
     const [isShowing, setIsShowing] = useState<boolean>(false);
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
@@ -46,7 +47,6 @@ function MastermindPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}:
             } else {
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                notifyIncorrectAnswer();
             }
 
 
@@ -93,46 +93,47 @@ function MastermindPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}:
 
 
     return (
-        <div className='puzzle'>
-            <PopupComponent
-                trigger={
+        <PopupComponent
+            trigger={
+                <div className='puzzle-card'>
+                    <p className='puzzle-number'>#{i}</p>
                     <Button variant='outline-primary'>
                         Placeholder text for mastermind puzzle. To be chosen depending on the theme
                     </Button>
-                }
-                isOpen={isShowing}
-                onOpen={() => setIsShowing(true)}
-                onClose={() => setIsShowing(false)}
-                children=
-                {
-                    <div className='d-flex flex-column position-relative'>
-                        <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
-                        <div className='flex-grow-1'>
-                            <div className='text-center d-flex align-items-center flex-column'>
-                                <div className='mb-4'>
-                                    <h5>{puzzle.question}</h5>
-                                </div>
-                                {
-                                    puzzle.previousGuesses.map((guess, guessI) => {
-                                        return <Guess 
-                                            key={guessI}
-                                            length={length}
-                                            guess={guess[0]}
-                                            feedback={guess[1]}
-                                            animation={guessI === puzzle.previousGuesses.length - 1}
-                                        />
-                                    })
-                                }
-                                
-                                {!puzzle.isSolved &&
-                                    <Guess length={length} guess={currentInput} animation={false}/>
-                                }
+                </div>
+            }
+            isOpen={isShowing}
+            onOpen={() => setIsShowing(true)}
+            onClose={() => setIsShowing(false)}
+            children=
+            {
+                <div className='d-flex flex-column position-relative'>
+                    <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
+                    <div className='flex-grow-1'>
+                        <div className='text-center d-flex align-items-center flex-column'>
+                            <div className='mb-4'>
+                                <h5>{puzzle.question}</h5>
                             </div>
+                            {
+                                puzzle.previousGuesses.map((guess, guessI) => {
+                                    return <Guess 
+                                        key={guessI}
+                                        length={length}
+                                        guess={guess[0]}
+                                        feedback={guess[1]}
+                                        animation={guessI === puzzle.previousGuesses.length - 1}
+                                    />
+                                })
+                            }
+                            
+                            {!puzzle.isSolved &&
+                                <Guess length={length} guess={currentInput} animation={false}/>
+                            }
                         </div>
                     </div>
-                }
-            />
-        </div>
+                </div>
+            }
+        />
     );
 }
 

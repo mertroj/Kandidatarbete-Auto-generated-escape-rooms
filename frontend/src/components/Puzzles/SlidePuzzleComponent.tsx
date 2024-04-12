@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SlidePuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
-import './slidePuzzle.css';
+import './puzzles.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
@@ -28,10 +28,11 @@ enum Direction {
 }
 interface SlidePuzzleProps {
     puzzle: SlidePuzzle;
+    i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
 }
-function SlidePuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: SlidePuzzleProps) {
+function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: SlidePuzzleProps) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -102,7 +103,8 @@ function SlidePuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: Slid
             onOpen={() => setIsOpen(true)}
             onClose={() => setIsOpen(false)}
             trigger={
-                <div className='puzzle'>
+                <div className='puzzle-card'>
+                    <p className='puzzle-number'>#{i}</p>
                     <Button variant='outline-primary'>{puzzle.question}</Button>
                 </div>
             }

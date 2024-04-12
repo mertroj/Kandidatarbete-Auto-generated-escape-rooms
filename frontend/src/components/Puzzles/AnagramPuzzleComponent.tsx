@@ -13,11 +13,12 @@ const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface AnagramProps {
     puzzle: AnagramPuzzle;
+    i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
 }
 
-function AnagramPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: AnagramProps) {
+function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: AnagramProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -50,7 +51,8 @@ function AnagramPuzzleComponent ({puzzle, updateRoom, notifyIncorrectAnswer}: An
     }
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle-card'>
+            <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>

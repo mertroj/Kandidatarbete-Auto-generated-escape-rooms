@@ -22,15 +22,14 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
             {
-                room.puzzles.map((puzzle) => {
-                    if (puzzle.isLocked) return null;
-                        
-                    if (puzzle.isSolved) return null;
+                room.puzzles.map((puzzle, i) => {
+                    if (puzzle.isLocked || puzzle.isSolved) return null;
         
                     if (puzzle.type === 'anagram')
                         return <AnagramComponent 
                             key={puzzle.id} 
-                            puzzle={puzzle as AnagramPuzzle} 
+                            puzzle={puzzle as AnagramPuzzle}
+                            i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                         />
@@ -38,7 +37,8 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                     if (puzzle.type === 'lettersMathPuzzle')
                         return <LettersMathPuzzleComponent 
                             key={puzzle.id} 
-                            puzzle={puzzle as LettersMathPuzzle} 
+                            puzzle={puzzle as LettersMathPuzzle}
+                            i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                         />
@@ -46,7 +46,8 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                     if (puzzle.type === 'operatorMathPuzzle') 
                         return <OperatorMathPuzzleComponent 
                             key={puzzle.id} 
-                            puzzle={puzzle as OperatorsMathPuzzle} 
+                            puzzle={puzzle as OperatorsMathPuzzle}
+                            i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                         />
@@ -54,7 +55,8 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                     if (puzzle.type === 'slidePuzzle') 
                         return <SlidePuzzleComponent 
                             key={puzzle.id} 
-                            puzzle={puzzle as SlidePuzzle} 
+                            puzzle={puzzle as SlidePuzzle}
+                            i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                         />
@@ -63,6 +65,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                         return <MastermindPuzzleComponent 
                             key={puzzle.id}
                             puzzle={puzzle as MastermindPuzzle}
+                            i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                         />
@@ -71,20 +74,21 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                 })
             }
             {room.puzzles.some((puzzle) => puzzle.isLocked) && <LockedPuzzleComponent key={"lockedIn"+room.id} />}
-            {<div className="solved-puzzles-container">
-                {
-                    room.puzzles.filter((puzzle) => puzzle.isSolved).map((puzzle, i) => {
-                        return <SolvedPuzzleComponent
-                                key={puzzle.id}
-                                style={{
-                                    position: 'absolute',
-                                    top: `${i * 10}px`,
-                                    left: `${i * 10}px`
-                                }}
-                            />
-                    })
-                }
-            </div>
+            {room.puzzles.some((puzzle) => puzzle.isSolved) && 
+                <div className="solved-puzzles-container">
+                    {
+                        room.puzzles.filter((puzzle) => puzzle.isSolved).map((puzzle, i) => {
+                            return <SolvedPuzzleComponent
+                                    key={puzzle.id}
+                                    style={{
+                                        position: 'absolute',
+                                        top: `${i * 10}px`,
+                                        left: `${i * 10}px`
+                                    }}
+                                />
+                        })
+                    }
+                </div>
             }
         </div>
     );

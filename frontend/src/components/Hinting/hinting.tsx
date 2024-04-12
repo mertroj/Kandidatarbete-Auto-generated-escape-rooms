@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './hinting.css';
 import { EscapeRoom, Room } from '../../interfaces';
@@ -36,7 +36,7 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
                             if (puzzle.hints > 0){
                                 return <div className='d-flex' key={puzzleI}>
                                     <h6>
-                                        {`Puzzle ${puzzleI} - ${puzzle.hints} ${puzzle.hints === 1 ? 'hint' : 'hints'}`}
+                                        {`Puzzle ${puzzleI+1} - ${puzzle.hints} ${puzzle.hints === 1 ? 'hint' : 'hints'}`}
                                     </h6>
                                 </div>
                             } else return null;
@@ -45,7 +45,7 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
                             return <div key={puzzleI}>
                                 <div onClick={() => toggleShowHints(puzzleI)} className='d-flex flex-row justify-content-between hint-dropdown-button'>
                                     <h6>
-                                        Puzzle {puzzleI} - {puzzle.hints.length} {puzzle.hints.length === 1 ? 'hint' : 'hints'}
+                                        Puzzle {puzzleI+1} - {puzzle.hints.length} {puzzle.hints.length === 1 ? 'hint' : 'hints'}
                                     </h6>
                                     <h6>{showHints[puzzleI] ? 'v' : '>'}</h6>
                                 </div>
@@ -56,6 +56,7 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
                                 </div>
                             </div>
                         };
+                        return null;
                     })
                 }
             </div>

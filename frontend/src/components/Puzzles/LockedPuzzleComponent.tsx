@@ -21,7 +21,7 @@ function LockedPuzzleComponent () {
     }, []);
 
     return (
-        <div className='puzzle text-center'>
+        <div className='puzzle-card text-center'>
             <b>{description}</b>
         </div>
     );
