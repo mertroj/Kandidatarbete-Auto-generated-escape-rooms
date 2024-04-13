@@ -35,7 +35,7 @@ export class MemoryPuzzle implements Observer, Observable{
         if (dependentPuzzles.length > 0){
             this.isLocked = true;
         }
-        this.estimatedTime = difficulty * 3; //Arbitrary at the moment
+        this.estimatedTime = difficulty + 3; //Arbitrary at the moment
         if (difficulty === 1) {
             [this.rows, this.cols] = choice([[3, 4], [4, 3]]);
         } else if (difficulty === 2) {
