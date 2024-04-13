@@ -13,8 +13,8 @@ function ResultScreenPage() {
     interface PuzzleProps {
         hintLevel: number;
     }
-    interface TimerProps{
-        elapsedTime: number;
+    interface fetchResponse{
+        escapeRoom: EscapeRoom
     }
 
     async function fetchTimeTaken() {
@@ -25,8 +25,8 @@ function ResultScreenPage() {
             if (storedTimeTaken) {
                 setFormattedTimeTaken(storedTimeTaken);
             } else {
-                const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
-                const escapeRoom: EscapeRoom = response.data;
+                const response = await axios.get<fetchResponse>('http://localhost:8080/escaperoom/?gameId=' + gameId);
+                const escapeRoom: EscapeRoom = response.data.escapeRoom;
                 const time: string = formatMilliseconds(escapeRoom.timer.elapsedTime);
                 setFormattedTimeTaken(time);
                 sessionStorage.setItem('timeTaken', time);
@@ -38,9 +38,9 @@ function ResultScreenPage() {
 
     const fetchEscapeRoom = async () => {
         try {
-            const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
+            const response = await axios.get<fetchResponse>('http://localhost:8080/escaperoom/?gameId=' + gameId);
 
-            const rooms: Room[] = response.data.rooms;
+            const rooms: Room[] = response.data.escapeRoom.rooms;
 
             setHintUsed(0);
             rooms.forEach((room) => {

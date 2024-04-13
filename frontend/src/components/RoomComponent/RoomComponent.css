@@ -16,3 +16,15 @@
     padding: 10px;
     font-size: 20px;
 }
+
+.solved-puzzles-container {
+    position: relative;
+    width: 240px;
+    height: 300px;
+    margin: 16px;
+}
+
+.solved-puzzles-container > .puzzle {
+    position: absolute;
+    margin: 0;
+}

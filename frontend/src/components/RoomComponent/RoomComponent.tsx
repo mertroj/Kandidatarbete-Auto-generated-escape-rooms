@@ -14,24 +14,30 @@ import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent"
 interface RoomComponentProps {
     room: Room;
     addHint: Function;
-    updateRoom: Function;
+    onSubmit: Function;
     
 }
 
 function RoomComponent (roomProps: RoomComponentProps) {
-    const {room, addHint, updateRoom} = roomProps;
+    const {room, addHint, onSubmit} = roomProps;
     const [puzzles, setPuzzles] = useState<(JSX.Element | null) []>();
 
     useEffect(() => {
         let hasLockedPuzzle: boolean = room.puzzles.some((puzzle) => puzzle.isLocked);
+        let solvedPuzzles: JSX.Element[] = [];
         let nodes: JSX.Element[] = [];
         room.puzzles.forEach((puzzle) => {
             if (puzzle.isLocked)
                 return
                 
             else if (puzzle.isSolved)
-                nodes.push(<SolvedPuzzleComponent
+                solvedPuzzles.push(<SolvedPuzzleComponent
                     key={puzzle.id} 
+                    style={{
+                        position: 'absolute',
+                        top: `${solvedPuzzles.length * 10}px`,
+                        left: `${solvedPuzzles.length * 10}px`
+                    }}
                 />)
 
             else if (puzzle.type === 'anagram')
@@ -39,7 +45,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as AnagramPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
                 
             else if (puzzle.type === 'lettersMathPuzzle')
@@ -47,7 +53,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as LettersMathPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else if (puzzle.type === 'operatorMathPuzzle') 
@@ -55,14 +61,14 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id} 
                     addHint={addHint} 
                     puzzle={puzzle as OperatorsMathPuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
                         
             else if (puzzle.type === 'slidePuzzle') 
                 nodes.push(<SlidePuzzleComponent 
                     key={puzzle.id} 
                     puzzle={puzzle as SlidePuzzle} 
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else if (puzzle.type === 'mastermindPuzzle')
@@ -70,7 +76,7 @@ function RoomComponent (roomProps: RoomComponentProps) {
                     key={puzzle.id}
                     addHint={addHint}
                     puzzle={puzzle as MastermindPuzzle}
-                    onSolve={updateRoom}
+                    onSubmit={onSubmit}
                 />)
 
             else nodes.push(<p>Invalid puzzle</p>)
@@ -79,6 +85,13 @@ function RoomComponent (roomProps: RoomComponentProps) {
             nodes.push(<LockedPuzzleComponent
                 key={"lockedIn"+room.id} 
             />)
+        if (solvedPuzzles.length > 0){
+            nodes.push(
+                <div className="solved-puzzles-container">
+                    {solvedPuzzles}
+                </div>
+            );
+        }
         setPuzzles(nodes);
     }, [room])
     return (
