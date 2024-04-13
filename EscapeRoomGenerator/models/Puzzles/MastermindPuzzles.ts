@@ -4,6 +4,12 @@ import { randomInt, repeat } from '../Helpers';
 
 export class MastermindPuzzle implements Observable, Observer {
     private static puzzles: {[key: string]: MastermindPuzzle} = {}
+    private static possibleHints: string[] = ['After each guess some numbers change colours, maybe that means something', 
+                            'Green numbers are correct and in correct position, yellow are correct but wrong position', 
+                            'The solution is: '];
+
+    private observers: Observer[] = [];
+    private dependentPuzzles: string[];
 
     id: string = uuidv4();
     type: string = 'mastermindPuzzle';
@@ -12,17 +18,11 @@ export class MastermindPuzzle implements Observable, Observer {
     isSolved: boolean = false;
     isLocked: boolean = false;
     estimatedTime: number = 3; //TODO - Testing
+
     length: number; //Decides the length of the array - Easy: 3 | Medium: 4 | Hard: 5
     previousGuesses: [string, string][] = [];
     solution: number[];
 
-    private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
-    private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
-    private possibleHints: string[] = ['After each guess some numbers change colours, maybe that means something', 
-                            'Green numbers are correct and in correct position, yellow are correct but wrong position', 
-                            'The solution is: '];
-
-    
     constructor(diff: number, dependentPuzzles: string[]){
         this.dependentPuzzles = dependentPuzzles;
         this.isLocked = this.dependentPuzzles.length > 0;
@@ -31,32 +31,35 @@ export class MastermindPuzzle implements Observable, Observer {
         this.question = 'Figure out the ' + this.length + ' digit combination';
         MastermindPuzzle.puzzles[this.id] = this
     }
-    addObserver(observer: Observer): void {
-        this.observers.push(observer);
-    }
-    notifyObservers(): void {
-        this.observers.forEach(observer => observer.update(this.id));
-    }
-    update(id: string): void{
-        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
-        if (this.dependentPuzzles.length === 0) {
-            this.isLocked = false;
-        }
-    }
 
     static get(puzzleId: string): MastermindPuzzle {
         return MastermindPuzzle.puzzles[puzzleId];
     }
 
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    }
+    update(id: string): string{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+            return this.id
+        }
+        return ''
+    }
+
     getHint(): string{
         if(this.hints.length < 2){
-            let hint = this.possibleHints[this.hints.length];
+            let hint = MastermindPuzzle.possibleHints[this.hints.length];
             this.hints.push(hint);
             return hint;
         }
         
         if(this.hints.length === 2){
-            let hint = this.possibleHints[2] + this.solution.map(x => String(x)).join('');
+            let hint = MastermindPuzzle.possibleHints[2] + this.solution.map(x => String(x)).join('');
             this.hints.push(hint);
             return hint;
         }
@@ -64,7 +67,7 @@ export class MastermindPuzzle implements Observable, Observer {
         return 'No more hints.';
     }
 
-    checkAnswer(answer: string): string{
+    checkAnswer(answer: string): {result: boolean, bools: string, unlockedPuzzles: string[]}{
         let numAns = answer.split('').map((x) => parseInt(x));
         let bools: number[] = new Array(this.length).fill(0); //Base value 0 for incorrect
         let incorrectNums: number[] = [];
@@ -84,13 +87,17 @@ export class MastermindPuzzle implements Observable, Observer {
             }
         }
 
-        if(bools.every(x => x === 2)){
+        let boolsStr = bools.join('');
+        
+        this.previousGuesses.push([answer, boolsStr]);
+        
+        let result = bools.every(x => x === 2)
+        if(result && !this.isSolved){
             this.isSolved = true;
-            this.notifyObservers();
+            let unlockedPuzzles = this.notifyObservers();
+            return {result, bools: boolsStr, unlockedPuzzles}
         }
-
-        this.previousGuesses.push([answer, bools.join('')]);
-        return bools.join('');
+        return {result, bools: boolsStr, unlockedPuzzles: []};
     }
     strip() {
         return {

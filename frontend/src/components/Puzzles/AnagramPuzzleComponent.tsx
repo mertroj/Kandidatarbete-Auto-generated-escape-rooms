@@ -11,24 +11,31 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
 interface AnagramProps {
     puzzle: AnagramPuzzle;
     i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
 
-function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: AnagramProps) {
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
+}
+
+function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: AnagramProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        try{
-            const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            if(response.data){
+        try {
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                puzzle.isSolved = true
-                updateRoom();
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();

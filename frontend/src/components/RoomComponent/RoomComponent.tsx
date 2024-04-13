@@ -15,9 +15,10 @@ interface RoomComponentProps {
     room: Room;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
+    puzzleSolved: (puzzleId: string, unlockedPuzzles: string[]) => void;
 }
 
-function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponentProps) {
+function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}: RoomComponentProps) {
 
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
@@ -32,6 +33,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
                         />
                         
                     if (puzzle.type === 'lettersMathPuzzle')
@@ -41,6 +43,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
                         />
         
                     if (puzzle.type === 'operatorMathPuzzle') 
@@ -50,6 +53,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
                         />
                                 
                     if (puzzle.type === 'slidePuzzle') 
@@ -59,6 +63,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
                         />
         
                     if (puzzle.type === 'mastermindPuzzle')
@@ -68,6 +73,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer}: RoomComponent
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
                         />
         
                     else return <p>Invalid puzzle</p>

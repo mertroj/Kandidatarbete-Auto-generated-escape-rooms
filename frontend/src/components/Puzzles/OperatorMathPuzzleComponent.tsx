@@ -11,11 +11,18 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
 interface OperatorMathPuzzleProps {
     puzzle: OperatorsMathPuzzle;
     i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
+}
+
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
 }
 
 interface HintI {
@@ -23,17 +30,17 @@ interface HintI {
     question: string;
 }
 
-function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: OperatorMathPuzzleProps) {
+function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            if(response.data){
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer, puzzleId: puzzle.id});
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                puzzle.isSolved = true
-                updateRoom();
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();

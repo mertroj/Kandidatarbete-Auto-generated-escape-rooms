@@ -12,6 +12,21 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
+enum Direction {
+    UP = 'up',
+    DOWN = 'down',
+    LEFT = 'left',
+    RIGHT = 'right'
+}
+
+interface SlidePuzzleProps {
+    puzzle: SlidePuzzle;
+    i: number;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
+}
 interface PatchResponse {
     isSuccessful: boolean;
     puzzle: SlidePuzzle;
@@ -20,19 +35,12 @@ interface HintResponse {
     isSuccessful: boolean;
     puzzle: SlidePuzzle;
 }
-enum Direction {
-    UP = 'up',
-    DOWN = 'down',
-    LEFT = 'left',
-    RIGHT = 'right'
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
 }
-interface SlidePuzzleProps {
-    puzzle: SlidePuzzle;
-    i: number;
-    updateRoom: () => void;
-    notifyIncorrectAnswer: () => void;
-}
-function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: SlidePuzzleProps) {
+
+function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: SlidePuzzleProps) {
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -68,11 +76,11 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: S
     }
     async function handleSubmit(){ //closes the Popup if the answer is correct
         try{
-            const response = await axios.post(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
-            if (response.data){
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                puzzle.isSolved = true
-                updateRoom();
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
                 setIsOpen(false);
             }else{
                 incorrectAudio.currentTime = 0;

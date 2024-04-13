@@ -20,9 +20,15 @@ interface MasterMindPuzzleProps {
     i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
+}
+interface GuessResponse {
+    result: boolean;
+    bools: string;
+    unlockedPuzzles: string[];
 }
 
-function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer}: MasterMindPuzzleProps) {
+function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MasterMindPuzzleProps) {
     const [isShowing, setIsShowing] = useState<boolean>(false);
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
@@ -30,19 +36,18 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
 
     async function handleGuess(guess: string){
         try{
-            const response = await axios.post<string>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
-            let bools = String(response.data)
+            const response = await axios.post<GuessResponse>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
+            let resp = response.data
 
-            puzzle.previousGuesses.push([guess, bools]);
+            puzzle.previousGuesses.push([guess, resp.bools]);
             setCurrentInput('')
             updateRoom();
 
-            if (bools === '2'.repeat(length)) {
-                puzzle.isSolved = true;
+            if (resp.bools === '2'.repeat(length)) {
                 setTimeout(async () => {
                     setIsShowing(false);
                     correctAudio.play();
-                    updateRoom();
+                    puzzleSolved(puzzle.id, resp.unlockedPuzzles)
                 }, 500*length);
             } else {
                 incorrectAudio.currentTime = 0;

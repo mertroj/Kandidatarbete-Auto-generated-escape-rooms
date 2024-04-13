@@ -66,16 +66,16 @@ export class Jigsaw implements Observable, Observer {
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-    notifyObservers(): void {
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-    update(id: string): void{
+    update(id: string): string{
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
+            return this.id;
         }
+        return '';
     }
 
     strip() {
