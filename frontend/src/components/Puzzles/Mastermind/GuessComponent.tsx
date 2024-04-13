@@ -2,18 +2,25 @@ import { useEffect, useState } from "react";
 import './Guess.css';
 import { Col, Row } from "react-bootstrap";
 
-function GuessComponent({length, guess, feedback, animation}: {length: number, guess: string, animation: boolean, feedback?: string}) {
-    const [backgroundColor, setBackgroundColor] = useState<Array<string>>(Array(length).fill('transparent'));
+interface GuessComponentProps {
+    length: number;
+    guess: string;
+    animation: boolean;
+    feedback?: string;
+}
+
+function GuessComponent({length, guess, feedback, animation}: GuessComponentProps) {
+    const [backgroundColor, setBackgroundColor] = useState<string[]>(new Array(length).fill('transparent'));
     const animationDuration = 500; // ms
 
     const getColor = (feedbackChar: string) => {
         switch (feedbackChar) {
             case '0':
-                return 'green';
+                return 'grey';
             case '1':
                 return 'yellow';
             case '2':
-                return 'grey';
+                return 'green';
             default:
                 return 'transparent'; // default color
         }
@@ -29,7 +36,7 @@ function GuessComponent({length, guess, feedback, animation}: {length: number, g
                     timeoutId = setTimeout(() => {
                         setBackgroundColor(prevState => {
                             const newState = [...prevState];
-                            newState[i] = getColor(feedback[i]);
+                            newState[i] = getColor(feedback.charAt(i));
                             return newState;
                         });
                     }, ((i + 1) * animationDuration) / 2);
@@ -37,7 +44,7 @@ function GuessComponent({length, guess, feedback, animation}: {length: number, g
                 return () => clearTimeout(timeoutId);
             }
         }
-    }, [feedback]);
+    }, []);
 
     return (
         <div className={'grid-container d-flex flex-row'}>

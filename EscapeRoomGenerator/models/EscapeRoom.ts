@@ -5,7 +5,6 @@ import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
 import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
 import { Puzzle } from './Puzzles/Puzzle';
-import { PuzzleManager } from './PuzzleManager';
 
 
 export class EscapeRoom {
@@ -16,14 +15,13 @@ export class EscapeRoom {
     timer: Timer = new Timer();
     endPuzzle: Puzzle;
     theme: Theme;
-    puzzleManager: PuzzleManager = new PuzzleManager();
 
     constructor(players: number, difficulty: number, theme: Theme) {
         this.theme = theme;
         let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
 
-        [this.rooms, this.endPuzzle] = EscapeRoom.createRooms(totalTime, difficulty, this.puzzleManager);
+        [this.rooms, this.endPuzzle] = EscapeRoom.createRooms(totalTime, difficulty);
         EscapeRoom.connectRooms(this.rooms);
         this.rooms[0].isLocked = false;
 
@@ -43,12 +41,12 @@ export class EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
     }
     
-    static createRooms(totalTime: number, difficulty: number, manager: PuzzleManager): [Room[], Puzzle] {
+    static createRooms(totalTime: number, difficulty: number): [Room[], Puzzle] {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
-        let graph = puzzleTreePopulator(totalTime, difficulty, manager);
+        let graph = puzzleTreePopulator(totalTime, difficulty);
         let nodes = graph.nodes();
         let avgNodesPerRoom = Math.floor((nodes.length - 1) / nrOfRooms);
         let remainingNodes = (nodes.length - 1) % nrOfRooms;
@@ -74,19 +72,11 @@ export class EscapeRoom {
     }
     
     static connectRooms(rooms: Room[]): void {
-        let r: Room | undefined;
         rooms.forEach((room) => {
-            r = rooms.find((r) => r.x === room.x-1 && r.y === room.y);
-            if (r) room.left = r.id;
-    
-            r = rooms.find((r) => r.x === room.x+1 && r.y === room.y);
-            if (r) room.right = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y-1);
-            if (r) room.up = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y+1);
-            if (r) room.down = r.id;
+            room.left = rooms.findIndex((r) => r.x === room.x-1 && r.y === room.y);
+            room.right = rooms.findIndex((r) => r.x === room.x+1 && r.y === room.y);
+            room.up = rooms.findIndex((r) => r.x === room.x && r.y === room.y-1);
+            room.down = rooms.findIndex((r) => r.x === room.x && r.y === room.y+1);
         })
     }
 

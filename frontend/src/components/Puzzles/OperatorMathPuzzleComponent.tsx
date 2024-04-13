@@ -11,26 +11,40 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
 interface OperatorMathPuzzleProps {
-    addHint: Function;
     puzzle: OperatorsMathPuzzle;
-    onSubmit: Function;
+    i: number;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
-function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
-    const {puzzle, addHint, onSubmit} = operatorMathPuzzleProps;
+
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
+}
+
+interface HintI {
+    hint: string;
+    question: string;
+}
+
+function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            if(response.data){
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer, puzzleId: puzzle.id});
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                onSubmit(true);
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -39,15 +53,19 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<HintI>(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
+            if (response.data.hint === "No more hints.") return;
+            puzzle.hints.push(response.data.hint);
+            puzzle.question = response.data.question
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
     }
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle-card'>
+            <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>
