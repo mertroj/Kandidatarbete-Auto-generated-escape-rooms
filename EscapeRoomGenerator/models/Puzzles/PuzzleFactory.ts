@@ -7,6 +7,7 @@ import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { Jigsaw } from "./Jigsaw";
 import { MastermindPuzzle } from "./MastermindPuzzles";
 import { MemoryPuzzle } from "./MemoryPuzzle/MemoryPuzzle";
+import { Theme } from "../Theme";
 
 export class PuzzleFactory{
     private static anagramCounter = 0;
@@ -17,7 +18,7 @@ export class PuzzleFactory{
     private static memoryCounter = 0;
 
     //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
-    static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
+    static createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = [],): Puzzle{
         return frequencies<() => Puzzle>([
             [1000 - (this.anagramCounter/1000), () =>
                 {
@@ -49,10 +50,10 @@ export class PuzzleFactory{
                     return new MastermindPuzzle(difficulty, dependentPuzzles);
                 }
             ],
-            [1000 - (this.memoryCounter/1000), () =>
+            [10000 - (this.memoryCounter/1000), () =>
                 {
                     this.memoryCounter++;
-                    return new MemoryPuzzle(difficulty, dependentPuzzles);
+                    return new MemoryPuzzle(difficulty, dependentPuzzles, theme);
                 }
             ]
 

@@ -28,23 +28,23 @@ export class MemoryPuzzle implements Observer, Observable{
     private dependentPuzzles: string[];
     private observers: Observer[] = [];
 
-    constructor(difficulty: number, dependentPuzzles: string[]){
+    constructor(difficulty: number, dependentPuzzles: string[], theme: Theme){
         this.dependentPuzzles = dependentPuzzles;
         this.matchedCells = Math.max(2, difficulty); //2 for easy and medium, 3 for hard
         this.description = `Pair each group of ${this.matchedCells} symbols with their corresponding location by clicking to flip.`;
         if (dependentPuzzles.length > 0){
             this.isLocked = true;
         }
-        this.estimatedTime = difficulty + 3; //Arbitrary at the moment
-        if (difficulty === 1) {
+        this.estimatedTime = difficulty + 2; //Arbitrary at the moment
+        if (difficulty === 1) { //difficulty === 1 => 12 cells
             [this.rows, this.cols] = choice([[3, 4], [4, 3]]);
-        } else if (difficulty === 2) {
+        } else if (difficulty === 2) { //difficulty === 2 => 24 cells
             [this.rows, this.cols] = choice([[3, 8], [4, 6], [6, 4]]);
         } else { //difficulty === 3 => 36 cells
             [this.rows, this.cols] = choice([[6, 6], [4, 9]]);
         }
         this.cellsMatrix = this.initCells();
-        this.valuesToSymbols = this.assignSymbols();
+        this.valuesToSymbols = this.assignSymbols(theme);
         MemoryPuzzle.puzzles[this.id] = this;
     }
     update(id: string): void{
@@ -79,7 +79,7 @@ export class MemoryPuzzle implements Observer, Observable{
     }
 
     toggleAllUnflippedCells(): void{
-        if (this.hintLevel === 4) return; //3 hints allowed, but 4 because of the toggle functionality so each hint is calling toggle twice
+        if (this.hintLevel === 4) return; //3 hints allowed, but 4 because of the toggle functionality
         const flipCells = (cells: number[][], checkFlipped: boolean) => {
             const cellsCopy = [...cells];
             cellsCopy.forEach(cell => {
@@ -89,7 +89,6 @@ export class MemoryPuzzle implements Observer, Observable{
             });
         };
 
-        console.log('temporarilyFlipped:', this.temporarilyFlipped.length);
         if (this.temporarilyFlipped.length > 0) {
             flipCells(this.temporarilyFlipped, false);
             this.temporarilyFlipped = [];
@@ -186,9 +185,9 @@ export class MemoryPuzzle implements Observer, Observable{
         this.currentlyFlipped = [];
         return true;
     }
-    private assignSymbols(): Array<[number, string]> {
+    private assignSymbols(theme: Theme): Array<[number, string]> {
         const imageDir = path.join(__dirname, '../../../Images/symbols');
-        const imageFilenames = imagesData[Theme.MAGICALWORKSHOP].symbols; //TODO: Change to dynamic theme
+        const imageFilenames = imagesData[theme].symbols;
         const uniqueValues = [...new Set(this.cellsMatrix.flat().map(cell => cell.value))];
         if (uniqueValues.length > imageFilenames.length) {
             throw new Error('Not enough unique images for the number of unique symbols in memory puzzle');

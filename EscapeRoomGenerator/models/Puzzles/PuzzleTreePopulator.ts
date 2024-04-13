@@ -3,6 +3,7 @@ import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 import { PuzzleManager } from "../PuzzleManager";
+import { Theme } from "../Theme";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
@@ -15,7 +16,7 @@ class TimeoutError extends Error {
     }
 }
 
-export function puzzleTreePopulator(estimatedTime: number, difficulty: number, manager: PuzzleManager): Graph {
+export function puzzleTreePopulator(estimatedTime: number, difficulty: number, manager: PuzzleManager, theme: Theme): Graph {
     let puzzleBox: Puzzle[];
     let counter = 0;
     while(true){
@@ -25,7 +26,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number, m
             if(remainingTime <= 0){ //Should never be under 0 bcz of recursiveness in generatePuzzle(), but just in case
                 break;
             }
-            let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty);
+            let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty, theme);
             remainingTime -= tempPuzzleObject.estimatedTime;
             puzzleBox.push(tempPuzzleObject);
         }
@@ -68,7 +69,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number, m
             }else if(graph.node(nodeId) === true){ //if the node is a converging node
                 puzzleBox[i] = generateConvergingPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
             }else{ //if the node is a normal node but has which can still have incoming edges
-                puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
+                puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds, theme);
             }
             //addObservers(puzzleBox[i], incomingPuzzles);
             manager.addPuzzle(puzzleBox[i]);
@@ -88,25 +89,25 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number, m
 
 
 //Recursive functions to generate puzzles with approperiate time and difficulty:
-function generatePuzzle(requiredTime: number, difficulty: number, counter: number = 1): Puzzle {
-    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty);
+function generatePuzzle(requiredTime: number, difficulty: number, theme: Theme, counter: number = 1): Puzzle {
+    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty, theme);
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
 
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generatePuzzle(requiredTime, difficulty, counter + 1);
+        return generatePuzzle(requiredTime, difficulty, theme, counter + 1);
     }
     return puzzle;
 }
-function generateDependentPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], counter: number = 1): Puzzle {
-    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty, incomingPuzzles);
+function generateDependentPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], theme: Theme, counter: number = 1): Puzzle {
+    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty, theme, incomingPuzzles);
 
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generateDependentPuzzle(requiredTime, difficulty, incomingPuzzles, counter + 1);
+        return generateDependentPuzzle(requiredTime, difficulty, incomingPuzzles, theme, counter + 1);
     }
     return puzzle;
 }
