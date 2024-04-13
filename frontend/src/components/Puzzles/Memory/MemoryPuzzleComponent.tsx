@@ -13,11 +13,13 @@ const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
 interface PatchResponse {
-    isSolved: boolean;
     puzzle: MemoryPuzzle;
 }
 interface HintResponse {
-    isSuccessful: boolean;
+    puzzle: MemoryPuzzle;
+}
+interface CheckMatchResponse {
+    isSolved: boolean;
     puzzle: MemoryPuzzle;
 }
 interface MemoryPuzzleProps {
@@ -36,13 +38,18 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
         try{
             let response = await axios.patch<PatchResponse>(`http://localhost:8080/memoryPuzzles/flipCell`, {pos: [row, col], puzzleId: puzzle.id});
             setPuzzle(response.data.puzzle);
-            if (response.data.isSolved) {
-                correctAudio.play();
-                onSubmit(true);
-                setIsOpen(false);
-            }else{
-                onSubmit(false);
-            }
+            setTimeout(async () =>{
+                let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkMatch/?puzzleId=${puzzle.id}`);
+                setPuzzle(matchResponse.data.puzzle);
+                if (matchResponse.data.isSolved) {
+                    correctAudio.play();
+                    onSubmit(true);
+                    setIsOpen(false);
+                }else{
+                    onSubmit(false);
+                }
+            }, 600);
+            
         }catch(error: any){
             console.error(error);
         }
@@ -63,12 +70,12 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
 
     async function handleHintRequest(){
         try{
-            const response = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/hint/?puzzleId=${puzzle.id}`);
-            if (response.data.isSuccessful) {
-                setPuzzle(response.data.puzzle);
-            }else{
-                // TODO: 'No more hints. Question already answered. Alert instead? Should not be needed later on
-            }
+            const response = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
+            setPuzzle(response.data.puzzle);
+            setTimeout(async () =>{
+                let hintResponse = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
+                setPuzzle(hintResponse.data.puzzle);
+            }, 1000);
         }catch(error: any){
             console.error(error);
         }
@@ -101,7 +108,7 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
                             {row.map((cell, j) => (
                                 <Col xs={1} key={j} className="cell-col">
                                     <div 
-                                        className='cell'
+                                        className={`cell ${cell.isFlipped ? 'cell-flip' : ''}`}
                                         onMouseEnter={(e) => {
                                             if (!cell.isFlipped){
 
@@ -117,10 +124,16 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
                                             handleClick(i, j, e);
                                         }}
                                     >
-                                        <img 
-                                            className="symbol"
-                                            src={valueImages.find(([key]) => key === cell.value)?.[1]} 
-                                            alt={"symbol " + j} />
+                                        <div className="cell-inner">
+                                            <div className="cell-front"> </div> {/* empty div representing the front side of the cells */}
+                                            <div className="cell-back">
+                                                <img 
+                                                    className="symbol"
+                                                    src={valueImages.find(([key]) => key === cell.value)?.[1]} 
+                                                    alt={"symbol " + j} 
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                 </Col>
                             ))}

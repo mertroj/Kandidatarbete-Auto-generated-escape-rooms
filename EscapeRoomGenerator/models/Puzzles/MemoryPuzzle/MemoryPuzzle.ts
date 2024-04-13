@@ -22,6 +22,7 @@ export class MemoryPuzzle implements Observer, Observable{
     cellsMatrix: Cell[][];
     valuesToSymbols: Array<[number, string]>;
     private currentlyFlipped: number[][] = [];
+    private temporarilyFlipped: number[][] = [];
     private rows: number;
     private cols: number;
     private dependentPuzzles: string[];
@@ -62,6 +63,7 @@ export class MemoryPuzzle implements Observer, Observable{
     }
 
     checkAnswer(): boolean {
+        if (!this.checkMatch()) return false;
         const res: boolean = this.cellsMatrix.every(row => row.every(cell => cell.isFlipped));
 
         if (!res) return false;
@@ -70,24 +72,33 @@ export class MemoryPuzzle implements Observer, Observable{
         return true;
     }
 
-    flipPiece(row: number, col: number): void {
+    flipCell(row: number, col: number): void {
         if (this.cellsMatrix[row][col].isFlipped) return;
         this.cellsMatrix[row][col].flip();
         this.currentlyFlipped.push([row, col]);
-        if (this.currentlyFlipped.length === this.matchedCells) {
-            if (!this.checkMatch(row, col)) { //resetting in case the answer is false by unflipping the cells
-                for (let pos of this.currentlyFlipped){
-                    this.cellsMatrix[pos[0]][pos[1]].flip();
-                }
-                this.currentlyFlipped = [];
-            }
-
-        }
     }
 
-    //TODO: Implement hint system
-    getHint(): boolean{
-        return false;
+    toggleAllUnflippedCells(): void{
+        if (this.hintLevel === 4) return; //3 hints allowed, but 4 because of the toggle functionality so each hint is calling toggle twice
+        const flipCells = (cells: number[][], checkFlipped: boolean) => {
+            const cellsCopy = [...cells];
+            cellsCopy.forEach(cell => {
+                if (checkFlipped && this.cellsMatrix[cell[0]][cell[1]].isFlipped) return;
+                this.cellsMatrix[cell[0]][cell[1]].flip();
+                this.temporarilyFlipped.push(cell);
+            });
+        };
+
+        console.log('temporarilyFlipped:', this.temporarilyFlipped.length);
+        if (this.temporarilyFlipped.length > 0) {
+            flipCells(this.temporarilyFlipped, false);
+            this.temporarilyFlipped = [];
+        } else {
+            this.hintLevel++;
+            if (this.hintLevel < 4) {
+                flipCells(this.cellsMatrix.flatMap((row, r) => row.map((cell, c) => [r, c])), true);
+            }
+        }
     }
 
     initCells(): Cell[][] {
@@ -155,19 +166,25 @@ export class MemoryPuzzle implements Observer, Observable{
         return MemoryPuzzle.puzzles[puzzleId];
     }
 
-    private checkMatch(row: number, col: any): boolean {
-        let matchedValue = this.cellsMatrix[row][col].value;
-
-        let matchedCount = 0;
-        for (let r = 0; r < this.currentlyFlipped.length; r++){
-            if (this.cellsMatrix[this.currentlyFlipped[r][0]][this.currentlyFlipped[r][1]].value === matchedValue){
-                matchedCount++;
+    private checkMatch(): boolean {
+        if (this.currentlyFlipped.length !== this.matchedCells) { //Guarantees the we have at least two elements in the currentlyFlipped array
+            return true;
+        }
+    
+        let firstFlippedValue = this.cellsMatrix[this.currentlyFlipped[0][0]][this.currentlyFlipped[0][1]].value;
+    
+        for (let pos of this.currentlyFlipped) {
+            if (this.cellsMatrix[pos[0]][pos[1]].value !== firstFlippedValue) {
+                // Unflip the cells
+                for (let pos of this.currentlyFlipped) {
+                    this.cellsMatrix[pos[0]][pos[1]].flip();
+                }
+                this.currentlyFlipped = [];
+                return false;
             }
         }
-        if (matchedCount !== this.matchedCells){ 
-            return false;
-        }
-        return true
+        this.currentlyFlipped = [];
+        return true;
     }
     private assignSymbols(): Array<[number, string]> {
         const imageDir = path.join(__dirname, '../../../Images/symbols');
@@ -190,7 +207,7 @@ export class MemoryPuzzle implements Observer, Observable{
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hintLevel: this.hintLevel - 1, //to solve the toggle caused hintLevel increment
             question: this.question,
             description: this.description,
             cellsMatrix: this.cellsMatrix.map(row => row.map(cell => cell.strip())),

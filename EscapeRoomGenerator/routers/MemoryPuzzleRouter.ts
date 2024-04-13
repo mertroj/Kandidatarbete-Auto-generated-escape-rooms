@@ -11,6 +11,11 @@ interface FlipCellRequest extends Request{
         puzzleId: string;
     }
 }
+interface CheckMatchRequest extends Request{
+    query: {
+        puzzleId: string;
+    }
+}
 interface getImageRequest extends Request{
     query: {
         puzzleId: string;
@@ -44,9 +49,8 @@ MemoryPuzzleRouter.patch('/flipCell', (req: FlipCellRequest, res: Response) => {
             res.status(404).send("The pos parameter is invalid");
             return;
         }
-        puzzle.flipPiece(pos[0], pos[1]);
+        puzzle.flipCell(pos[0], pos[1]);
         res.status(200).send({
-            isSolved: puzzle.checkAnswer(), 
             puzzle: puzzle.strip()
         });
 
@@ -77,19 +81,43 @@ MemoryPuzzleRouter.get('/symbol', (req: getImageRequest, res: Response) => {
     }
 });
 
-MemoryPuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
+MemoryPuzzleRouter.get('/checkMatch', (req: CheckMatchRequest, res: Response) => {
     try{
         const puzzleId = req.query.puzzleId;
         if (puzzleId === undefined) {
             res.status(400).send("The puzzleId parameter is missing");
             return;
         }
-        const puzzle = SlidePuzzle.get(puzzleId);
+        const puzzle = MemoryPuzzle.get(String(puzzleId));
         if (puzzle === undefined) {
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        res.status(200).send({isSuccessful: puzzle.getHint(), puzzle: puzzle});
+        res.status(200).send({
+            isSolved: puzzle.checkAnswer(),
+            puzzle: puzzle.strip()
+        });
+    }catch(error: any){
+        res.status(500).send('Internal server error' + error.message);
+    }
+});
+
+MemoryPuzzleRouter.get('/toggleAllUnflippedCells', (req: HintRequest, res: Response) => {
+    try{
+        const puzzleId = req.query.puzzleId;
+        if (puzzleId === undefined) {
+            res.status(400).send("The puzzleId parameter is missing");
+            return;
+        }
+        const puzzle = MemoryPuzzle.get(puzzleId);
+        if (puzzle === undefined) {
+            res.status(404).send("The puzzleId parameter is invalid");
+            return;
+        }
+        puzzle.toggleAllUnflippedCells();
+        res.status(200).send({
+            puzzle: puzzle.strip()
+        });
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }
