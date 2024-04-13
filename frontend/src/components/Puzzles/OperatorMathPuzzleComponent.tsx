@@ -56,6 +56,7 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
         async function fetchOperandAmount() {
             try {
                 const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/info?puzzleId=${operatorMathPuzzleProps.puzzle.id}`);
+                // console.log('Server response:', response.data); // Add this line
                 setNumberOfOperands(response.data.numberOfOperands);
                 setAnswer(Array(response.data.numberOfOperands - 1).fill('+'));
             } catch (error) {
@@ -87,16 +88,16 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
             <p>{puzzle.question}</p>
             <div>
                 <form action="" onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{display: 'flex', justifyContent: 'center'}}>
                         {dropdowns.map((dropdown, index) => (
-                            <div key={index} style={{ margin: '0 10px' }}>
+                            <div key={index} style={{margin: '0 10px'}}>
                                 {dropdown}
                             </div>
                         ))}
                     </div>
-                    <button className='w-100' type='submit' style={{ marginTop: '20px' }}>Test answer</button>
+                    <button className='w-100' type='submit' style={{marginTop: '20px'}}>Test answer</button>
                 </form>
-                <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
+                <HintAudioClickButton className="w-100" onClick={async () => getHint()}>
                     Get a hint
                 </HintAudioClickButton>
             </div>

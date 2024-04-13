@@ -104,6 +104,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
             isSolved: this.isSolved,
             isLocked: this.isLocked,
             hintLevel: this.hintLevel,
+            numberOfOperands: this.numberOfOperands,
 
             question: this.formulateQuestion(),
             description: this.description,
