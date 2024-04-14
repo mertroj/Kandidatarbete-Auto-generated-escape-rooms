@@ -24,7 +24,7 @@
     margin: 16px;
 }
 
-.solved-puzzles-container > .puzzle {
+.solved-puzzles-container > .puzzle-card {
     position: absolute;
     margin: 0;
 }

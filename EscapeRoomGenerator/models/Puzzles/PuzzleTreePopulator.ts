@@ -2,7 +2,6 @@ import {Edge, Graph, alg} from "graphlib";
 import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
-import { PuzzleManager } from "../PuzzleManager";
 import { Theme } from "../Theme";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
@@ -16,23 +15,19 @@ class TimeoutError extends Error {
     }
 }
 
-export function puzzleTreePopulator(estimatedTime: number, difficulty: number, manager: PuzzleManager, theme: Theme): Graph {
-    let puzzleBox: Puzzle[];
+export function puzzleTreePopulator(estimatedTime: number, difficulty: number, theme: Theme): Graph {
+    let puzzleBox: Puzzle[] = [];
     let counter = 0;
-    while(true){
-        let remainingTime: number = estimatedTime;
+    let remainingTime: number;
+    while(puzzleBox.length <= 2){
+        remainingTime = estimatedTime;
         puzzleBox = [];
-        while(true){
-            if(remainingTime <= 0){ //Should never be under 0 bcz of recursiveness in generatePuzzle(), but just in case
-                break;
-            }
+        while(remainingTime > 0){ //Should never be under 0 bcz of recursiveness in generatePuzzle(), but just in case
             let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty, theme);
             remainingTime -= tempPuzzleObject.estimatedTime;
             puzzleBox.push(tempPuzzleObject);
         }
-        if(puzzleBox.length > 2){
-            break;
-        }else if(counter > 50){ //prevent infinite loop if not possible
+        if(counter > 50){ //prevent infinite loop if not possible
             throw new TimeoutError("Failed to generate a puzzle box with the required time " +estimatedTime+ " after 50 tries");
         }
         counter++;
@@ -71,8 +66,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number, m
             }else{ //if the node is a normal node but has which can still have incoming edges
                 puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds, theme);
             }
-            //addObservers(puzzleBox[i], incomingPuzzles);
-            manager.addPuzzle(puzzleBox[i]);
+            addObservers(puzzleBox[i], incomingPuzzles);
             graph.setNode(nodeId, puzzleBox[i]);
         }catch(e){
             if(e instanceof TimeoutError){

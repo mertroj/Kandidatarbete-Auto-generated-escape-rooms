@@ -3,6 +3,7 @@ export interface EscapeRoom {
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
+    theme: string;
 }
 
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
@@ -14,10 +15,10 @@ export enum FeedbackMessages{
 
 export interface Room {
     id: string;
-    left: string;
-    right: string;
-    up: string;
-    down: string;
+    left: number;
+    right: number;
+    up: number;
+    down: number;
     isLocked: boolean;
     puzzles: Puzzle[];
 }
@@ -27,7 +28,7 @@ export interface AnagramPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -38,7 +39,7 @@ export interface LettersMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -66,7 +67,7 @@ export interface OperatorsMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
 
     question: string;
     description: string;
@@ -85,7 +86,7 @@ export interface SlidePuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: number;
 
     question: string;
     description: string;
@@ -120,7 +121,7 @@ export interface JigsawPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: number;
 
     question: string;
     description: string;
@@ -134,7 +135,8 @@ export interface MastermindPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: string[];
     question: string;
     length: number;
+    previousGuesses: [string, string][];
 }

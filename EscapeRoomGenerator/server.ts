@@ -72,16 +72,7 @@ app.get('/escaperoom', (req: Request, res: Response) => {
     if (er === null) {
         res.status(404).send("The entered gameId does not exist");
     } else {
-        const tempSolvedPuzzles = er.puzzleManager.solvedPuzzlesQueue.slice();
-        const tempUnlockedPuzzles = er.puzzleManager.unLockedPuzzlesQueue.slice();
-        er.puzzleManager.solvedPuzzlesQueue = [];
-        er.puzzleManager.unLockedPuzzlesQueue = [];
-    
-        res.send({
-            escapeRoom: er.strip(),
-            solvedPuzzles: tempSolvedPuzzles,
-            unlockedPuzzles: tempUnlockedPuzzles
-        });
+        res.send(er.strip());
     }
 });
 

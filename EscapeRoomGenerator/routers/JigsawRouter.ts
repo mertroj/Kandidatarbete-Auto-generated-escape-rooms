@@ -1,4 +1,4 @@
-import * as path from "node:path";
+import * as path from "path";
 import { Request, Response } from 'express';
 import {Jigsaw} from "../models/Puzzles/Jigsaw";
 import {EscapeRoom} from "../models/EscapeRoom";
