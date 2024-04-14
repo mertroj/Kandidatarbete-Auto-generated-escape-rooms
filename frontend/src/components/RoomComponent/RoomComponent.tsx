@@ -76,6 +76,16 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                             puzzleSolved={puzzleSolved}
                         />
+
+                    if (puzzle.type === 'memoryPuzzle')
+                        return <MemoryPuzzleComponent
+                            key={puzzle.id}
+                            puzzle={puzzle as MemoryPuzzle}
+                            i={i+1}
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
+                        />
         
                     else return <p>Invalid puzzle</p>
                 })

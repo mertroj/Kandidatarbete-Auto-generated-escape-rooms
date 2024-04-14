@@ -19,15 +19,20 @@ interface HintResponse {
     puzzle: MemoryPuzzle;
 }
 interface CheckMatchResponse {
+    matching?: boolean;
     isSolved: boolean;
     puzzle: MemoryPuzzle;
+    unlockedPuzzles: string[];
 }
 interface MemoryPuzzleProps {
     puzzle: MemoryPuzzle;
-    onSubmit: Function;
+    i: number;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
 
-function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
+function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MemoryPuzzleProps) {
     console.log(puzzle);
     const [updatedPuzzle, setPuzzle] = useState<MemoryPuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
@@ -39,14 +44,17 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
             let response = await axios.patch<PatchResponse>(`http://localhost:8080/memoryPuzzles/flipCell`, {pos: [row, col], puzzleId: puzzle.id});
             setPuzzle(response.data.puzzle);
             setTimeout(async () =>{
-                let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkMatch/?puzzleId=${puzzle.id}`);
+                let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkAnswer/?puzzleId=${puzzle.id}`);
                 setPuzzle(matchResponse.data.puzzle);
-                if (matchResponse.data.isSolved) {
-                    correctAudio.play();
-                    onSubmit(true);
+                let resp = matchResponse.data;
+                if (resp.isSolved) {
+                    correctAudio.play(); 
+                    puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsOpen(false);
-                }else{
-                    onSubmit(false);
+                }else if (resp.matching === false) {
+                    incorrectAudio.currentTime = 0;
+                    incorrectAudio.play();
+                    notifyIncorrectAnswer();
                 }
             }, 600);
             
@@ -93,7 +101,8 @@ function MemoryPuzzleComponent ({puzzle, onSubmit}: MemoryPuzzleProps) {
             onOpen={() => setIsOpen(true)}
             onClose={() => setIsOpen(false)}
             trigger={
-                <div className='puzzle'>
+                <div className='puzzle-card'>
+                    <p className='puzzle-number'>#{i}</p>
                     <Button variant='outline-primary'>{puzzle.question}</Button>
                 </div>
             }

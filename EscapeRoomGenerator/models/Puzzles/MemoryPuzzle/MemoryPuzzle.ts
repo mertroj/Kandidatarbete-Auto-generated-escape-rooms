@@ -15,7 +15,7 @@ export class MemoryPuzzle implements Observer, Observable{
     question: string = "Can you memorize in which places each group of symbols is located?";
     description: string;
     isSolved: boolean = false;
-    hintLevel: number = 0;
+    hints: number = 0;
     estimatedTime: number;
     isLocked: boolean = false;
     matchedCells: number; //number of similar symbols in a group to be matched
@@ -47,29 +47,28 @@ export class MemoryPuzzle implements Observer, Observable{
         this.valuesToSymbols = this.assignSymbols(theme);
         MemoryPuzzle.puzzles[this.id] = this;
     }
-    update(id: string): void{
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    }
+    update(id: string): string{
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
+            return this.id
         }
-    }
-    addObserver(observer: Observer): void{
-        this.observers.push(observer);
-    }
-    notifyObservers(): void{
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+        return ''
     }
 
-    checkAnswer(): boolean {
-        if (!this.checkMatch()) return false;
-        const res: boolean = this.cellsMatrix.every(row => row.every(cell => cell.isFlipped));
-
-        if (!res) return false;
-        this.isSolved = true;
-        this.notifyObservers();
-        return true;
+    checkAnswer(): {isSolved: boolean, unlockedPuzzles: string[]}{
+        if(this.cellsMatrix.every(row => row.every(cell => cell.isFlipped) && !this.isSolved)){
+            this.isSolved = true;
+            let unlockedPuzzles = this.notifyObservers();
+            return {isSolved: true, unlockedPuzzles: unlockedPuzzles};
+        }
+        return {isSolved: false, unlockedPuzzles: []};
     }
 
     flipCell(row: number, col: number): void {
@@ -79,7 +78,7 @@ export class MemoryPuzzle implements Observer, Observable{
     }
 
     toggleAllUnflippedCells(): void{
-        if (this.hintLevel === 4) return; //3 hints allowed, but 4 because of the toggle functionality
+        if (this.hints === 4) return; //3 hints allowed, but 4 because of the toggle functionality
         const flipCells = (cells: number[][], checkFlipped: boolean) => {
             const cellsCopy = [...cells];
             cellsCopy.forEach(cell => {
@@ -93,8 +92,8 @@ export class MemoryPuzzle implements Observer, Observable{
             flipCells(this.temporarilyFlipped, false);
             this.temporarilyFlipped = [];
         } else {
-            this.hintLevel++;
-            if (this.hintLevel < 4) {
+            this.hints++;
+            if (this.hints < 4) {
                 flipCells(this.cellsMatrix.flatMap((row, r) => row.map((cell, c) => [r, c])), true);
             }
         }
@@ -165,9 +164,9 @@ export class MemoryPuzzle implements Observer, Observable{
         return MemoryPuzzle.puzzles[puzzleId];
     }
 
-    private checkMatch(): boolean {
+    checkMatch(): boolean | undefined {
         if (this.currentlyFlipped.length !== this.matchedCells) { //Guarantees the we have at least two elements in the currentlyFlipped array
-            return true;
+            return;
         }
     
         let firstFlippedValue = this.cellsMatrix[this.currentlyFlipped[0][0]][this.currentlyFlipped[0][1]].value;
@@ -206,7 +205,7 @@ export class MemoryPuzzle implements Observer, Observable{
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel - 1, //to solve the toggle caused hintLevel increment
+            hints: Math.min(3, this.hints), //to solve the toggle caused hintLevel increment
             question: this.question,
             description: this.description,
             cellsMatrix: this.cellsMatrix.map(row => row.map(cell => cell.strip())),

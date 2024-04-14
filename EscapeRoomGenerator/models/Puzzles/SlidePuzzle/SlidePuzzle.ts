@@ -122,7 +122,6 @@ export class SlidePuzzle implements Observer, Observable{
         return false;
     }
 
-    //TODO: Implement hint system
     getHint(): boolean{
         //replace the biggest number with the null piece
         if (this.hints === 2) return false
