@@ -194,7 +194,7 @@ function EscapeRoomPage() {
                     navbarRemove={true}
                     isOpen={showNotification}
                     onOpen={() => setShowNotification(true)}
-                    onClose={() => setShowNotification(false)}
+                    onClose={() => {}}
                     trigger={
                         <div>
                         </div>

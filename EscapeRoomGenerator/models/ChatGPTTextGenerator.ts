@@ -8,6 +8,8 @@ const openai = new OpenAI({apiKey: apiKey});
 const wordToTokenMultiplier = 1.25;
 
 export async function generateIntroText(theme: Theme): Promise<string> {
+    return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Good luck!";
+    /*
     const desiredLength = 300;
     const randomTemp = randomFloat(0.4);
     const randomTopP = randomFloat(1);
@@ -38,11 +40,11 @@ export async function generateIntroText(theme: Theme): Promise<string> {
         throw new Error("Empty response from GPT-3");
     }
     return response.choices[0].message.content;
-    
-    //return "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet nisi fringilla, porttitor tellus quis, aliquet tortor. Quisque at tincidunt enim. Aliquam mattis sapien at ligula luctus, vitae bibendum diam ullamcorper. Pellentesque vel quam luctus, sollicitudin magna ut, vestibulum libero. Integer congue lorem ut consequat cursus. Fusce posuere pellentesque urna, eu finibus est euismod in. Nunc tristique dignissim elit eu sollicitudin. Curabitur mattis velit at commodo pharetra. Curabitur scelerisque tristique purus a finibus. Donec porta accumsan dictum. Suspendisse quam magna, scelerisque in nulla sed, ultricies suscipit nisl. Nunc vehicula tortor et dui porttitor, non convallis metus commodo. Donec vel est turpis. Mauris feugiat blandit ligula a condimentum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae" +
-    //"\n" + "Pellentesque lacinia dolor at diam cursus, id posuere quam sollicitudin. Cras at ornare arcu. Sed tincidunt ipsum nisl, eget vulputate ligula dignissim quis. Sed in nulla aliquet, faucibus enim eget, malesuada urna. Proin suscipit ipsum vitae tellus rhoncus hendrerit. Duis mattis velit id aliquam maximus. Nam dignissim laoreet diam, vel accumsan justo hendrerit vel. Maecenas mi risus, laoreet ut urna vel, imperdiet condimentum enim. Vivamus finibus rhoncus est nec fringilla. Fusce suscipit est ex. Donec id nulla mollis est finibus ultricies. ";
+    */
 }
 export async function generateEndingText(theme: Theme): Promise<string> {
+    return "Congratulations! You have successfully escaped the " + theme + " themed escape room. We hope you enjoyed the experience and look forward to seeing you again soon!";
+    /*
     const desiredLength = 100;
     const randomTemp = randomFloat(0.4);
     const randomTopP = randomFloat(1);
@@ -70,10 +72,12 @@ export async function generateEndingText(theme: Theme): Promise<string> {
     }
     
     return response.choices[0].message.content;
+    */
 }
 
 export async function generateThemedPuzzleText(textToChange: string, theme: Theme): Promise<string> {
-    
+    return textToChange;
+    /*
     const desiredLength: string = (textToChange.split(' ').length).toString(); //Buffer of 5 words
     const randomTemp: number = randomFloat(0.4);
     const randomTopP: number = randomFloat(1);
@@ -99,9 +103,5 @@ export async function generateThemedPuzzleText(textToChange: string, theme: Them
     }
     
     return response.choices[0].message.content;
+    */
 }
-
-(async () => {
-    const text = await generateThemedPuzzleText('Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?', Theme.PHAROAHTOMB);
-    console.log('generatePuzzleText:', text);
-})();
