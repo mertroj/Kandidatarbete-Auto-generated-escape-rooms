@@ -36,14 +36,20 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
     console.log(puzzle);
     const [updatedPuzzle, setPuzzle] = useState<MemoryPuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [valueImages, setValueImages] = useState<Array<[number, string]>>([]);
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>) {
+        if (isLoading) {
+            return;
+        }
+
         e.stopPropagation();
+        setIsLoading(true);
         try{
             let response = await axios.patch<PatchResponse>(`http://localhost:8080/memoryPuzzles/flipCell`, {pos: [row, col], puzzleId: puzzle.id});
             setPuzzle(response.data.puzzle);
-            setTimeout(async () =>{
+            setTimeout(async () => {
                 let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkAnswer/?puzzleId=${puzzle.id}`);
                 setPuzzle(matchResponse.data.puzzle);
                 let resp = matchResponse.data;
@@ -51,15 +57,16 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                     correctAudio.play(); 
                     puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsOpen(false);
-                }else if (resp.matching === false) {
+                } else if (resp.matching === false) {
                     incorrectAudio.currentTime = 0;
                     incorrectAudio.play();
                     notifyIncorrectAnswer();
                 }
+                setIsLoading(false);
             }, 600);
-            
-        }catch(error: any){
+        } catch(error: any) {
             console.error(error);
+            setIsLoading(false);
         }
     }
     async function fetchImages(){

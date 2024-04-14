@@ -18,7 +18,7 @@ export class PuzzleFactory{
     private static memoryCounter = 0;
 
     //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
-    static createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = [],): Puzzle{
+    static createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
             [1000 - (this.anagramCounter/1000), () =>
                 {
