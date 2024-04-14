@@ -82,14 +82,6 @@ export async function puzzleTreePopulator(estimatedTime: number, difficulty: num
             }
         }
     }
-    let promises = graph.nodes().map(async nodeId => {
-        let puzzle = graph.node(nodeId) as Puzzle;
-        if(nodeId === '0' || puzzle instanceof Jigsaw) {
-            return;
-        }
-        await puzzle.applyTheme(theme);
-    });
-    await Promise.all(promises);
 
     return graph;
 }

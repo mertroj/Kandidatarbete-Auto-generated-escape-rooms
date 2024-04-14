@@ -107,6 +107,7 @@ function MastermindPuzzleComponent ({addHint, puzzle, onSolve}: {addHint : Funct
 return (
     <div className='puzzle'>
         <PopupComponent
+            navbarRemove={false}
             trigger={
                 <Button variant='outline-primary'>
                     Placeholder text for mastermind puzzle. To be chosen depending on the theme

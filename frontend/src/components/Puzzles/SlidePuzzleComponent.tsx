@@ -86,6 +86,7 @@ function SlidePuzzleComponent ({puzzle, onSolve}: SlidePuzzleProps) {
 
     return (
         <Popup 
+            navbarRemove={false}
             isOpen={isOpen}
             onOpen={() => setIsOpen(true)}
             onClose={() => setIsOpen(false)}

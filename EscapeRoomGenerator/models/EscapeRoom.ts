@@ -7,6 +7,7 @@ import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
 import { Puzzle } from './Puzzles/Puzzle';
 import { generateEndingText, generateIntroText } from './ChatGPTTextGenerator';
 import { Direction } from './Direction';
+import { Jigsaw } from './Puzzles/Jigsaw';
 
 
 export class EscapeRoom {
@@ -61,6 +62,16 @@ export class EscapeRoom {
         let nrOfRooms: number = Math.floor(totalTime / 20);
         let graph = await puzzleTreePopulator(totalTime, difficulty, theme);
         let nodes = graph.nodes();
+
+        let promises = nodes.map(async nodeId => { //change the text for all puzzles into themed text using OPENAI
+            let puzzle = graph.node(nodeId) as Puzzle;
+            if(nodeId === '0' || puzzle instanceof Jigsaw) {
+                return;
+            }
+            await puzzle.applyTheme(theme);
+        });
+        await Promise.all(promises);
+
         let avgNodesPerRoom = Math.floor((nodes.length - 1) / nrOfRooms);
         let remainingNodes = (nodes.length - 1) % nrOfRooms;
         let endPuzzle = graph.node('0') as Puzzle;

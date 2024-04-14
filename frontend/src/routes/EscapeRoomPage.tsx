@@ -26,7 +26,7 @@ function EscapeRoomPage() {
     }
 
     async function fetchEndingText(){
-        const response = await axios.post(`http://localhost:8080/chatGPT/endingText`);
+        const response = await axios.post(`http://localhost:8080/chatGPT/endingText`, {gameId: gameId});
         setEndingText(response.data);
     }
 
@@ -191,6 +191,7 @@ function EscapeRoomPage() {
             </div>}
             {showNotification ?
                 <PopupComponent
+                    navbarRemove={true}
                     isOpen={showNotification}
                     onOpen={() => setShowNotification(true)}
                     onClose={() => setShowNotification(false)}
