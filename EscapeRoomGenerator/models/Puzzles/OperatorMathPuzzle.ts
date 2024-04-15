@@ -30,6 +30,8 @@ export class OperatorMathPuzzle implements Observable, Observer {
         this.numbers = repeat(this.numberOfOperands, () => randomIntRange(1, 11))
         this.operators = repeat(this.numberOfOperands-1, () => choice(['+', '-', '*'])).join('')
         this.answer = this.calcAnswer();
+        while (this.operators.includes('*'))
+            this.operators = this.operators.replace('*', '×');
         OperatorMathPuzzle.puzzles[this.id] = this;
     }
 

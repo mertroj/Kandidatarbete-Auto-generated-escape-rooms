@@ -31,7 +31,7 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
-    const [answer, setAnswer] = useState<Array<string>>(Array(puzzle.numberOfOperators).fill('+'));
+    const [answer, setAnswer] = useState<string[]>(Array(puzzle.numberOfOperators).fill('+'));
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -67,20 +67,9 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
     }
 
     const handleSelectChange = (index: number, value: string) => {
-        setAnswer(prevAnswer => {
-            const newAnswer = [...prevAnswer];
-            newAnswer[index] = value;
-            return newAnswer;
-        });
+        answer[index] = value;
+        setAnswer([...answer]);
     };
-    const dropdowns = Array.from({ length: puzzle.numberOfOperators }).map((_, index) => (
-        <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">*</option>
-            <option value="/">÷</option>
-        </select>
-    ));
 
     return (
         <div className='puzzle-card'>
@@ -90,9 +79,14 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <div>
                 <form action="" onSubmit={handleSubmit}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
-                        {dropdowns.map((dropdown, index) => (
+                        {Array.from({ length: puzzle.numberOfOperators }).map((_, index) => (
                             <div key={index} style={{margin: '0 10px'}}>
-                                {dropdown}
+                                <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
+                                    <option value="+">+</option>
+                                    <option value="-">-</option>
+                                    <option value="*">×</option>
+                                    <option value="/">÷</option>
+                                </select>
                             </div>
                         ))}
                     </div>
