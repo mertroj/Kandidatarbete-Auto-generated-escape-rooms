@@ -11,31 +11,45 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
 interface OperatorMathPuzzleProps {
-    addHint: Function;
     puzzle: OperatorsMathPuzzle;
-    onSubmit: Function;
+    i: number;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
-function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzleProps) {
-    const {puzzle, addHint, onSubmit} = operatorMathPuzzleProps;
+
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
+}
+
+interface HintI {
+    hint: string;
+    question: string;
+}
+
+function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
+    let operatorMathPuzzleProps = puzzle;
     const [numberOfOperands, setNumberOfOperands] = useState<number>(1  );
     const [answer, setAnswer] = useState<Array<string>>(Array(numberOfOperands - 1).fill('+'));
-
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
-            const response = await axios.post(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {
                 answer: answer.join(''), // join the elements of the answer array into a string
                 puzzleId: puzzle.id
             });
-            if(response.data){
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                onSubmit(true);
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -43,9 +57,12 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     }
 
     async function getHint() {
-        try {
-            const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+        try{
+            const response = await axios.get<HintI>(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
+            if (response.data.hint === "No more hints.") return;
+            puzzle.hints.push(response.data.hint);
+            puzzle.question = response.data.question
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
@@ -55,7 +72,7 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     useEffect(() => {
         async function fetchOperandAmount() {
             try {
-                const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/info?puzzleId=${operatorMathPuzzleProps.puzzle.id}`);
+                const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/info?puzzleId=${puzzle.id}`);
                 // console.log('Server response:', response.data); // Add this line
                 setNumberOfOperands(response.data.numberOfOperands);
                 setAnswer(Array(response.data.numberOfOperands - 1).fill('+'));
@@ -65,7 +82,7 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
         }
 
         fetchOperandAmount();
-    }, [operatorMathPuzzleProps.puzzle.id]);
+    }, [puzzle.id]);
 
     const handleSelectChange = (index: number, value: string) => {
         setAnswer(prevAnswer => {
@@ -83,7 +100,8 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
     ));
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle-card'>
+            <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>
@@ -97,7 +115,7 @@ function OperatorMathPuzzleComponent (operatorMathPuzzleProps: OperatorMathPuzzl
                     </div>
                     <button className='w-100' type='submit' style={{marginTop: '20px'}}>Test answer</button>
                 </form>
-                <HintAudioClickButton className="w-100" onClick={async () => getHint()}>
+                <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
                 </HintAudioClickButton>
             </div>

@@ -11,27 +11,35 @@ import withClickAudio from '../withClickAudioComponent';
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
 const incorrectAudio = new Audio(incorrectSound);
+
 interface AnagramProps {
-    addHint: Function;
     puzzle: AnagramPuzzle;
-    onSubmit: Function;
+    i: number;
+    updateRoom: () => void;
+    notifyIncorrectAnswer: () => void;
+    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
 
-function AnagramPuzzleComponent (anagramProps: AnagramProps) {
-    const {puzzle, addHint, onSubmit} = anagramProps;
+interface GuessResponse {
+    result: boolean;
+    unlockedPuzzles: string[];
+}
+
+function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: AnagramProps) {
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        try{
-            const response = await axios.post(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
-            if(response.data){
+        try {
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
+            let resp = response.data;
+            if(resp.result){
                 correctAudio.play();
-                onSubmit(true);
+                puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
-                onSubmit(false);
+                notifyIncorrectAnswer();
             }
         } catch (error) {
             console.error(error);
@@ -39,15 +47,19 @@ function AnagramPuzzleComponent (anagramProps: AnagramProps) {
     }
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
-            addHint(response.data);
+            const response = await axios.get<string>(`http://localhost:8080/anagrams/hint/?puzzleId=${puzzle.id}`);
+            let hint: string = response.data;
+            if (hint === "No more hints.") return;
+            puzzle.hints.push(hint);
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
     }
 
     return (
-        <div className='puzzle'>
+        <div className='puzzle-card'>
+            <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>

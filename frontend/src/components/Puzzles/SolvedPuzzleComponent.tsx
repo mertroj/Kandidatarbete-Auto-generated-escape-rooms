@@ -1,10 +1,14 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
 
-function SolvedPuzzleComponent ({style}: {style: React.CSSProperties}) {
+interface SolvedPuzzleProps {
+    style: React.CSSProperties;
+}
+
+function SolvedPuzzleComponent ({style}: SolvedPuzzleProps) {
 
     return (
-        <div className='puzzle' style={style}>
+        <div className='puzzle-card' style={style}>
             <b>Solved</b>
         </div>
     );
