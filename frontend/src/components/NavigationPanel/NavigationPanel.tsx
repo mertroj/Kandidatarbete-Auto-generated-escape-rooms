@@ -1,5 +1,5 @@
 import './NavigationPanel.css';
-import { EscapeRoom, Room } from '../../interfaces';
+import { EscapeRoom, Room, RoomStatus } from '../../interfaces';
 import clickSound from '../../assets/sounds/navigation-click.wav';
 import withClickAudio from '../withClickAudioComponent';
 import Minimap from '../Minimap/Minimap';
@@ -9,13 +9,12 @@ type NavigationPanelProps = {
     gameId: string;
     currentRoom: Room;
     escapeRoom: EscapeRoom;
+    roomStatus: RoomStatus[];
     move: (roomIdx: number) => void;
 };
 
 const NavigationAudioClickButton = withClickAudio('button', clickSound);
-function NavigationPanel (props: NavigationPanelProps) {
-    const { gameId, currentRoom, escapeRoom, move } = props;
-
+function NavigationPanel ({gameId, currentRoom, escapeRoom, roomStatus, move}: NavigationPanelProps) {
     return (
         <div className='navigation-window d-flex flex-column text-center'>
             {currentRoom && escapeRoom && (
@@ -23,6 +22,7 @@ function NavigationPanel (props: NavigationPanelProps) {
                     <Minimap
                         escapeRoom={escapeRoom}
                         currentRoom={currentRoom}
+                        roomStatus={roomStatus}
                     />
                 </div>
             )}

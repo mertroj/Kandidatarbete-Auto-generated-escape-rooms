@@ -34,6 +34,11 @@ export interface Timer {
     elapsedTime: number;
 }
 
+export interface RoomStatus {
+    solved: boolean;
+    unlocked: boolean;
+}
+
 export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
 
 export interface AnagramPuzzle {

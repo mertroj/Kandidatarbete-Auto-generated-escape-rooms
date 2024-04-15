@@ -12,6 +12,7 @@
 .minimap-element-square {
     z-index: 1;
     border-radius: 6px;
+    position: relative;
 }
 
 .minimap-line {
@@ -19,4 +20,26 @@
     height: 8px;
     background-color: rgb(150,150,150);
     position: absolute;
+}
+
+.puzzle-solved-status {
+    width: 30%;
+    height: 30%;
+    background-color: green;
+    border-radius: 999px;
+    margin: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.puzzle-unlocked-status {
+    width: 30%;
+    height: 30%;
+    background-color: blue;
+    border-radius: 999px;
+    margin: 2px;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
