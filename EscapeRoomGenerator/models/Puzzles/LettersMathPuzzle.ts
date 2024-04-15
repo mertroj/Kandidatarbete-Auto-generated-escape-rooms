@@ -47,8 +47,9 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     private init(): [string, string, number, number] {
-        const checkTermsValidity = (remainder: number, firstTerm: number, firstTermsShuffled: number): boolean => {
-            return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
+
+        const checkTermsValidity = (remainder: number, firstTerm: number, firstTermsShuffled: number): boolean =>{
+            return remainder < 100 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
         }
         let answerSlice: string;
         let remainder: number;
@@ -69,20 +70,7 @@ export class LettersMathPuzzle implements Observable, Observer {
         return [question, letters, firstTerm-remainder, firstTerm]
     }
 
-    private getLetters(): string {
-        return LettersMathPuzzle.puzzles[this.id][1]
-    }
 
-    private getMainAnswer(): number {
-        return LettersMathPuzzle.puzzles[this.id][2]
-    }
-    private getPossibleAnswers(): string[] {
-        return LettersMathPuzzle.puzzles[this.id][3]
-    }
-
-    private checkTermsValidity(remainder: number, firstTerm: number, firstTermsShuffled: number): boolean {
-        return remainder <= 0 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
-    }
 
     addObserver(observer: Observer): void {
         this.observers.push(observer);
@@ -137,10 +125,6 @@ export class LettersMathPuzzle implements Observable, Observer {
 
 function mapNumbersToLetters(numbers: string, letters: string): string {
     return numbers.split('').map(num => letters[Number(num)]).join('');
-}
-
-function mapLettersToNumbers(letters: string[], word: string): number {
-    return Number(word.split('').map(letter => letters.indexOf(letter)).join(''));
 }
 
 function hasRepeats (str: string): boolean {

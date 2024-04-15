@@ -14,7 +14,6 @@ export class OperatorMathPuzzle implements Observable, Observer {
     private dependentPuzzles: string[];
     id: string = uuidv4();
     type: string = "operatorMathPuzzle"
-    question: string;
     description: string = "What is the sequence of operators used in the following expression?"
     hints: string[] = [];
     isSolved: boolean = false;

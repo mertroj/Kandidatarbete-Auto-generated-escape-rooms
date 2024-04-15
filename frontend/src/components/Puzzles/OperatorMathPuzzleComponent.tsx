@@ -31,8 +31,7 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
-    let operatorMathPuzzleProps = puzzle;
-    const [numberOfOperands, setNumberOfOperands] = useState<number>(1  );
+    const [numberOfOperands, setNumberOfOperands] = useState<number>(1);
     const [answer, setAnswer] = useState<Array<string>>(Array(numberOfOperands - 1).fill('+'));
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
