@@ -95,6 +95,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <option value="+">+</option>
             <option value="-">-</option>
             <option value="*">*</option>
+            <option value="/">÷</option>
         </select>
     ));
 
