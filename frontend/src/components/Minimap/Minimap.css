@@ -1,0 +1,22 @@
+.minimap-container {
+    display: grid;
+}
+
+.minimap-element {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.minimap-element-square {
+    z-index: 1;
+    border-radius: 6px;
+}
+
+.minimap-line {
+    width: 8px;
+    height: 8px;
+    background-color: rgb(150,150,150);
+    position: absolute;
+}

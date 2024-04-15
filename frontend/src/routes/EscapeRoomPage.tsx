@@ -31,7 +31,6 @@ function EscapeRoomPage() {
             const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
             const blob = await response.blob();
             const objectURL = URL.createObjectURL(blob);
-            console.log(objectURL)
             setBackgroundImageURL(objectURL);
         } catch (error) {
             console.error('Error fetching image:', error);
@@ -167,7 +166,7 @@ function EscapeRoomPage() {
 
             {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
 
-            {!showNotification && escapeRoom && currentRoom && 
+            {!showNotification && escapeRoom && currentRoom && gameId && 
                 <div 
                     style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
                     className="panel-container"
