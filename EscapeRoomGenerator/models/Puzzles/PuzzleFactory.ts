@@ -50,7 +50,7 @@ export class PuzzleFactory{
                     return new MastermindPuzzle(difficulty, dependentPuzzles);
                 }
             ],
-            [1000 - (this.memoryCounter/1000), () =>
+            [10000 - (this.memoryCounter/1000), () =>
                 {
                     this.memoryCounter++;
                     return new MemoryPuzzle(difficulty, dependentPuzzles, theme);

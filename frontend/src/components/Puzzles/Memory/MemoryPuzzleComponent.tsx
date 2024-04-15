@@ -19,7 +19,6 @@ interface HintResponse {
     puzzle: MemoryPuzzle;
 }
 interface CheckMatchResponse {
-    matching?: boolean;
     isSolved: boolean;
     puzzle: MemoryPuzzle;
     unlockedPuzzles: string[];
@@ -33,14 +32,15 @@ interface MemoryPuzzleProps {
 }
 
 function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MemoryPuzzleProps) {
-    console.log(puzzle);
+    const hintDuration = 1000 + (((puzzle.difficulty - 1)/2)) * 1000; //1 second, 1.5 seconds or 2 seconds
     const [updatedPuzzle, setPuzzle] = useState<MemoryPuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isHintLoading, setIsHintLoading] = useState(false);
     const [valueImages, setValueImages] = useState<Array<[number, string]>>([]);
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>) {
-        if (isLoading) {
+        if (isLoading || isHintLoading) {
             return;
         }
 
@@ -57,10 +57,6 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                     correctAudio.play(); 
                     puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsOpen(false);
-                } else if (resp.matching === false) {
-                    incorrectAudio.currentTime = 0;
-                    incorrectAudio.play();
-                    notifyIncorrectAnswer();
                 }
                 setIsLoading(false);
             }, 600);
@@ -83,22 +79,30 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
         }
     }
 
-    async function handleHintRequest(){
+    async function handleHintRequest(e: React.MouseEvent<HTMLButtonElement>){
+        if (isHintLoading || isLoading) {
+            return;
+        }
+
+        e.stopPropagation();
+        setIsHintLoading(true);
         try{
             const response = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
             setPuzzle(response.data.puzzle);
             setTimeout(async () =>{
                 let hintResponse = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
                 setPuzzle(hintResponse.data.puzzle);
-            }, 1000);
+                setIsHintLoading(false);
+            }, hintDuration); //1 second, 1.5 seconds or 2 seconds
         }catch(error: any){
             console.error(error);
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
         fetchImages();
-    }, [updatedPuzzle]);
+    }, []);
 
     if (valueImages.length === 0) return (<div>Loading...</div>);
 
@@ -157,7 +161,7 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                         ))}
                         <Row className="justify-content-md-center">
                             <Col xs="auto">
-                                <HintAudioClickButton variant="primary" className='mt-1' onClick={() => handleHintRequest()}>Get help</HintAudioClickButton>
+                                <HintAudioClickButton variant="primary" disabled={updatedPuzzle.hints === 3} className='mt-1' onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleHintRequest(e)}>{"Get help " + `(${updatedPuzzle.hints}/3)`}</HintAudioClickButton>
                             </Col>
                         </Row>
                     </Row>

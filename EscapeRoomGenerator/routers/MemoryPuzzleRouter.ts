@@ -93,22 +93,12 @@ MemoryPuzzleRouter.get('/checkAnswer', (req: CheckMatchRequest, res: Response) =
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        let matching: boolean | undefined = puzzle.checkMatch();
         let {isSolved, unlockedPuzzles} = puzzle.checkAnswer();
-        if (matching !== undefined) {
-            res.status(200).send({
-                matching: matching,
-                isSolved: isSolved,
-                unlockedPuzzles: unlockedPuzzles,
-                puzzle: puzzle.strip()
-            });
-        } else {
-            res.status(200).send({
-                unlockedPuzzles: unlockedPuzzles,
-                isSolved: isSolved,
-                puzzle: puzzle.strip()
-            });
-        }
+        res.status(200).send({
+            unlockedPuzzles: unlockedPuzzles,
+            isSolved: isSolved,
+            puzzle: puzzle.strip()
+        });
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }

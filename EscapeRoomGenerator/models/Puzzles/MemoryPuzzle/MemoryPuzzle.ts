@@ -21,6 +21,7 @@ export class MemoryPuzzle implements Observer, Observable{
     matchedCells: number; //number of similar symbols in a group to be matched
     cellsMatrix: Cell[][];
     valuesToSymbols: Array<[number, string]>;
+    difficulty: number;
     private currentlyFlipped: number[][] = [];
     private temporarilyFlipped: number[][] = [];
     private rows: number;
@@ -29,6 +30,7 @@ export class MemoryPuzzle implements Observer, Observable{
     private observers: Observer[] = [];
 
     constructor(difficulty: number, dependentPuzzles: string[], theme: Theme){
+        this.difficulty = difficulty;
         this.dependentPuzzles = dependentPuzzles;
         this.matchedCells = Math.max(2, difficulty); //2 for easy and medium, 3 for hard
         this.description = `Pair each group of ${this.matchedCells} symbols with their corresponding location by clicking to flip.`;
@@ -63,6 +65,7 @@ export class MemoryPuzzle implements Observer, Observable{
     }
 
     checkAnswer(): {isSolved: boolean, unlockedPuzzles: string[]}{
+        if (!this.checkMatch()) return {isSolved: false, unlockedPuzzles: []};
         if(this.cellsMatrix.every(row => row.every(cell => cell.isFlipped) && !this.isSolved)){
             this.isSolved = true;
             let unlockedPuzzles = this.notifyObservers();
@@ -164,9 +167,9 @@ export class MemoryPuzzle implements Observer, Observable{
         return MemoryPuzzle.puzzles[puzzleId];
     }
 
-    checkMatch(): boolean | undefined {
+    private checkMatch(): boolean {
         if (this.currentlyFlipped.length !== this.matchedCells) { //Guarantees the we have at least two elements in the currentlyFlipped array
-            return;
+            return false;
         }
     
         let firstFlippedValue = this.cellsMatrix[this.currentlyFlipped[0][0]][this.currentlyFlipped[0][1]].value;
@@ -208,6 +211,7 @@ export class MemoryPuzzle implements Observer, Observable{
             hints: Math.min(3, this.hints), //to solve the toggle caused hintLevel increment
             question: this.question,
             description: this.description,
+            difficulty: this.difficulty,
             cellsMatrix: this.cellsMatrix.map(row => row.map(cell => cell.strip())),
             valuesToSymbols: this.valuesToSymbols
         }

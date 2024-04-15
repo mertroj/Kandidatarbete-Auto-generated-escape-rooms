@@ -51,6 +51,7 @@ export interface MemoryPuzzle {
     isSolved: boolean;
     isLocked: boolean;
     hints: number;
+    difficulty: number;
     question: string;
     description: string;
     cellsMatrix: Cell[][];
