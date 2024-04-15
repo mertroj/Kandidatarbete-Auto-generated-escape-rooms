@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -79,7 +79,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <div>
                 <form action="" onSubmit={handleSubmit}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
-                        {Array.from({ length: puzzle.numberOfOperators }).map((_, index) => (
+                        {Array(puzzle.numberOfOperators).map((_, index) => (
                             <div key={index} style={{margin: '0 10px'}}>
                                 <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
                                     <option value="+">+</option>
