@@ -51,7 +51,7 @@ export interface OperatorsMathPuzzle {
     isSolved: boolean;
     isLocked: boolean;
     hints: string[];
-    numberOfOperands: number;
+    numberOfOperators: number;
 
     question: string;
     description: string;

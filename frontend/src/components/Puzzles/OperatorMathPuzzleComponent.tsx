@@ -31,8 +31,7 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
-    const [numberOfOperands, setNumberOfOperands] = useState<number>(1);
-    const [answer, setAnswer] = useState<Array<string>>(Array(numberOfOperands - 1).fill('+'));
+    const [answer, setAnswer] = useState<Array<string>>(Array(puzzle.numberOfOperators).fill('+'));
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -67,22 +66,6 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
         }
     }
 
-
-    useEffect(() => {
-        async function fetchOperandAmount() {
-            try {
-                const response = await axios.get(`http://localhost:8080/operatorMathPuzzles/info?puzzleId=${puzzle.id}`);
-                // console.log('Server response:', response.data); // Add this line
-                setNumberOfOperands(response.data.numberOfOperands);
-                setAnswer(Array(response.data.numberOfOperands - 1).fill('+'));
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        fetchOperandAmount();
-    }, [puzzle.id]);
-
     const handleSelectChange = (index: number, value: string) => {
         setAnswer(prevAnswer => {
             const newAnswer = [...prevAnswer];
@@ -90,7 +73,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             return newAnswer;
         });
     };
-    const dropdowns = Array.from({ length: numberOfOperands - 1 }).map((_, index) => (
+    const dropdowns = Array.from({ length: puzzle.numberOfOperators }).map((_, index) => (
         <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
             <option value="+">+</option>
             <option value="-">-</option>

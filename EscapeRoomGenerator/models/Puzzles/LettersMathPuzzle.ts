@@ -57,7 +57,7 @@ export class LettersMathPuzzle implements Observable, Observer {
         let letters: string = shuffleArray<string>((allLetters).split('')).join('');
         do {
             firstTerm = randomIntRange(101, 1000);
-            answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same four digits as the answer.
+            answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same three digits as the answer.
             remainder = firstTerm - Number(answerSlice);
         } while(!checkTermsValidity(remainder, firstTerm, Number(answerSlice))); //valid if shuffled number is less than the answer
         
