@@ -75,21 +75,15 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
-            <div>
-                <form action="">
-                    <div style={{display: 'flex', justifyContent: 'center'}}>
-                        {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
-                            <div key={index} style={{margin: `0 ${Math.floor(10/puzzle.difficulty)}px`}}> 
-                                <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
-                                    <option value="+">+</option>
-                                    <option value="-">-</option>
-                                    <option value="*">×</option>
-                                    <option value="/">÷</option>
-                                </select>
-                            </div>
-                        ))}
-                    </div>
-                </form>
+            <div className='w-100 d-flex justify-content-around'>
+                {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
+                    <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="*">×</option>
+                        <option value="/">÷</option>
+                    </select>
+                ))}
             </div>
             <div>
                 <button className='w-100' style={{marginTop: '20px'}} onClick={() => handleSubmit()}>Test answer</button>
