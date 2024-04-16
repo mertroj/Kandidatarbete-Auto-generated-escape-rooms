@@ -33,8 +33,7 @@ interface HintI {
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
     const [answer, setAnswer] = useState<string[]>(Array(puzzle.numberOfOperators).fill('+'));
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    async function handleSubmit() {
         try{
             const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {
                 answer: answer.join(''), // join the elements of the answer array into a string
@@ -77,7 +76,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div>
-                <form action="" onSubmit={handleSubmit}>
+                <form action="">
                     <div style={{display: 'flex', justifyContent: 'center'}}>
                         {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
                             <div key={index} style={{margin: `0 ${Math.floor(10/puzzle.difficulty)}px`}}> 
@@ -93,7 +92,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
                 </form>
             </div>
             <div>
-                <button className='w-100' style={{marginTop: '20px'}} onClick={(e) => handleSubmit(e as any)}>Test answer</button>
+                <button className='w-100' style={{marginTop: '20px'}} onClick={() => handleSubmit()}>Test answer</button>
                 <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
                 </HintAudioClickButton>
