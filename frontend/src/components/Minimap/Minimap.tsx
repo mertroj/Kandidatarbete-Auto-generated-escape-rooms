@@ -24,15 +24,6 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
     let room: Room;
     let key: string;
     let color: string;
-
-    useEffect(() => {
-        const elements = document.querySelectorAll('.puzzle-unlocked-status');
-        elements.forEach((element) => {
-            element.classList.remove('puzzle-unlocked-status');
-            void element.clientWidth; 
-            element.classList.add('puzzle-unlocked-status');
-        });
-    }, [roomStatus]);
     
     for (let y = maxY; y >= minY; y--) {
         for (let x = minX; x <= maxX; x++) {
@@ -43,14 +34,14 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
                 continue
             }
             room = escapeRoom.rooms[roomI];
-            color = currentRoom.id === room.id ? "blue" : "rgb(150,150,150)"
+            color = currentRoom.id === room.id ? "red" : "rgb(150,150,150)"
             nodes.push(<div key={key} className='minimap-element'>
                 <div 
                     className='minimap-element-square w-75 h-75 m-auto'
                     style={{backgroundColor: color}}
                 >
-                    {roomStatus[roomI].solved   && <div className='puzzle-solved-status'  ></div>}
-                    {roomStatus[roomI].unlocked && <div className='puzzle-unlocked-status'></div>}
+                    {roomStatus[roomI].solved   && <div className='puzzle-solved-status   blinking'></div>}
+                    {roomStatus[roomI].unlocked && <div className='puzzle-unlocked-status blinking'></div>}
                 </div>
                 {room.left  !== -1 && <div className='minimap-line' style={{left: 0}}  ></div>}
                 {room.right !== -1 && <div className='minimap-line' style={{right: 0}} ></div>}
@@ -59,6 +50,14 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
             </div>)
         }
     }
+
+    useEffect(() => {
+        document.querySelectorAll('.blinking').forEach((element) => {
+            element.classList.remove('blinking');
+            void element.clientWidth;
+            element.classList.add('blinking');
+        });
+    }, [roomStatus]);
 
     return (
         <div 
