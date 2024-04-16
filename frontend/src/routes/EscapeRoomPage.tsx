@@ -3,7 +3,7 @@ import {Button, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HintingComponent from "../components/Hinting/hinting";
-import { EscapeRoom, JigsawPuzzle, Puzzle, Room } from "../interfaces";
+import { EscapeRoom, JigsawPuzzle, Puzzle, Room, RoomStatus } from "../interfaces";
 import PopupComponent from "../components/PopupComponent/Popup";
 import RoomComponent from "../components/RoomComponent/RoomComponent";
 import JigsawComponent from "../components/Puzzles/JigsawPuzzleComponent";
@@ -23,6 +23,7 @@ function EscapeRoomPage() {
     const [showEndPuzzle, setShowEndPuzzle] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
     const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: FeedbackMessages, bgCol:string}>>([]);
+    const [roomStatus, setRoomStatus] = useState<RoomStatus[]>([]);
     let feedbackId = 0;
 
     // Fetch
@@ -31,7 +32,6 @@ function EscapeRoomPage() {
             const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
             const blob = await response.blob();
             const objectURL = URL.createObjectURL(blob);
-            console.log(objectURL)
             setBackgroundImageURL(objectURL);
         } catch (error) {
             console.error('Error fetching image:', error);
@@ -42,6 +42,9 @@ function EscapeRoomPage() {
             let er = response.data;
             setEscapeRoom(er);
 
+            let initRoomStatus: RoomStatus[] = [];
+            er.rooms.forEach((r) => initRoomStatus.push({solved: false, unlocked:false}));
+            setRoomStatus(initRoomStatus);
         }).catch((error) => {
             console.error(error);
             navigate('/');
@@ -50,8 +53,11 @@ function EscapeRoomPage() {
 
     // Getters
     function getPuzzle(puzzleId: string): Puzzle | undefined {
-        let room = escapeRoom?.rooms.find((room) => room.puzzles.find((puzzle) => puzzle.id === puzzleId))
-        return room?.puzzles.find((puzzle) => puzzle.id === puzzleId)
+        let room = escapeRoom?.rooms.find((room) => room.puzzles.find((puzzle) => puzzle.id === puzzleId));
+        return room?.puzzles.find((puzzle) => puzzle.id === puzzleId);
+    }
+    function getRoomIndex(puzzleId: string): number | undefined {
+        return escapeRoom?.rooms.findIndex((room) => room.puzzles.find((puzzle) => puzzle.id === puzzleId));
     }
 
     // notifiers
@@ -84,20 +90,37 @@ function EscapeRoomPage() {
     }
 
     // Larger functions
-    function puzzleSolved(puzzleId: string, unlockedPuzzles: string[]): void {
+    function solvePuzzle(puzzleId: string) {
         let solvedPuzzle = getPuzzle(puzzleId);
-        if (!solvedPuzzle) return;
-        solvedPuzzle.isSolved = true;
-        notifySolvedPuzzle(puzzleId);
+        let roomI = getRoomIndex(puzzleId);
 
+        if (!solvedPuzzle || roomI === undefined || roomI === -1) return;
+
+        solvedPuzzle.isSolved = true;
+        roomStatus[roomI].solved = true;
+
+        setRoomStatus([...roomStatus]);
+        notifySolvedPuzzle(puzzleId);
+    }
+    function unlockPuzzles(unlockedPuzzles: string[]) {
         let puzzle: Puzzle | undefined;
+        let roomI: number | undefined;
         unlockedPuzzles.forEach((puzzleId) => {
             puzzle = getPuzzle(puzzleId);
-            if (!puzzle) return;
+            roomI = getRoomIndex(puzzleId);
+
+            if (!puzzle || roomI === undefined || roomI === -1) return;
+
             puzzle.isLocked = false;
+            roomStatus[roomI].unlocked = true;
+
+            setRoomStatus([...roomStatus]);
             notifyUnlockedPuzzle(puzzleId)
         })
-
+    }
+    function puzzleSolved(puzzleId: string, unlockedPuzzles: string[]): void {
+        solvePuzzle(puzzleId);
+        unlockPuzzles(unlockedPuzzles);
         update();
     }    
     function getEndPuzzleComponent() {
@@ -120,9 +143,12 @@ function EscapeRoomPage() {
     }, [gameId]);
 
     useEffect(() => {
-        if (escapeRoom)
+        if (escapeRoom) {
             setCurrentRoom(escapeRoom.rooms[currentRoomIdx]);
-
+            roomStatus[currentRoomIdx].solved = false;
+            roomStatus[currentRoomIdx].unlocked = false;
+            setRoomStatus([...roomStatus]);
+        }
         if (checkEscapeRoomDone() && escapeRoom) {
             //navigate(resultScreenUrl);
             setShowEndPuzzle(true);
@@ -167,7 +193,7 @@ function EscapeRoomPage() {
 
             {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
 
-            {!showNotification && escapeRoom && currentRoom && 
+            {!showNotification && escapeRoom && currentRoom && gameId && 
                 <div 
                     style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
                     className="panel-container"
@@ -180,6 +206,7 @@ function EscapeRoomPage() {
                         gameId={gameId}
                         currentRoom={currentRoom}
                         escapeRoom={escapeRoom}
+                        roomStatus={roomStatus}
                         move={move}
                     />
                 </div>

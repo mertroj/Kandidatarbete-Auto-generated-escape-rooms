@@ -36,6 +36,7 @@ export class Room {
     strip() {
         return {
             id: this.id,
+            pos: [this.x, this.y],
             left: this.left,
             right: this.right,
             up: this.up,
