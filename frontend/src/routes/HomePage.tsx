@@ -17,8 +17,9 @@ function HomePage() {
     const handleExclusionChange = (selectedOptions: readonly OptionType[], actionMeta: ActionMeta<OptionType>) => {
         if (selectedOptions.length > exclusionLimit) {
             return;
+        } else {
+            setSelectedExclusions(selectedOptions);
         }
-        setSelectedExclusions(selectedOptions);
     };
     const exclusionOptions = [
         { value: 'slidePuzzle', label: 'Slide' },
@@ -132,20 +133,18 @@ function HomePage() {
                         isSearchable={false}
                         styles={selectStyle}
                     />
-                    <span>
-                        <Select 
-                            name='exclusions'
-                            id='exclusions'
-                            isMulti
-                            isSearchable={false}
-                            options={exclusionOptions}
-                            value={selectedExclusions}
-                            onChange={handleExclusionChange}
-                            placeholder='Excluded puzzle types'
-                            styles={selectStyle}
-                        />
-                        {<p>({selectedExclusions.length} / {exclusionLimit})</p>}
-                    </span>
+                    
+                    <Select 
+                        name='exclusions'
+                        id='exclusions'
+                        isMulti
+                        isSearchable={false}
+                        options={exclusionOptions}
+                        value={selectedExclusions}
+                        onChange={handleExclusionChange}
+                        placeholder='Excluded puzzle types'
+                        styles={selectStyle}
+                    />
                 </div>
                 <NavigationAudioClickButton className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</NavigationAudioClickButton>
             </form>
