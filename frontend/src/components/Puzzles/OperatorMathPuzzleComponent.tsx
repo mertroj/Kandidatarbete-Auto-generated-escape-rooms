@@ -79,12 +79,12 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <div>
                 <form action="" onSubmit={handleSubmit}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
-                        {Array(puzzle.numberOfOperators).map((_, index) => (
+                        {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
                             <div key={index} style={{margin: '0 10px'}}>
                                 <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
                                     <option value="+">+</option>
                                     <option value="-">-</option>
-                                    <option value="*">×</option>
+                                    <option value="*">x</option>
                                     <option value="/">÷</option>
                                 </select>
                             </div>
