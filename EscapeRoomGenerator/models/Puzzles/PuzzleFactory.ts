@@ -11,6 +11,17 @@ import { Theme } from "../Theme";
 
 export class PuzzleFactory{
     private puzzleInitializers: {[key: string]: (difficulty: number, dependentPuzzles: string[], theme: Theme) => Puzzle};
+    private puzzleTypeMap: {    
+        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw]
+    } = {
+        'anagram': [60, Anagram],
+        'lettersMathPuzzle': [40, LettersMathPuzzle],
+        'operatorMathPuzzle': [40, OperatorMathPuzzle],
+        'slidePuzzle': [100, SlidePuzzle],
+        'mastermindPuzzle': [100, MastermindPuzzle],
+        'memoryPuzzle': [100, MemoryPuzzle],
+        'jigsawPuzzle': [100, Jigsaw]
+    };
     
     constructor(excludedPuzzleTypes: string[]){
         //TODO: do the same for converging and end puzzles when more types are available
@@ -21,16 +32,18 @@ export class PuzzleFactory{
             'slidePuzzle': (difficulty, dependentPuzzles) => new SlidePuzzle(difficulty, dependentPuzzles),
             'mastermindPuzzle': (difficulty, dependentPuzzles) => new MastermindPuzzle(difficulty, dependentPuzzles),
             'memoryPuzzle': (difficulty, dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme),
-          };
+        };
       
-          excludedPuzzleTypes.forEach(puzzleType => {
+        excludedPuzzleTypes.forEach(puzzleType => {
             delete this.puzzleInitializers[puzzleType];
-          });
+            delete this.puzzleTypeMap[puzzleType];
+        });
     }
 
     createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
         const puzzleFrequencies = Object.entries(this.puzzleInitializers).map(([puzzleType, initializer]) => {
-            return [100 - this.getFrequency(puzzleType), () => initializer(difficulty, dependentPuzzles, theme)] as [number, () => Puzzle];
+            let [granularity, Puzzle] = this.puzzleTypeMap[puzzleType];
+            return [granularity - Puzzle.objectCounter, () => initializer(difficulty, dependentPuzzles, theme)] as [number, () => Puzzle];
         });
     
         return frequencies<() => Puzzle>(puzzleFrequencies)();
@@ -45,24 +58,5 @@ export class PuzzleFactory{
         return frequencies<() => Puzzle>([
             [1, () => new Jigsaw(difficulty, dependentPuzzles)]
         ])();
-    }
-
-    private getFrequency(puzzleType: string): number{
-        switch(puzzleType){
-            case 'anagram':
-                return Anagram.objectCounter;
-            case 'lettersMathPuzzle':
-                return LettersMathPuzzle.objectCounter;
-            case 'operatorMathPuzzle':
-                return OperatorMathPuzzle.objectCounter;
-            case 'slidePuzzle':
-                return SlidePuzzle.objectCounter;
-            case 'mastermindPuzzle':
-                return MastermindPuzzle.objectCounter;
-            case 'memoryPuzzle':
-                return MemoryPuzzle.objectCounter;
-            default:
-                throw new Error(`Unknown puzzle type: ${puzzleType}`);
-        }
     }
 }

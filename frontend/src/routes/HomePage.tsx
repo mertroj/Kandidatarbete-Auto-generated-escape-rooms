@@ -2,13 +2,24 @@ import { Row } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import axios from 'axios';
-import Select from 'react-select';
+import Select, { ActionMeta } from 'react-select';
 import clickSound from '../assets/sounds/navigation-click.wav';
 import withClickAudio from '../components/withClickAudioComponent';
 const NavigationAudioClickButton = withClickAudio('button', clickSound);
 
+type OptionType = { value: string; label: string; };
+
 function HomePage() {
     const [gameCode, setGameCode] = useState('');
+    const [selectedExclusions, setSelectedExclusions] = useState<readonly OptionType[]>([]);
+    const exclusionLimit = 2;
+
+    const handleExclusionChange = (selectedOptions: readonly OptionType[], actionMeta: ActionMeta<OptionType>) => {
+        if (selectedOptions.length > exclusionLimit) {
+            return;
+        }
+        setSelectedExclusions(selectedOptions);
+    };
     const exclusionOptions = [
         { value: 'slidePuzzle', label: 'Slide' },
         { value: 'memoryPuzzle', label: 'Memory' },
@@ -121,15 +132,20 @@ function HomePage() {
                         isSearchable={false}
                         styles={selectStyle}
                     />
-                    <Select 
-                        name='exclusions'
-                        id='exclusions'
-                        isMulti
-                        isSearchable={false}
-                        options={exclusionOptions}
-                        placeholder='Excluded puzzle types'
-                        styles={selectStyle}
-                    />
+                    <span>
+                        <Select 
+                            name='exclusions'
+                            id='exclusions'
+                            isMulti
+                            isSearchable={false}
+                            options={exclusionOptions}
+                            value={selectedExclusions}
+                            onChange={handleExclusionChange}
+                            placeholder='Excluded puzzle types'
+                            styles={selectStyle}
+                        />
+                        {<p>({selectedExclusions.length} / {exclusionLimit})</p>}
+                    </span>
                 </div>
                 <NavigationAudioClickButton className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</NavigationAudioClickButton>
             </form>

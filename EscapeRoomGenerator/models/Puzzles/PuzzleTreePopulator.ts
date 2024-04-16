@@ -3,9 +3,6 @@ import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 import { Theme } from "../Theme";
-import { get } from "http";
-import { Anagram } from "./Anagram";
-
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
 //TODO: check the new Anagram and MathPuzzle and adjust the factory accordingl

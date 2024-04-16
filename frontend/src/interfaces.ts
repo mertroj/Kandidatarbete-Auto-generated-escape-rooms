@@ -39,7 +39,7 @@ export interface RoomStatus {
     unlocked: boolean;
 }
 
-export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
 
 export interface AnagramPuzzle {
     id: string;
