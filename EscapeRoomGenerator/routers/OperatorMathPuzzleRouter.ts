@@ -14,7 +14,7 @@ OperatorMathPuzzleRouter.get("/info", async (req: Request, res: Response) => {
         res.status(404).send("The puzzleId parameter is invalid")
         return
     }
-    res.send(puzzle);
+    res.send(puzzle.strip());
 });
 
 OperatorMathPuzzleRouter.post("/checkAnswer", async (req: Request, res: Response) => {

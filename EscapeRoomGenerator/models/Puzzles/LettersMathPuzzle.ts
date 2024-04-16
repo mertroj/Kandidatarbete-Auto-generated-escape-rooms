@@ -9,7 +9,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     private static puzzles: {[key: string]: LettersMathPuzzle} = {}
     static type = 'lettersMathPuzzle';
     static objectCounter: number = 0;
-    
+
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
@@ -19,7 +19,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hints: string[] = [];
     isSolved: boolean = false;
-    estimatedTime: number = 3; //Average based on tests
+    estimatedTime: number = 7; //Average based on tests
     isLocked: boolean = false;
 
     letters: string;
@@ -49,16 +49,18 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     private init(): [string, string, number, number] {
-        const checkTermsValidity = (remainder: number, firstTerm: number, firstTermsShuffled: number): boolean => {
-            return remainder <= 0 || firstTermsShuffled < 1000 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
+
+        const checkTermsValidity = (remainder: number, firstTerm: number, firstTermsShuffled: number): boolean =>{
+            return remainder < 100 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || 
+                    hasRepeats(firstTermsShuffled.toString()) || remainder.toString().includes('0') ? false : true;
         }
         let answerSlice: string;
         let remainder: number;
         let firstTerm: number;
         let letters: string = shuffleArray<string>((allLetters).split('')).join('');
         do {
-            firstTerm = randomIntRange(1001, 10000);
-            answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same four digits as the answer.
+            firstTerm = randomIntRange(101, 1000);
+            answerSlice = shuffleArray(firstTerm.toString().split("")).join(""); //shuffle the same three digits as the answer.
             remainder = firstTerm - Number(answerSlice);
         } while(!checkTermsValidity(remainder, firstTerm, Number(answerSlice))); //valid if shuffled number is less than the answer
         
@@ -70,6 +72,8 @@ export class LettersMathPuzzle implements Observable, Observer {
         let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`
         return [question, letters, firstTerm-remainder, firstTerm]
     }
+
+
     increaseCounter(){
         LettersMathPuzzle.objectCounter++;
     }
@@ -89,7 +93,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     getHint(): string{
-        if (this.hints.length === 4) 
+        if (this.hints.length === 3)
             return 'No more hints.';
 
         const number: string = this.mainAnswer.toString()[this.hints.length];
@@ -106,7 +110,7 @@ export class LettersMathPuzzle implements Observable, Observer {
             this.isSolved = result;
             let unlockedPuzzles = this.notifyObservers();
             return {result, unlockedPuzzles}
-        } 
+        }
         return {result, unlockedPuzzles: []};
     }
 
@@ -126,10 +130,6 @@ export class LettersMathPuzzle implements Observable, Observer {
 
 function mapNumbersToLetters(numbers: string, letters: string): string {
     return numbers.split('').map(num => letters[Number(num)]).join('');
-}
-
-function mapLettersToNumbers(letters: string[], word: string): number {
-    return Number(word.split('').map(letter => letters.indexOf(letter)).join(''));
 }
 
 function hasRepeats (str: string): boolean {
@@ -167,7 +167,7 @@ function generateAllMappings(original: string, shuffled: string, remainder: numb
 
     // Filter out permutations that do not satisfy the given helping digit
     allPermutations = allPermutations.filter(
-        permutation => 
+        permutation =>
         permutation[permutation.length-1] === givenDigit &&
         mapNumbersToLetters(permutation[permutation.length-1].toString(), letters) === givenLetter
     );

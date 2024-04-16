@@ -1,0 +1,56 @@
+.minimap-container {
+    display: grid;
+}
+
+.minimap-element {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.minimap-element-square {
+    z-index: 1;
+    border-radius: 6px;
+    position: relative;
+}
+
+.minimap-line {
+    width: 8px;
+    height: 8px;
+    background-color: rgb(150,150,150);
+    position: absolute;
+}
+
+.puzzle-solved-status {
+    width: 30%;
+    height: 30%;
+    background-color: green;
+    border-radius: 999px;
+    margin: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: blink 1s infinite;
+}
+
+.puzzle-unlocked-status {
+    width: 30%;
+    height: 30%;
+    background-color: blue;
+    border-radius: 999px;
+    margin: 2px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.blinking{
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
