@@ -80,7 +80,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
                 <form action="" onSubmit={handleSubmit}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
                         {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
-                            <div key={index} style={{margin: '0 10px'}}>
+                            <div key={index} style={{margin: `0 ${Math.floor(10/puzzle.difficulty)}px`}}> 
                                 <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
                                     <option value="+">+</option>
                                     <option value="-">-</option>
@@ -90,8 +90,10 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
                             </div>
                         ))}
                     </div>
-                    <button className='w-100' type='submit' style={{marginTop: '20px'}}>Test answer</button>
                 </form>
+            </div>
+            <div>
+                <button className='w-100' style={{marginTop: '20px'}} onClick={(e) => handleSubmit(e as any)}>Test answer</button>
                 <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
                 </HintAudioClickButton>

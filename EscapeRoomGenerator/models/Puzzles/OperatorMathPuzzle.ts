@@ -18,11 +18,13 @@ export class OperatorMathPuzzle implements Observable, Observer {
     isLocked: boolean;
     
     numberOfOperands: number;
+    private difficulty: number;
     private numbers: number[];
     private operators: string;
     private answer: number;
 
     constructor(difficulty: number, dependentPuzzles: string[]) {
+        this.difficulty = difficulty;
         this.dependentPuzzles = dependentPuzzles;
         this.isLocked = this.dependentPuzzles.length > 0
         this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard
@@ -114,6 +116,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
             isLocked: this.isLocked,
             hints: this.hints,
             numberOfOperators: this.numberOfOperands-1,
+            difficulty: this.difficulty,
 
             question: this.formulateQuestion(),
             description: this.description,

@@ -49,7 +49,8 @@ export class LettersMathPuzzle implements Observable, Observer {
     private init(): [string, string, number, number] {
 
         const checkTermsValidity = (remainder: number, firstTerm: number, firstTermsShuffled: number): boolean =>{
-            return remainder < 100 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || hasRepeats(firstTermsShuffled.toString()) ? false : true;
+            return remainder < 100 || firstTermsShuffled < 100 || hasRepeats(firstTerm.toString()) || 
+                    hasRepeats(firstTermsShuffled.toString()) || remainder.toString().includes('0') ? false : true;
         }
         let answerSlice: string;
         let remainder: number;
