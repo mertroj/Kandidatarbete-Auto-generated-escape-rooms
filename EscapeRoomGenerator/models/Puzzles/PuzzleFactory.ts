@@ -23,13 +23,13 @@ export class PuzzleFactory{
                     return new Anagram(difficulty, dependentPuzzles);
                 }
             ],            
-            [1000 - (this.lettersCounter/1000), () =>
+            [500 - (this.lettersCounter/500), () =>
                 {
                     this.lettersCounter++;
                     return new LettersMathPuzzle(dependentPuzzles);
                 }
             ],
-            [1000 - (this.operatorCounter/1000), () =>
+            [400 - (this.operatorCounter/400), () =>
                 {
                     this.operatorCounter++;
                     return new OperatorMathPuzzle(difficulty, dependentPuzzles);

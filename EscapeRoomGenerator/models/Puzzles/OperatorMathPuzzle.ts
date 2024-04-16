@@ -16,8 +16,8 @@ export class OperatorMathPuzzle implements Observable, Observer {
     isSolved: boolean = false;
     estimatedTime: number;
     isLocked: boolean;
-
-    private numberOfOperands: number;
+    
+    numberOfOperands: number;
     private numbers: number[];
     private operators: string;
     private answer: number;
@@ -30,6 +30,8 @@ export class OperatorMathPuzzle implements Observable, Observer {
         this.numbers = repeat(this.numberOfOperands, () => randomIntRange(1, 11))
         this.operators = repeat(this.numberOfOperands-1, () => choice(['+', '-', '*'])).join('')
         this.answer = this.calcAnswer();
+        while (this.operators.includes('*'))
+            this.operators = this.operators.replace('*', '×');
         OperatorMathPuzzle.puzzles[this.id] = this;
     }
 
@@ -78,14 +80,14 @@ export class OperatorMathPuzzle implements Observable, Observer {
         if (this.hints.length === this.numberOfOperands-1)
             return {hint: 'No more hints.', question: this.formulateQuestion()}
 
-        let hint = 'The next operation is ' + this.operators[this.hints.length];
+        let hint = `The ${this.hints.length === 0 ? 'first':'next'} operator is ${this.operators[this.hints.length]}`;
 
         this.hints.push(hint)
         return {hint, question: this.formulateQuestion()}
     }
 
     checkAnswer(answer: string): {result: boolean, unlockedPuzzles: string[]} {
-        if (answer.length !== this.operators.length) 
+        if (answer.length !== this.operators.length)
             return {result: false, unlockedPuzzles: []};
 
         let expression: string = this.numbers[0].toString();
@@ -95,12 +97,12 @@ export class OperatorMathPuzzle implements Observable, Observer {
         }
         let answerRes = eval(expression) as number
         let result: boolean = answerRes === this.answer;
-        
+
         if (result && !this.isSolved) {
             this.isSolved = result;
             let unlockedPuzzles = this.notifyObservers();
             return {result, unlockedPuzzles};
-        } 
+        }
         return {result, unlockedPuzzles: []};
     }
 
@@ -111,6 +113,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
             isSolved: this.isSolved,
             isLocked: this.isLocked,
             hints: this.hints,
+            numberOfOperators: this.numberOfOperands-1,
 
             question: this.formulateQuestion(),
             description: this.description,

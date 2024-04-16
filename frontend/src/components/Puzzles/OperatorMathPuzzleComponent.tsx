@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -31,12 +31,14 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
-    const [answer, setAnswer] = useState<string>();
+    const [answer, setAnswer] = useState<string[]>(Array(puzzle.numberOfOperators).fill('+'));
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    async function handleSubmit() {
         try{
-            const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {answer, puzzleId: puzzle.id});
+            const response = await axios.post<GuessResponse>(`http://localhost:8080/operatorMathPuzzles/checkAnswer`, {
+                answer: answer.join(''), // join the elements of the answer array into a string
+                puzzleId: puzzle.id
+            });
             let resp = response.data;
             if(resp.result){
                 correctAudio.play();
@@ -50,7 +52,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             console.error(error);
         }
     }
-    
+
     async function getHint() {
         try{
             const response = await axios.get<HintI>(`http://localhost:8080/operatorMathPuzzles/hint/?puzzleId=${puzzle.id}`);
@@ -63,22 +65,33 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
         }
     }
 
+    const handleSelectChange = (index: number, value: string) => {
+        answer[index] = value;
+        setAnswer([...answer]);
+    };
+
     return (
         <div className='puzzle-card'>
             <p className='puzzle-number'>#{i}</p>
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
+            <div className='w-100 d-flex justify-content-around'>
+                {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
+                    <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="*">×</option>
+                        <option value="/">÷</option>
+                    </select>
+                ))}
+            </div>
             <div>
-                <form action="" onSubmit={handleSubmit}>
-                    <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
-                    <button className='w-100' type='submit'>Test answer</button>
-                </form>
+                <button className='w-100' style={{marginTop: '20px'}} onClick={() => handleSubmit()}>Test answer</button>
                 <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
                     Get a hint
                 </HintAudioClickButton>
             </div>
         </div>
-        
     );
 }
 
