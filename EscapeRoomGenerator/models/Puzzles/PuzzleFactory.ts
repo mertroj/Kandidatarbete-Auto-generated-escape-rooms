@@ -38,8 +38,6 @@ export class PuzzleFactory{
             delete this.puzzleInitializers[puzzleType];
             delete this.puzzleTypeMap[puzzleType];
         });
-
-        console.log(excludedPuzzleTypes);
     }
 
     createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
