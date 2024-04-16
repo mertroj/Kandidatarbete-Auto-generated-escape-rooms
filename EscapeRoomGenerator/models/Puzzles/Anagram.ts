@@ -6,12 +6,14 @@ const anagramsData = require('../../anagrams.json')
 
 export class Anagram implements Observable, Observer {
     private static puzzles: {[key: string]: Anagram} = {}
+    static type = 'anagram';
+    static objectCounter: number = 0;
 
     private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
     private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
 
     id: string = uuidv4();
-    type: string = 'anagram';
+    type: string = Anagram.type;
     question: string;
     description: string = 'Find the hidden word';
     hints: string[] = [];
@@ -33,7 +35,9 @@ export class Anagram implements Observable, Observer {
     private getAnswers(): string {
         return anagramsData[`${this.question.length}`].find((a: string[]) => a[0] === this.question)[1]
     }
-
+    increaseCounter(): void {
+        Anagram.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }

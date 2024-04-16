@@ -7,12 +7,14 @@ const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Observable, Observer {
     private static puzzles: {[key: string]: LettersMathPuzzle} = {}
+    static type = 'lettersMathPuzzle';
+    static objectCounter: number = 0;
     
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "lettersMathPuzzle";
+    type: string = LettersMathPuzzle.type;
     question: string;
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hints: string[] = [];
@@ -68,7 +70,9 @@ export class LettersMathPuzzle implements Observable, Observer {
         let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`
         return [question, letters, firstTerm-remainder, firstTerm]
     }
-
+    increaseCounter(){
+        LettersMathPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }

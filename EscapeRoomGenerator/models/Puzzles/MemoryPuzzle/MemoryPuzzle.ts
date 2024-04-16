@@ -9,9 +9,11 @@ const imagesData = require('../../../themedImages.json');
 
 export class MemoryPuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: MemoryPuzzle} = {}
+    static type = "memoryPuzzle";
+    static objectCounter: number = 0;
 
     id: string = uuidv4();
-    type: string = "memoryPuzzle";
+    type: string = MemoryPuzzle.type;
     question: string = "Can you memorize in which places each group of symbols is located?";
     description: string;
     isSolved: boolean = false;
@@ -48,6 +50,9 @@ export class MemoryPuzzle implements Observer, Observable{
         this.cellsMatrix = this.initCells();
         this.valuesToSymbols = this.assignSymbols(theme);
         MemoryPuzzle.puzzles[this.id] = this;
+    }
+    increaseCounter(): void {
+        MemoryPuzzle.objectCounter++;
     }
     addObserver(observer: Observer): void {
         this.observers.push(observer);

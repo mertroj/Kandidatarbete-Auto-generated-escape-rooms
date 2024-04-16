@@ -5,12 +5,14 @@ import { Observable, Observer } from './ObserverPattern';
 
 export class OperatorMathPuzzle implements Observable, Observer {
     private static puzzles: {[key:string]: OperatorMathPuzzle} = {}
+    static type = 'operatorMathPuzzle';
+    static objectCounter: number = 0;
     
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "operatorMathPuzzle"
+    type: string = OperatorMathPuzzle.type;
     description: string = "What is the sequence of operators used in the following expression?"
     hints: string[] = [];
     isSolved: boolean = false;
@@ -36,7 +38,9 @@ export class OperatorMathPuzzle implements Observable, Observer {
     static get(puzzleId: string): OperatorMathPuzzle {
         return OperatorMathPuzzle.puzzles[puzzleId]
     }
-
+    increaseCounter(): void {
+        OperatorMathPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }

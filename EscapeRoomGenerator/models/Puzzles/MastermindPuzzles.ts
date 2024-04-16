@@ -7,12 +7,14 @@ export class MastermindPuzzle implements Observable, Observer {
     private static possibleHints: string[] = ['After each guess some numbers change colours, maybe that means something', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
                             'The solution is: '];
+    static type = 'mastermindPuzzle';
+    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = 'mastermindPuzzle';
+    type: string = MastermindPuzzle.type;
     question: string;
     hints: string[] = [];
     isSolved: boolean = false;
@@ -35,7 +37,9 @@ export class MastermindPuzzle implements Observable, Observer {
     static get(puzzleId: string): MastermindPuzzle {
         return MastermindPuzzle.puzzles[puzzleId];
     }
-
+    increaseCounter(): void {
+        MastermindPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }

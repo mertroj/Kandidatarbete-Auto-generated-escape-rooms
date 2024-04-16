@@ -6,12 +6,14 @@ import { Observable, Observer } from '../ObserverPattern';
 
 export class SlidePuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
+    static type = "slidePuzzle";
+    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "slidePuzzle";
+    type: string = SlidePuzzle.type;
     question: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
     description: string = "The last squares are the ones to be empty, the rest should be in order";
     isSolved: boolean = false;
@@ -40,7 +42,9 @@ export class SlidePuzzle implements Observer, Observable{
     static get(puzzleId: string): SlidePuzzle {
         return SlidePuzzle.puzzles[puzzleId];
     }
-
+    increaseCounter(): void {
+        SlidePuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void{
         this.observers.push(observer);
     }

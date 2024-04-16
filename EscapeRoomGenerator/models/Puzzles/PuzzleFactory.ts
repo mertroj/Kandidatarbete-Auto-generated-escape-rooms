@@ -10,62 +10,59 @@ import { MemoryPuzzle } from "./MemoryPuzzle/MemoryPuzzle";
 import { Theme } from "../Theme";
 
 export class PuzzleFactory{
-    private static anagramCounter = 0;
-    private static lettersCounter = 0;
-    private static operatorCounter = 0;
-    private static slideCounter = 0;
-    private static mastermindCounter = 0;
-    private static memoryCounter = 0;
-
-    //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
-    static createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
-        return frequencies<() => Puzzle>([
-            [1000 - (this.anagramCounter/1000), () =>
-                {
-                    this.anagramCounter++;
-                    return new Anagram(difficulty, dependentPuzzles);
-                }
-            ],            
-            [1000 - (this.lettersCounter/1000), () =>
-                {
-                    this.lettersCounter++;
-                    return new LettersMathPuzzle(dependentPuzzles);
-                }
-            ],
-            [1000 - (this.operatorCounter/1000), () =>
-                {
-                    this.operatorCounter++;
-                    return new OperatorMathPuzzle(difficulty, dependentPuzzles);
-                }
-            ],
-            [1000 - (this.slideCounter/1000), () => 
-                {
-                    this.slideCounter++;
-                    return new SlidePuzzle(difficulty, dependentPuzzles);
-                }
-            ],
-            [1000 - (this.mastermindCounter/1000), () =>
-                {
-                    this.mastermindCounter++;
-                    return new MastermindPuzzle(difficulty, dependentPuzzles);
-                }
-            ],
-            [10000 - (this.memoryCounter/1000), () =>
-                {
-                    this.memoryCounter++;
-                    return new MemoryPuzzle(difficulty, dependentPuzzles, theme);
-                }
-            ]
-
-        ])();
+    private puzzleInitializers: {[key: string]: (difficulty: number, dependentPuzzles: string[], theme: Theme) => Puzzle};
+    
+    constructor(excludedPuzzleTypes: string[]){
+        //TODO: do the same for converging and end puzzles when more types are available
+        this.puzzleInitializers = {
+            'anagram': (difficulty, dependentPuzzles) => new Anagram(difficulty, dependentPuzzles),
+            'lettersMathPuzzle': (difficulty, dependentPuzzles) => new LettersMathPuzzle(dependentPuzzles),
+            'operatorMathPuzzle': (difficulty, dependentPuzzles) => new OperatorMathPuzzle(difficulty, dependentPuzzles),
+            'slidePuzzle': (difficulty, dependentPuzzles) => new SlidePuzzle(difficulty, dependentPuzzles),
+            'mastermindPuzzle': (difficulty, dependentPuzzles) => new MastermindPuzzle(difficulty, dependentPuzzles),
+            'memoryPuzzle': (difficulty, dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme),
+          };
+      
+          excludedPuzzleTypes.forEach(puzzleType => {
+            delete this.puzzleInitializers[puzzleType];
+          });
     }
-    static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
+
+    createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
+        const puzzleFrequencies = Object.entries(this.puzzleInitializers).map(([puzzleType, initializer]) => {
+            return [100 - this.getFrequency(puzzleType), () => initializer(difficulty, dependentPuzzles, theme)] as [number, () => Puzzle];
+        });
+    
+        return frequencies<() => Puzzle>(puzzleFrequencies)();
+    }
+    
+    createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles); //TODO: Add more types of converging puzzles
         return puzzle;
     }
-    static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
+    
+    createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         return frequencies<() => Puzzle>([
             [1, () => new Jigsaw(difficulty, dependentPuzzles)]
         ])();
+    }
+
+    private getFrequency(puzzleType: string): number{
+        switch(puzzleType){
+            case 'anagram':
+                return Anagram.objectCounter;
+            case 'lettersMathPuzzle':
+                return LettersMathPuzzle.objectCounter;
+            case 'operatorMathPuzzle':
+                return OperatorMathPuzzle.objectCounter;
+            case 'slidePuzzle':
+                return SlidePuzzle.objectCounter;
+            case 'mastermindPuzzle':
+                return MastermindPuzzle.objectCounter;
+            case 'memoryPuzzle':
+                return MemoryPuzzle.objectCounter;
+            default:
+                throw new Error(`Unknown puzzle type: ${puzzleType}`);
+        }
     }
 }
