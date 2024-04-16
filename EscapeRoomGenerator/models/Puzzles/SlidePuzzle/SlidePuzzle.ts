@@ -85,31 +85,26 @@ export class SlidePuzzle implements Observer, Observable{
         return tempPieces;
     }
     
-    movePiece(piece: Piece | null, newPos?: Position): boolean {
+    movePiece(piece: Piece | null, newPos?: Position): {result: boolean, pieces: (Piece | null)[][]} {
         if (piece === null){
-            return false;
+            return {result: false, pieces: this.pieces};
         }
         if(newPos === undefined){
             const possiblePositions = [
-                { x: piece.position.x - 1, y: piece.position.y }, //up
-                { x: piece.position.x + 1, y: piece.position.y }, //down
-                { x: piece.position.x, y: piece.position.y - 1 }, //left
-                { x: piece.position.x, y: piece.position.y + 1 }, //right
+                { x: piece.position.x - 1, y: piece.position.y }, //left
+                { x: piece.position.x + 1, y: piece.position.y }, //right
+                { x: piece.position.x, y: piece.position.y - 1 }, //down
+                { x: piece.position.x, y: piece.position.y + 1 }, //up
             ];
             newPos = possiblePositions.find(pos => this.checkValidMove(pos));
-        }else{
-            if (!this.checkValidMove(newPos)){
-                return false;
-            }
         }
+
+        if (!newPos || !this.checkValidMove(newPos)) return {result: false, pieces: this.pieces};
     
-        if (newPos) {
-            this.pieces[piece.position.x][piece.position.y] = null;
-            this.pieces[newPos.x][newPos.y] = piece;
-            piece.position = newPos;
-            return true;
-        }
-        return false;
+        this.pieces[piece.position.x][piece.position.y] = null;
+        this.pieces[newPos.x][newPos.y] = piece;
+        piece.position = newPos;
+        return {result: true, pieces: this.pieces};
     }
     
     private checkValidMove(newPos: Position): boolean {
@@ -123,22 +118,20 @@ export class SlidePuzzle implements Observer, Observable{
     }
 
     //TODO: Implement hint system
-    getHint(): boolean{
+    getHint(): {result: boolean, pieces: (Piece | null)[][]}{
         //replace the biggest number with the null piece
-        if (this.hints === 2) return false
+        if (this.hints === 2) return {result: false, pieces: this.pieces}
 
-        for (let i = 0; i < this.rows; i++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
-            for (let j = 0; j < this.cols; j++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
-                if (this.pieces[i][j] === null) continue;
+        let number = this.rows*this.cols - 1 - this.hints++;
 
-                if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hints)){
-                    this.pieces[i][j] = null;
-                    this.hints++;
-                    return true;
-                }
-            }
-        }
-        return false
+        this.pieces = this.pieces.map((row) => {
+            return row.map((piece) => {
+                if (piece?.number === number) 
+                    return null;
+                return piece;
+            })
+        })
+        return {result: true, pieces: this.pieces}
     }
 
     checkAnswer(): {result: boolean, unlockedPuzzles: string[]} {
