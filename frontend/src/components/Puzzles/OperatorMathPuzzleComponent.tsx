@@ -84,7 +84,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
                                 <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
                                     <option value="+">+</option>
                                     <option value="-">-</option>
-                                    <option value="*">x</option>
+                                    <option value="*">×</option>
                                     <option value="/">÷</option>
                                 </select>
                             </div>
