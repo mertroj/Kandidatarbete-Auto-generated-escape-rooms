@@ -8,20 +8,24 @@ import { generateThemedPuzzleText } from '../../ChatGPTTextGenerator';
 
 export class SlidePuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
+    static type = "slidePuzzle";
+    static objectCounter: number = 0;
+
+    private observers: Observer[] = [];
+    private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "slidePuzzle";
+    type: string = SlidePuzzle.type;
     question: string = "Someone messed up the the order of the numbers here. Can you fix it?";
     description: string = "The last squares are the ones to be empty, the rest should be in order";
     isSolved: boolean = false;
-    hintLevel: number = 0;
+    hints: number = 0;
     estimatedTime: number;
-    pieces: (Piece | null)[][];
     isLocked: boolean = false;
+    
+    pieces: (Piece | null)[][];
     private rows: number;
     private cols: number;
-    private dependentPuzzles: string[];
-    private observers: Observer[] = [];
 
     constructor(difficulty: number, dependentPuzzles: string[]){
         this.dependentPuzzles = dependentPuzzles;
@@ -36,56 +40,26 @@ export class SlidePuzzle implements Observer, Observable{
         this.pieces = this.init();
         SlidePuzzle.puzzles[this.id] = this;
     }
-    update(id: string): void{
-        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
-        if (this.dependentPuzzles.length === 0) {
-            this.isLocked = false;
-        }
+
+    static get(puzzleId: string): SlidePuzzle {
+        return SlidePuzzle.puzzles[puzzleId];
+    }
+    increaseCounter(): void {
+        SlidePuzzle.objectCounter++;
     }
     addObserver(observer: Observer): void{
         this.observers.push(observer);
     }
-    notifyObservers(): void{
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-
-    checkAnswer(): boolean {
-        let previousNumber: number = 0; //numbers start at 1
-        let flattenedPieces = this.pieces.flat();
-        for (let i = 0; i < flattenedPieces.length - (1+this.hintLevel); i++){ 
-            if (flattenedPieces[i] === null){ //if there is a null not at the last space
-                return false;
-            }
-            let tempNumber = flattenedPieces[i]!.number; //safe since we checked for null above
-            if (tempNumber < previousNumber){
-                return false;
-            }
-            previousNumber = tempNumber;
+    update(id: string): string{
+        this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
+        if (this.dependentPuzzles.length === 0) {
+            this.isLocked = false;
+            return this.id
         }
-        this.isSolved = true; //can be set to true even if it was true before
-        this.notifyObservers();
-        return true;
-    }
-
-    //TODO: Implement hint system
-    getHint(): boolean{
-        //replace the biggest number with the null piece
-        if (this.hintLevel < 2){
-            for (let i = 0; i < this.rows; i++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-                for (let j = 0; j < this.cols; j++){ //should skip the last piece if hintLevel is 0, the last two if hintLevel is 1, etc.
-                    if (this.pieces[i][j] === null){
-                        continue;
-                    }else if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hintLevel)){
-                        this.pieces[i][j] = null;
-                        this.hintLevel++;
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return ''
     }
 
     private init(): (Piece | null)[][] {
@@ -115,10 +89,6 @@ export class SlidePuzzle implements Observer, Observable{
             inversionCounter++;
         }
         return tempPieces;
-    }
-
-    static get(puzzleId: string): SlidePuzzle {
-        return SlidePuzzle.puzzles[puzzleId];
     }
     
     movePiece(piece: Piece | null, newPos?: Position): boolean {
@@ -162,13 +132,53 @@ export class SlidePuzzle implements Observer, Observable{
         this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
+    getHint(): boolean{
+        //replace the biggest number with the null piece
+        if (this.hints === 2) return false
+
+        for (let i = 0; i < this.rows; i++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
+            for (let j = 0; j < this.cols; j++){ //should skip the last piece if hints is 0, the last two if hints is 1, etc.
+                if (this.pieces[i][j] === null) continue;
+
+                if (this.pieces[i][j]!.number === this.rows*this.cols - (1+this.hints)){
+                    this.pieces[i][j] = null;
+                    this.hints++;
+                    return true;
+                }
+            }
+        }
+        return false
+    }
+
+    checkAnswer(): {result: boolean, unlockedPuzzles: string[]} {
+        let previousNumber: number = 0; //numbers start at 1
+        let flattenedPieces = this.pieces.flat();
+        for (let i = 0; i < flattenedPieces.length - (1+this.hints); i++){ 
+            if (flattenedPieces[i] === null){ //if there is a null not at the last space
+                return {result: false, unlockedPuzzles: []};
+            }
+            let tempNumber = flattenedPieces[i]!.number; //safe since we checked for null above
+            if (tempNumber < previousNumber){
+                return {result: false, unlockedPuzzles: []};
+            }
+            previousNumber = tempNumber;
+        }
+        if (!this.isSolved) {
+            this.isSolved = true;
+            let unlockedPuzzles = this.notifyObservers();
+            return {result: true, unlockedPuzzles};
+        } 
+        return {result: true, unlockedPuzzles: []};
+    }
+
     strip() {
         return {
             type: this.type,
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
+
             question: this.question,
             description: this.description,
             pieces: this.pieces

@@ -1,30 +1,53 @@
+export enum FeedbackMessages{
+    CORRECT = "Puzzle Solved!",
+    INCORRECT = "Incorrect answer!",
+    UNLOCKED = "Puzzle Unlocked!",
+}
+
 export interface EscapeRoom {
     timer: Timer;
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
     currentRoom: Room;
+    theme: string;
 }
-
-export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
 
 export interface Room {
     id: string;
-    left: string;
-    right: string;
-    up: string;
-    down: string;
+    pos: Point;
+    left: number;
+    right: number;
+    up: number;
+    down: number;
     isLocked: boolean;
     puzzles: Puzzle[];
 }
+
+export type Point = [number, number]
+
+export interface Position {
+    x: number;
+    y: number;
+}
+
+export interface Timer {
+    elapsedTime: number;
+}
+
+export interface RoomStatus {
+    solved: boolean;
+    unlocked: boolean;
+}
+
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
 
 export interface AnagramPuzzle {
     id: string;
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
-
+    hints: string[];
     question: string;
     description: string;
 }
@@ -34,10 +57,27 @@ export interface LettersMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
-
+    hints: string[];
     question: string;
     description: string;
+}
+
+export interface MemoryPuzzle {
+    id: string;
+    type: string;
+    isSolved: boolean;
+    isLocked: boolean;
+    hints: number;
+    difficulty: number;
+    question: string;
+    description: string;
+    cellsMatrix: Cell[][];
+    valuesToSymbols: Array<[number, string]>;
+}
+
+export interface Cell{
+    value: number;
+    isFlipped: boolean;
 }
 
 export interface OperatorsMathPuzzle {
@@ -45,18 +85,21 @@ export interface OperatorsMathPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
-
+    hints: string[];
+    numberOfOperators: number;
     question: string;
     description: string;
 }
 
-export interface NewHint{
-    hint: string;
-}
-
-export interface Timer {
-    elapsedTime: number;
+export interface MastermindPuzzle {
+    id: string;
+    type: string;
+    isSolved: boolean;
+    isLocked: boolean;
+    hints: string[];
+    question: string;
+    length: number;
+    previousGuesses: [string, string][];
 }
 
 export interface SlidePuzzle {
@@ -64,7 +107,7 @@ export interface SlidePuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
+    hints: number;
 
     question: string;
     description: string;
@@ -74,11 +117,6 @@ export interface SlidePuzzle {
 export interface Piece {
     number: number;
     position: Position;
-}
-
-export interface Position {
-    x: number;
-    y: number;
 }
 
 export interface JigsawPiece {
@@ -99,21 +137,9 @@ export interface JigsawPuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hintLevel: number;
-
+    hints: number;
     question: string;
     description: string;
     pieces: JigsawPiece[];
     size: {rows: number, columns: number};
-
-}
-
-export interface MastermindPuzzle {
-    id: string;
-    type: string;
-    isSolved: boolean;
-    isLocked: boolean;
-    hintLevel: number;
-    question: string;
-    length: number;
 }

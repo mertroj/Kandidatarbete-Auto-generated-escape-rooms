@@ -7,21 +7,24 @@ import { Theme } from '../Theme';
 
 export class OperatorMathPuzzle implements Observable, Observer {
     private static puzzles: {[key:string]: OperatorMathPuzzle} = {}
+    static type = 'operatorMathPuzzle';
+    static objectCounter: number = 0;
     
-    private numberOfOperands: number;
-    private numbers: number[];
-    private operands: string;
-    private answer: number;
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
+
     id: string = uuidv4();
-    type: string = "operatorMathPuzzle"
-    question: string;
+    type: string = OperatorMathPuzzle.type;
     description: string = "What is the sequence of operators used in the following expression?"
-    hintLevel : number = 0;
+    hints: string[] = [];
     isSolved: boolean = false;
     estimatedTime: number;
     isLocked: boolean;
+    
+    numberOfOperands: number;
+    private numbers: number[];
+    private operators: string;
+    private answer: number;
 
     constructor(difficulty: number, dependentPuzzles: string[]) {
         this.dependentPuzzles = dependentPuzzles;
@@ -29,57 +32,38 @@ export class OperatorMathPuzzle implements Observable, Observer {
         this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard
         this.numberOfOperands = 3 + difficulty; //easy: 4, medium: 5, hard: 6
         this.numbers = repeat(this.numberOfOperands, () => randomIntRange(1, 11))
-        this.operands = repeat(this.numberOfOperands-1, () => choice(['+', '-', '*'])).join('')
+        this.operators = repeat(this.numberOfOperands-1, () => choice(['+', '-', '*'])).join('')
         this.answer = this.calcAnswer();
-        this.question = this.formulateQuestion();
+        while (this.operators.includes('*'))
+            this.operators = this.operators.replace('*', '×');
         OperatorMathPuzzle.puzzles[this.id] = this;
     }
 
     static get(puzzleId: string): OperatorMathPuzzle {
         return OperatorMathPuzzle.puzzles[puzzleId]
     }
-
-    getHint(): string{
-        let message = 'No more hints.';
-        if(this.hintLevel < this.numberOfOperands-1){
-            message = `The ${this.hintLevel === 0 ? 'first': 'next'} operations is ` + this.operands[this.hintLevel++];
-        }
-        return message;
-    }
-
-    checkAnswer(answer: string): boolean {
-        if (answer.length != this.operands.length) return false
-
-        let expression: string = this.numbers[0].toString();
-        for (let i = 1; i < this.numberOfOperands; i++) {
-            expression += answer[i-1];
-            expression += this.numbers[i].toString();
-        }
-        let answerRes = eval(expression) as number
-        let res: boolean = answerRes === this.answer;
-        if (!this.isSolved && res) this.notifyObservers();
-        if (!this.isSolved) this.isSolved = res
-        return res
+    increaseCounter(): void {
+        OperatorMathPuzzle.objectCounter++;
     }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-    notifyObservers(): void {
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id));
     }
-    update(id: string): void{
+    update(id: string): string{
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
+            return this.id
         }
+        return ''
     }
 
     private calcAnswer(): number {
         let expression: string = this.numbers[0].toString();
         for (let i = 1; i < this.numberOfOperands; i++) {
-            expression += this.operands[i-1];
+            expression += this.operators[i-1];
             expression += this.numbers[i].toString();
         }
         return eval(expression)
@@ -89,7 +73,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
         let question: string[] = [];
         question.push(this.numbers[0].toString());
         for (let i = 1; i < this.numberOfOperands; i++) {
-            question.push(this.hintLevel < i ? "□" : this.operands[i-1]);
+            question.push(this.hints.length < i ? "□" : this.operators[i-1]);
             question.push(this.numbers[i].toString());
         }
         question.push("=");
@@ -101,13 +85,44 @@ export class OperatorMathPuzzle implements Observable, Observer {
         this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
+    getHint(): {hint: string, question: string} {
+        if (this.hints.length === this.numberOfOperands-1)
+            return {hint: 'No more hints.', question: this.formulateQuestion()}
+
+        let hint = `The ${this.hints.length === 0 ? 'first':'next'} operator is ${this.operators[this.hints.length]}`;
+
+        this.hints.push(hint)
+        return {hint, question: this.formulateQuestion()}
+    }
+
+    checkAnswer(answer: string): {result: boolean, unlockedPuzzles: string[]} {
+        if (answer.length !== this.operators.length)
+            return {result: false, unlockedPuzzles: []};
+
+        let expression: string = this.numbers[0].toString();
+        for (let i = 1; i < this.numberOfOperands; i++) {
+            expression += answer[i-1];
+            expression += this.numbers[i].toString();
+        }
+        let answerRes = eval(expression) as number
+        let result: boolean = answerRes === this.answer;
+
+        if (result && !this.isSolved) {
+            this.isSolved = result;
+            let unlockedPuzzles = this.notifyObservers();
+            return {result, unlockedPuzzles};
+        }
+        return {result, unlockedPuzzles: []};
+    }
+
     strip() {
         return {
             type: this.type,
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
+            numberOfOperators: this.numberOfOperands-1,
 
             question: this.formulateQuestion(),
             description: this.description,

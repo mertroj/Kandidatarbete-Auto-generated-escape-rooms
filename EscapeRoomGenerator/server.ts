@@ -13,6 +13,7 @@ import { JigsawRouter } from "./routers/JigsawRouter";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
 import { DescriptionRouter } from "./routers/DescriptionRouter";
+import { MemoryPuzzleRouter } from "./routers/MemoryPuzzleRouter";
 import { ChatGPTRouter } from "./routers/ChatGPTRouter";
 import { Direction } from "./models/Direction";
 
@@ -24,6 +25,7 @@ app.use(cors());
 app.use('/operatorMathPuzzles', OperatorMathPuzzleRouter);
 app.use('/lettersMathPuzzles', LettersMathPuzzleRouter);
 app.use('/mastermindPuzzle' , MastermindPuzzleRouter);
+app.use('/memoryPuzzles', MemoryPuzzleRouter);
 app.use('/slidePuzzles', SlidePuzzleRouter);
 app.use('/lockedPuzzle', DescriptionRouter);
 app.use('/anagrams', AnagramRouter);
@@ -45,10 +47,15 @@ app.get('/creategame', async (req: Request, res: Response) => {
             res.status(400).send("The theme parameter is missing");
             return;
         }
+    if (req.query.exclusions === undefined) {
+        res.status(400).send("The exclusions parameter is missing");
+        return;
+    }
     
         let players = parseInt(String(req.query.players));
         let difficulty = parseInt(String(req.query.difficulty));
         let theme = String(req.query.theme);
+    let exclusions = String(req.query.exclusions).split(',');
     
         if (Number.isNaN(players)) {
             res.status(400).send("The player query parameter is invalid");
@@ -57,7 +64,7 @@ app.get('/creategame', async (req: Request, res: Response) => {
         } else if (theme === "" || !(Object.values(Theme) as string[]).includes(theme)) {
             res.status(400).send("The theme query parameter is invalid");
         } else {
-            let er: EscapeRoom = await EscapeRoom.create(players, difficulty, theme as Theme);
+            let er: EscapeRoom = await EscapeRoom.create(players, difficulty, theme as Theme, exclusions);
             res.status(200).send(er.id);
         }
     } catch (error: any) {

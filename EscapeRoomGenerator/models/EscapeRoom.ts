@@ -22,14 +22,16 @@ export class EscapeRoom {
     endText!: string;
     currentRoom!: Room;
 
-    private constructor(theme: Theme) { //for synchronous creation operations
+    private constructor(theme: Theme, exclusions: string[]) { //for synchronous creation operations
         this.theme = theme;
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
+        EscapeRoom.connectRooms(this.rooms);
+        this.rooms[0].isLocked = false;
 
         this.timer.start();
         EscapeRoom.escapeRooms[this.id] = this;
     }
-    static async create(players: number, difficulty: number, theme: Theme): Promise<EscapeRoom> {
+    static async create(players: number, difficulty: number, theme: Theme, exclusions: string[]): Promise<EscapeRoom> {
         let instance = new EscapeRoom(theme);
         let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
 
@@ -55,12 +57,12 @@ export class EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
     }
     
-    static async createRooms(totalTime: number, difficulty: number, theme: Theme): Promise<[Room[], Puzzle]> {
+    static async createRooms(totalTime: number, difficulty: number, theme: Theme, exclusions: string[], theme: Theme): Promise<[Room[], Puzzle]> {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
-        let graph = await puzzleTreePopulator(totalTime, difficulty, theme);
+        let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions, theme);
         let nodes = graph.nodes();
 
         let promises = nodes.map(async nodeId => { //change the text for all puzzles into themed text using OPENAI
@@ -96,19 +98,11 @@ export class EscapeRoom {
     }
     
     static connectRooms(rooms: Room[]): void {
-        let r: Room | undefined;
         rooms.forEach((room) => {
-            r = rooms.find((r) => r.x === room.x-1 && r.y === room.y);
-            if (r) room.left = r.id;
-    
-            r = rooms.find((r) => r.x === room.x+1 && r.y === room.y);
-            if (r) room.right = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y-1);
-            if (r) room.up = r.id;
-    
-            r = rooms.find((r) => r.x === room.x && r.y === room.y+1);
-            if (r) room.down = r.id;
+            room.left = rooms.findIndex((r) => r.x === room.x-1 && r.y === room.y);
+            room.right = rooms.findIndex((r) => r.x === room.x+1 && r.y === room.y);
+            room.up = rooms.findIndex((r) => r.x === room.x && r.y === room.y+1);
+            room.down = rooms.findIndex((r) => r.x === room.x && r.y === room.y-1);
         })
     }
 

@@ -8,88 +8,59 @@ const anagramsData = require('../../anagrams.json')
 
 export class Anagram implements Observable, Observer {
     private static puzzles: {[key: string]: Anagram} = {}
+    static type = 'anagram';
+    static objectCounter: number = 0;
 
-    private difficulty: number;
     private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
     private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
+
     id: string = uuidv4();
-    type: string = 'anagram';
+    type: string = Anagram.type;
     question: string;
     description: string = 'Find the hidden word';
-    hintLevel: number = 0;
+    hints: string[] = [];
     estimatedTime: number;
     isSolved: boolean = false;
     isLocked: boolean = false;
 
-    constructor(difficulty: number, dependentPuzzlez: string[]) {
-        this.dependentPuzzles = dependentPuzzlez;
+    constructor(difficulty: number, dependentPuzzles: string[]) {
+        this.dependentPuzzles = dependentPuzzles;
         if (this.dependentPuzzles.length > 0) this.isLocked = true;
-        this.difficulty = difficulty;
-        this.estimatedTime = 2*this.difficulty;
-        this.question = this.getQuestion();
+        this.estimatedTime = 2*difficulty;
+        this.question = this.pickQuestion(difficulty);
         Anagram.puzzles[this.id] = this
     }
 
     static get(puzzleId: string): Anagram {
         return Anagram.puzzles[puzzleId]
     }
-
     private getAnswers(): string {
-        return anagramsData[`${this.question.length}`].find((a: string[]) => a[0] == this.question)[1]
+        return anagramsData[`${this.question.length}`].find((a: string[]) => a[0] === this.question)[1]
+    }
+    increaseCounter(): void {
+        Anagram.objectCounter++;
     }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-    notifyObservers(): void {
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-    update(id: string): void{
+    update(id: string): string{
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
+            return this.id
         }
+        return ''
     }
 
-    getHint(): string {
-        const answers = this.getAnswers()
-    
-        if (this.hintLevel === this.question.length) {
-            return 'No more hints.';
-        }
-        if (!answers.length) return '';
-    
-        const hint = `I know the ${this.hintLevel == 0 ? 'first' : 'next'} letter is ${answers[this.hintLevel]}, but what's the rest?`;
-        this.hintLevel++;
-    
-        return hint
-    }
-    
-    checkAnswer(answer: string): boolean {
-        const answers = this.getAnswers()
-        const answerLowerCase = answer.toLowerCase();
-    
-        let res: boolean;
-        if (answers.includes(';')) {
-            res = !!answers
-                        .split(';')
-                        .map(subAnswer => subAnswer.trim())
-                        .find((subAnswer) => subAnswer === answerLowerCase)
-        } else {
-            res = answers.toLowerCase() === answerLowerCase;
-        }
-        if (!this.isSolved) this.isSolved = res;
-        if (res) this.notifyObservers();
-        return res
-    }
-
-    getQuestion(): string {
+    pickQuestion(difficulty: number): string {
         let minLength: number;
         let maxLength: number;
-        if (this.difficulty === 1) {
+        if (difficulty === 1) {
             [minLength, maxLength] = [3, 4];
-        } else if (this.difficulty === 2) {
+        } else if (difficulty === 2) {
             [minLength, maxLength] = [5, 6];
         } else { // difficulty === 3
             [minLength, maxLength] = [7, 8];
@@ -108,13 +79,48 @@ export class Anagram implements Observable, Observer {
         this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
+    getHint(): string {
+        const answers = this.getAnswers();
+    
+        if (this.hints.length === this.question.length) {
+            return 'No more hints.';
+        }
+        if (!answers.length) return '';
+    
+        const hint = `I know the ${this.hints.length === 0 ? 'first' : 'next'} letter is ${answers[this.hints.length]}, but what's the rest?`;
+        this.hints.push(hint)
+        return hint
+    }
+    
+    checkAnswer(answer: string): {result: boolean, unlockedPuzzles: string[]} {
+        const answers = this.getAnswers();
+        const answerLowerCase = answer.toLowerCase();
+    
+        let result: boolean;
+        if (answers.includes(';')) {
+            result = !!answers
+                        .split(';')
+                        .map(subAnswer => subAnswer.trim())
+                        .find((subAnswer) => subAnswer === answerLowerCase)
+        } else {
+            result = answers.toLowerCase() === answerLowerCase;
+        }
+
+        if (result && !this.isSolved) {
+            this.isSolved = result;
+            let unlockedPuzzles = this.notifyObservers();
+            return {result, unlockedPuzzles}
+        } 
+        return {result, unlockedPuzzles: []};
+    }
+
     strip() {
         return {
             type: this.type,
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
             
             question: this.question,
             description: this.description,

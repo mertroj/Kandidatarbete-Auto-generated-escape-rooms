@@ -1,10 +1,23 @@
-.panel-container {
+.feedback-container{
+    position: absolute;
+    top: 1%;
+    left: 0.5%;
     display: flex;
-    align-items: stretch;
-    height: 100vh;
-    width: 50px;
+    flex-direction: column;
+    z-index: 102;
 }
 
+.background-image {
+    opacity: 60%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: -1;
+}
+
+/*
 .notification-box {
     position: fixed;
     top: 50%;
@@ -15,11 +28,12 @@
     color: #721c24;
     border-color: #f5c6cb;
     border-radius: .25rem;
-    z-index: 9999; /* This will ensure the box appears above everything else */
-    text-align: center; /* Center the text within the box */
-    width: 200px; /* Set a fixed width for the box */
-    height: 100px; /* Set a fixed height for the box */
-    display: flex; /* Use flexbox to center the text vertically */
-    justify-content: center; /* Center the text vertically */
-    align-items: center; /* Center the text horizontally */
+    z-index: 9999; 
+    text-align: center; 
+    width: 200px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+*/

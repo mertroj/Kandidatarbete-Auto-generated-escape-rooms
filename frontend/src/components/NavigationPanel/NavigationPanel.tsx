@@ -1,44 +1,65 @@
-import { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './NavigationPanel.css';
-import { EscapeRoom, Room } from '../../interfaces';
+import { EscapeRoom, Room, RoomStatus } from '../../interfaces';
+import clickSound from '../../assets/sounds/navigation-click.wav';
+import withClickAudio from '../withClickAudioComponent';
+import Minimap from '../Minimap/Minimap';
+
 
 type NavigationPanelProps = {
-    gameId?: string;
-    currentRoom?: Room;
-    escapeRoom?: EscapeRoom;
-    moveLeft: () => void;
-    moveRight: () => void;
-    moveUp: () => void;
-    moveDown: () => void;
+    gameId: string;
+    currentRoom: Room;
+    escapeRoom: EscapeRoom;
+    roomStatus: RoomStatus[];
+    move: (roomIdx: number) => void;
 };
 
-function NavigationPanel (props: NavigationPanelProps) {
-    const { gameId, currentRoom, escapeRoom, moveLeft, moveRight, moveUp, moveDown } = props;
-
+const NavigationAudioClickButton = withClickAudio('button', clickSound);
+function NavigationPanel ({gameId, currentRoom, escapeRoom, roomStatus, move}: NavigationPanelProps) {
     return (
-        <div className='navigation-window d-flex flex-column text-center justify-content-between'>
-            {/* The map of the rooms should go here */ <p>Map place holder text</p>}
-            <div>
-            {gameId ? (
-                <p>Game ID: {gameId}</p>
-            ) : null}
-            {currentRoom && escapeRoom ? (
-                <div className="d-flex justify-content-center">
-                    {currentRoom.left ? (
-                        <button onClick={moveLeft} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.left)}>Move Left</button>
-                    ) : null}
-                    {currentRoom.right ? (
-                        <button onClick={moveRight} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.right)}>Move Right</button>
-                    ) : null}
-                    {currentRoom.up ? (
-                        <button onClick={moveUp} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.up)}>Move Up</button>
-                    ) : null}
-                    {currentRoom.down ? (
-                        <button onClick={moveDown} disabled={!escapeRoom.rooms.find((room) => room.id === currentRoom.down)}>Move Down</button>
-                    ) : null}
+        <div className='navigation-window d-flex flex-column text-center'>
+            {currentRoom && escapeRoom && (
+                <div className='w-100 h-100 d-flex align-items-center justify-content-center'>
+                    <Minimap
+                        escapeRoom={escapeRoom}
+                        currentRoom={currentRoom}
+                        roomStatus={roomStatus}
+                    />
                 </div>
-            ) : null}
+            )}
+            <div>
+                {currentRoom && escapeRoom && (
+                    <div className="navigation-grid">
+                        <div className='navigation-grid-row'>
+                            <button 
+                                onClick={() => move(currentRoom.up)} 
+                                style={{gridColumn: 2}}
+                                disabled={currentRoom.up === -1}
+                            >Up</button>
+                        </div>
+                        <div className='navigation-grid-row'>
+                            <button 
+                                onClick={() => move(currentRoom.left)} 
+                                style={{gridColumn: 1}}
+                                disabled={currentRoom.left === -1}
+                            >Left</button>
+                            <button 
+                                onClick={() => move(currentRoom.right)} 
+                                style={{gridColumn: 3}}
+                                disabled={currentRoom.right === -1}
+                            >Right</button>
+                        </div>
+                        <div className='navigation-grid-row'>
+                            <button 
+                                onClick={() => move(currentRoom.down)} 
+                                style={{gridColumn: 2}}
+                                disabled={currentRoom.down === -1}
+                            >Down</button>
+                        </div>
+                    </div>
+                )}
+                {gameId && (
+                    <p>Game ID: {gameId}</p>
+                )}
             </div>
         </div>
     );

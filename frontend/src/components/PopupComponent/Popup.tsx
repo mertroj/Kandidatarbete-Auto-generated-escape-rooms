@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import './popup.css';
 import {Navbar,Button} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import withClickAudio from '../withClickAudioComponent';
+
+const AudioClickButton = withClickAudio(Button);
 
 export type Position =
         'top'
@@ -33,7 +36,7 @@ function Popup (popupProps: PopupProps) {
                         {!popupProps.navbarRemove &&
                         <div className='bg-light sticky-top'>
                             <Navbar className='p-0 justify-content-end'>
-                                <Button style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={popupProps.onClose} type='button' variant='outline-danger'></Button>
+                                <AudioClickButton style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={popupProps.onClose} type='button' variant='outline-danger'></AudioClickButton>
                             </Navbar>
                         </div>
                         }

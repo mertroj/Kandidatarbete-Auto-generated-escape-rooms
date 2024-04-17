@@ -3,7 +3,9 @@ import {v4 as uuidv4} from "uuid";
 
 export class Jigsaw implements Observable, Observer {
     private static puzzles: {[key: string]: Jigsaw} = {}
-    id: string = uuidv4();
+    static type = 'jigsawPuzzle';
+    static objectCounter: number = 0;
+
     static get(puzzleId: string): Jigsaw {
         return Jigsaw.puzzles[puzzleId]
     }
@@ -11,16 +13,15 @@ export class Jigsaw implements Observable, Observer {
     private observers: Observer[] = []; //All puzzles that depend on this one (outgoing)
     private dependentPuzzles: string[]; //All puzzles that need to be solved before this one can be attempted (incoming)
 
+    id: string = uuidv4();
+    type: string = Jigsaw.type;
     description: string = "Solve the jigsaw puzzle";
     estimatedTime: number;
-    hintLevel: number = 0;
+    hints: string[] = [];
     question: string = "";
     isSolved: boolean = false;
-    type: string = 'jigsawpuzzle';
     isLocked: boolean = false;
-
     pieces: Piece[] = [];
-
     size: Size = {rows: 0, columns: 0 }
 
     constructor(difficulty: number, dependentPuzzles: string[]) {  // 1 = easy, 2 = medium, 3 = hard
@@ -61,21 +62,22 @@ export class Jigsaw implements Observable, Observer {
     getHint(): string {
         return "Perhaps start with the corners";
     }
-
-
+    increaseCounter(): void {
+        Jigsaw.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-    notifyObservers(): void {
-        this.observers.forEach(observer => {
-            observer.update(this.id);
-        });
+    notifyObservers(): string[] {
+        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-    update(id: string): void{
+    update(id: string): string{
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
+            return this.id;
         }
+        return '';
     }
 
     strip() {
@@ -84,7 +86,7 @@ export class Jigsaw implements Observable, Observer {
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hintLevel: this.hintLevel,
+            hints: this.hints,
             
             question: this.question,
             description: this.description,

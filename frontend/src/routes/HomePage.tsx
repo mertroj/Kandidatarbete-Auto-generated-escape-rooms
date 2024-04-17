@@ -2,18 +2,74 @@ import { Row } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import axios from 'axios';
+import Select, { ActionMeta } from 'react-select';
+import clickSound from '../assets/sounds/navigation-click.wav';
+import withClickAudio from '../components/withClickAudioComponent';
+const NavigationAudioClickButton = withClickAudio('button', clickSound);
 
+type OptionType = { value: string; label: string; };
 
 function HomePage() {
+    const [gameCode, setGameCode] = useState('');
+    const [selectedExclusions, setSelectedExclusions] = useState<readonly OptionType[]>([]);
+    const exclusionLimit = 2;
+
+    const handleExclusionChange = (selectedOptions: readonly OptionType[], actionMeta: ActionMeta<OptionType>) => {
+        if (selectedOptions.length > exclusionLimit) {
+            return;
+        } else {
+            setSelectedExclusions(selectedOptions);
+        }
+    };
+    const exclusionOptions = [
+        { value: 'slidePuzzle', label: 'Slide' },
+        { value: 'memoryPuzzle', label: 'Memory' },
+        { value: 'anagram', label: 'Anagram' },
+        { value: 'mastermindPuzzle', label: 'Mastermind' },
+        { value: 'lettersMathPuzzle', label: 'Number Math' },
+        { value: 'operatorMathPuzzle', label: 'Operator Math' },
+    ];
+    const difficultyOptions = [
+        { value: '1', label: 'Easy' },
+        { value: '2', label: 'Medium' },
+        { value: '3', label: 'Hard' },
+    ];
+    const themeOptions = [
+        { value: 'magical_workshop', label: 'Magical Workshop' },
+        { value: "pharoah's_tomb", label: 'Pharoah\'s Tomb' },
+    ];
+    const playerOptions = [
+        { value: '1', label: '1 player' },
+        { value: '2', label: '2 players' },
+        { value: '3', label: '3 players' },
+        { value: '4', label: '4 players' },
+    ];
+    const selectStyle = {
+        control: (base: any) => ({
+          ...base,
+          backgroundColor: 'rgba(233,232,236,255)',
+          color: 'black',
+          boxShadow: '0 6px 10px 0 rgba(0, 0, 0, 0.2)',
+        }),
+        placeholder: (base: any) => ({
+            ...base,
+            color: 'black',
+        }),
+        multiValueLabel: (base: any) => ({
+            ...base,
+            fontSize: '1em', // Set this to your desired font size
+        }),
+    };
     const [gameId, setGameId] = useState('');
 
     const startEscapeRoom = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme');
+        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme'); +
+            '&exclusions=' + (formData.getAll('exclusions') as string[]).join(',');
         axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
-            window.location.pathname = '/escaperoom/' + res.data + '/start'
+            window.location.pathname = '/escaperoom/' + res.data + '/start';
         }).catch((error) => {
             console.error(error);
         })
@@ -51,42 +107,51 @@ function HomePage() {
             <form className='d-flex justify-content-center flex-column align-items-center'
                   onSubmit={e => startEscapeRoom(e)}>
                 <div className='w-100 d-flex justify-content-around'>
-                    <select
+                    <Select
                         name="players"
                         id="players"
                         required
-                    >
-                        <option value="" hidden>Amount of Players</option>
-                        <option value="1">1 player</option>
-                        <option value="2">2 players</option>
-                        <option value="3">3 players</option>
-                        <option value="4">4 players</option>
-                    </select>
-                    <select
+                        options={playerOptions}
+                        placeholder='Amount of players'
+                        isSearchable={false}
+                        styles={selectStyle}
+                    />
+                    <Select
                         name="difficulty"
                         id="difficulty"
                         required
-                    >
-                        <option value="" hidden>Difficulty</option>
-                        <option value="1">Easy</option>
-                        <option value="2">Medium</option>
-                        <option value="3">Hard</option>
-                    </select>
-                    <select
+                        options={difficultyOptions}
+                        placeholder='Difficulty'
+                        isSearchable={false}
+                        styles={selectStyle}
+                    />
+                    <Select
                         name="theme"
                         id="theme"
                         required
-                    >
-                        <option value="" hidden>Theme</option>
-                        <option value="magical_workshop">Magical workshop</option>
-                        <option value="pharoah's_tomb">Pharoah's Tomb</option>
-                    </select>
+                        options={themeOptions}
+                        placeholder='Theme'
+                        isSearchable={false}
+                        styles={selectStyle}
+                    />
+                    
+                    <Select 
+                        name='exclusions'
+                        id='exclusions'
+                        isMulti
+                        isSearchable={false}
+                        options={exclusionOptions}
+                        value={selectedExclusions}
+                        onChange={handleExclusionChange}
+                        placeholder='Excluded puzzle types'
+                        styles={selectStyle}
+                    />
                 </div>
-                <button className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</button>
+                <NavigationAudioClickButton className='d-flex justify-content-center mt-4 w-25 100vh' type='submit'>Create Game</NavigationAudioClickButton>
             </form>
             <div className='fixed-bottom mb-5'>
                 <input type="text" placeholder='Enter gamecode here' onChange={(e) => joinGameTextChange(e)}/>
-                <button onClick={joinGame}>Join game</button>
+                <NavigationAudioClickButton onClick={joinGame}>Join game</NavigationAudioClickButton>
             </div>
         </div>
 
