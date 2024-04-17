@@ -100,7 +100,8 @@ export class MastermindPuzzle implements Observable, Observer {
         let result = bools.every(x => x === 2)
         if(result && !this.isSolved){
             this.isSolved = true;
-            this.notifyObservers();
+            let unlockedPuzzles = this.notifyObservers();
+            return {result, bools: boolsStr, unlockedPuzzles: unlockedPuzzles}
         }
         return {result, bools: boolsStr, unlockedPuzzles: []};
     }

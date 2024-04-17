@@ -91,8 +91,6 @@ export class EscapeRoom {
                 possible_locations.push(pos);
             })
         }
-        console.log('number of rooms created: ', rooms.length);
-        console.log('number of puzzles created: ', nodeNumber);
         return [rooms, endPuzzle];
     }
     

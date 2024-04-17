@@ -79,7 +79,6 @@ function EscapeRoomPage() {
 
     // Smaller functions
     function checkEscapeRoomDone(): boolean {
-        console.log('All puzzles solved:', escapeRoom?.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)));
         return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false;
     }
     function update(): void {
@@ -99,7 +98,6 @@ function EscapeRoomPage() {
         let roomI = getRoomIndex(puzzleId);
 
         if (!solvedPuzzle || roomI === undefined || roomI === -1) return;
-
         solvedPuzzle.isSolved = true;
         roomStatus[roomI].solved = true;
 
@@ -109,7 +107,6 @@ function EscapeRoomPage() {
     function unlockPuzzles(unlockedPuzzles: string[]) {
         let puzzle: Puzzle | undefined;
         let roomI: number | undefined;
-        console.log('Unlocked puzzles to unlock:', unlockedPuzzles);
         unlockedPuzzles.forEach((puzzleId) => {
             puzzle = getPuzzle(puzzleId);
             roomI = getRoomIndex(puzzleId);
