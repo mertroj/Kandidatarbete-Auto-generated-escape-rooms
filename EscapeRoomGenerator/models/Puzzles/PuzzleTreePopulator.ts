@@ -3,7 +3,6 @@ import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
 import { Theme } from "../Theme";
-import { Theme } from "../Theme";
 import { Jigsaw } from "./Jigsaw";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
@@ -17,7 +16,7 @@ class TimeoutError extends Error {
     }
 }
 
-export async function puzzleTreePopulator(estimatedTime: number, difficulty: number, theme: Theme, excludedPuzzleTypes: string[], theme: Theme): Promise<Graph> {
+export async function puzzleTreePopulator(estimatedTime: number, difficulty: number, theme: Theme, excludedPuzzleTypes: string[]): Promise<Graph> {
     let factory = new PuzzleFactory(excludedPuzzleTypes);
     let puzzleBox: Puzzle[] = [];
     let counter = 0;

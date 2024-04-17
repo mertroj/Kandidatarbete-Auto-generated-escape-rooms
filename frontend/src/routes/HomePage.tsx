@@ -26,7 +26,7 @@ function HomePage() {
         { value: 'memoryPuzzle', label: 'Memory' },
         { value: 'anagram', label: 'Anagram' },
         { value: 'mastermindPuzzle', label: 'Mastermind' },
-        { value: 'lettersMathPuzzle', label: 'Number Math' },
+        { value: 'lettersMathPuzzle', label: 'Letter Math' },
         { value: 'operatorMathPuzzle', label: 'Operator Math' },
     ];
     const difficultyOptions = [
@@ -64,9 +64,10 @@ function HomePage() {
 
     const startEscapeRoom = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log('starting');    
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme'); +
+        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme') +
             '&exclusions=' + (formData.getAll('exclusions') as string[]).join(',');
         axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
             window.location.pathname = '/escaperoom/' + res.data + '/start';

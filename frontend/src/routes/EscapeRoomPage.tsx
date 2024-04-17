@@ -24,15 +24,10 @@ function EscapeRoomPage() {
     const [showNotification, setShowNotification] = useState(false);
     const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: FeedbackMessages, bgCol:string}>>([]);
     const [roomStatus, setRoomStatus] = useState<RoomStatus[]>([]);
-    let feedbackId = 0;
     const [endingText, setEndingText] = useState<string>('');
+    let feedbackId = 0;
 
     // Fetch
-    async function fetchEndingText(){
-        const response = await axios.post(`http://localhost:8080/chatGPT/endingText`, {gameId: gameId});
-        setEndingText(response.data);
-    }
-
     async function fetchImage() {
         try {
             const response = await fetch(`http://localhost:8080/images/themeImage/?gameId=${gameId}`);
@@ -43,18 +38,9 @@ function EscapeRoomPage() {
             console.error('Error fetching image:', error);
         }
     }
-
-    function getEndPuzzleComponent() {
-        switch (escapeRoom?.endPuzzle.type) { 
-            case 'jigsawpuzzle':
-                return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
-            default:
-                return null;
-        }
-    }
-
-    function addHint(hint: string) {
-        setHintsList(hintsList => [...hintsList, hint]);
+    async function fetchEndingText(){
+        const response = await axios.post(`http://localhost:8080/chatGPT/endingText`, {gameId: gameId});
+        setEndingText(response.data);
     }
 
     function fetchEscapeRoom() {
@@ -65,9 +51,6 @@ function EscapeRoomPage() {
             let initRoomStatus: RoomStatus[] = [];
             er.rooms.forEach((r) => initRoomStatus.push({solved: false, unlocked:false}));
             setRoomStatus(initRoomStatus);
-            console.log(response.data);
-            setEscapeRoom(response.data);
-            setCurrentRoom(response.data.currentRoom);
         }).catch((error) => {
             console.error(error);
             navigate('/');
@@ -78,15 +61,6 @@ function EscapeRoomPage() {
     function getPuzzle(puzzleId: string): Puzzle | undefined {
         let room = escapeRoom?.rooms.find((room) => room.puzzles.find((puzzle) => puzzle.id === puzzleId));
         return room?.puzzles.find((puzzle) => puzzle.id === puzzleId);
-    function moveLeft() {
-        axios.get<EscapeRoom>('http://localhost:8080/escaperoom/move/?gameId=' + gameId + '&direction=left').then((response) => {
-            setEscapeRoom(response.data);
-            setCurrentRoom(response.data.currentRoom);
-        }).catch((error) => {
-            console.error(error);
-        })
-        //setCurrentRoom(escapeRoom?.rooms.find((room) => room.id === currentRoom?.left));
-        fetchImage();
     }
     function getRoomIndex(puzzleId: string): number | undefined {
         return escapeRoom?.rooms.findIndex((room) => room.puzzles.find((puzzle) => puzzle.id === puzzleId));
@@ -105,6 +79,7 @@ function EscapeRoomPage() {
 
     // Smaller functions
     function checkEscapeRoomDone(): boolean {
+        console.log('All puzzles solved:', escapeRoom?.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)));
         return escapeRoom ? escapeRoom.rooms.every((room) => room.puzzles.every((puzzle) => puzzle.isSolved)) : false;
     }
     function update(): void {
@@ -112,9 +87,6 @@ function EscapeRoomPage() {
     }
     function handleSolve() {
         setShowNotification(true);
-        // setTimeout(() => {
-        //     navigate(resultScreenUrl);
-        // }, 4000); // wait for 4 seconds
     }
     function move(roomIdx: number) {
         setCurrentRoomIdx(roomIdx);
@@ -137,11 +109,13 @@ function EscapeRoomPage() {
     function unlockPuzzles(unlockedPuzzles: string[]) {
         let puzzle: Puzzle | undefined;
         let roomI: number | undefined;
+        console.log('Unlocked puzzles to unlock:', unlockedPuzzles);
         unlockedPuzzles.forEach((puzzleId) => {
             puzzle = getPuzzle(puzzleId);
             roomI = getRoomIndex(puzzleId);
 
             if (!puzzle || roomI === undefined || roomI === -1) return;
+            console.log('Unlocking puzzle:', puzzle.type);
 
             puzzle.isLocked = false;
             roomStatus[roomI].unlocked = true;
@@ -156,8 +130,9 @@ function EscapeRoomPage() {
         update();
     }    
     function getEndPuzzleComponent() {
+        console.log('End puzzle:', escapeRoom?.endPuzzle);
         switch (escapeRoom?.endPuzzle.type) { 
-            case 'jigsawpuzzle':
+            case 'jigsawPuzzle':
                 return <JigsawComponent key={'end'} puzzle={escapeRoom?.endPuzzle as JigsawPuzzle} onSolve={handleSolve} />;
             default:
                 return null;
@@ -175,6 +150,15 @@ function EscapeRoomPage() {
     }, [gameId]);
 
     useEffect(() => {
+        const getEndingText = async () => {
+            await fetchEndingText();
+        };
+        if(showNotification){
+            getEndingText();
+        }
+    }, [showNotification]);
+
+    useEffect(() => {
         if (escapeRoom) {
             setCurrentRoom(escapeRoom.rooms[currentRoomIdx]);
             roomStatus[currentRoomIdx].solved = false;
@@ -188,35 +172,25 @@ function EscapeRoomPage() {
     }, [escapeRoom, currentRoomIdx]);
 
     useEffect(() => {
+        const unblock = window.history.pushState(null, "", window.location.href);
+
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+        };
+
+        fetchEscapeRoom();
+
+        return () => {
+            window.onpopstate = null;
+        };
+    }, []);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             setFeedbackList(feedbackList => feedbackList.slice(1));
         }, 2000); // wait for fadeOut time (2s)
         return () => clearTimeout(timer);
     }, [feedbackList]);
-
-    useEffect(() => {
-        const getEndingText = async () => {
-            await fetchEndingText();
-        };
-        if(showNotification){
-            getEndingText();
-        }
-    }, [showNotification]);
-
-    useEffect(() => {
-        //Add current page to the history stack
-        const unblock = window.history.pushState(null, "", window.location.href);
-
-        //When navigating back, add current page to the history stack again
-        window.onpopstate = function () {
-            window.history.pushState(null, "", window.location.href);
-        };
-
-        //When done with the page, remove the back navigation listnere/preventer
-        return () => {
-            window.onpopstate = null;
-        };
-    }, []);
 
     return (
         <div 
@@ -249,7 +223,7 @@ function EscapeRoomPage() {
 
             {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
 
-            {!showNotification && escapeRoom && currentRoom && gameId && 
+            {!showNotification && !showEndPuzzle && escapeRoom && currentRoom && gameId && 
                 <div 
                     style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
                     className="panel-container"

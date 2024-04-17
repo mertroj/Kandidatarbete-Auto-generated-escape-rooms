@@ -5,6 +5,7 @@ import { choice, randomInt, shuffleArray } from '../../Helpers';
 import { Cell } from './Cell';
 import { Theme } from '../../Theme';
 import path from "path";
+import { generateThemedPuzzleText } from '../../ChatGPTTextGenerator';
 const imagesData = require('../../../themedImages.json');
 
 export class MemoryPuzzle implements Observer, Observable{
@@ -205,6 +206,11 @@ export class MemoryPuzzle implements Observer, Observable{
             valuesToImages.set(value, path.join(imageDir, shuffledImages[index]));
         });
         return Array.from(valuesToImages.entries());
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        //this.valuesToSymbols = this.assignSymbols(theme);
+        this.question = await generateThemedPuzzleText(this.question, theme);
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

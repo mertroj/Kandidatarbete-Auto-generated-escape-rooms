@@ -8,8 +8,8 @@ const openai = new OpenAI({apiKey: apiKey});
 const wordToTokenMultiplier = 1.25;
 
 export async function generateIntroText(theme: Theme): Promise<string> {
-    //return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Good luck!";
-    
+    return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Good luck!";
+    /*
     const desiredLength = 300;
     const randomTemp = randomFloat(0.4);
     const randomTopP = randomFloat(1);
@@ -40,11 +40,11 @@ export async function generateIntroText(theme: Theme): Promise<string> {
         throw new Error("Empty response from GPT-3");
     }
     return response.choices[0].message.content;
-    
+    */
 }
 export async function generateEndingText(theme: Theme): Promise<string> {
-    //return "Congratulations! You have successfully escaped the " + theme + " themed escape room. We hope you enjoyed the experience and look forward to seeing you again soon!";
-    
+    return "Congratulations! You have successfully escaped the " + theme + " themed escape room. We hope you enjoyed the experience and look forward to seeing you again soon!";
+    /*
     const desiredLength = 100;
     const randomTemp = randomFloat(0.4);
     const randomTopP = randomFloat(1);
@@ -72,12 +72,12 @@ export async function generateEndingText(theme: Theme): Promise<string> {
     }
     
     return response.choices[0].message.content;
-    
+    */
 }
 
 export async function generateThemedPuzzleText(textToChange: string, theme: Theme): Promise<string> {
-    //return textToChange;
-    
+    return textToChange;
+    /*
     const desiredLength: string = (textToChange.split(' ').length).toString(); //Buffer of 5 words
     const randomTemp: number = randomFloat(0.4);
     const randomTopP: number = randomFloat(1);
@@ -103,5 +103,5 @@ export async function generateThemedPuzzleText(textToChange: string, theme: Them
     }
     
     return response.choices[0].message.content;
-    
+    */
 }

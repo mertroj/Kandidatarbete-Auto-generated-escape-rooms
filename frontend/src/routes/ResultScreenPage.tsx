@@ -10,41 +10,18 @@ function ResultScreenPage() {
     const [hintUsed, setHintUsed] = useState<number>(0);
     const [formattedTimeTaken, setFormattedTimeTaken] = useState<string>('00:00:00');
 
-    interface PuzzleProps {
-        hints: number;
-    }
-    interface fetchResponse{
-        escapeRoom: EscapeRoom
-    }
-
-    async function fetchTimeTaken() {
-        try {
-
-            const storedTimeTaken = sessionStorage.getItem('timeTaken');
-    
-            if (storedTimeTaken) {
-                setFormattedTimeTaken(storedTimeTaken);
-            } else {
-                const response = await axios.get<fetchResponse>('http://localhost:8080/escaperoom/?gameId=' + gameId);
-                const escapeRoom: EscapeRoom = response.data.escapeRoom;
-                const time: string = formatMilliseconds(escapeRoom.timer.elapsedTime);
-                setFormattedTimeTaken(time);
-                sessionStorage.setItem('timeTaken', time);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-
     const fetchEscapeRoom = async () => {
         try {
             const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
-            const rooms: Room[] = response.data.rooms;
+            const escapeRoom = response.data;
+            const rooms: Room[] = escapeRoom.rooms;
             setHintUsed(rooms.reduce((acc, room) => acc + room.puzzles.reduce((acc, puzzle) => {
                 if (typeof puzzle.hints === "number") 
                     return acc + puzzle.hints
                 return acc + puzzle.hints.length
             }, 0), 0));
+            const time: string = formatMilliseconds(escapeRoom.timer.elapsedTime);
+            setFormattedTimeTaken(time);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -64,18 +41,14 @@ function ResultScreenPage() {
     }
 
     useEffect(() => {
-        //Add current page to the history stack
         const unblock = window.history.pushState(null, "", window.location.href);
 
-        //When navigating back, add current page to the history stack again
         window.onpopstate = function () {
             window.history.pushState(null, "", window.location.href);
         };
 
         fetchEscapeRoom();
-        fetchTimeTaken();
 
-        //When done with the page, remove the back navigation listnere/preventer
         return () => {
             window.onpopstate = null;
         };

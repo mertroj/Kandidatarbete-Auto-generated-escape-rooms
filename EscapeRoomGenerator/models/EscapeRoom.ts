@@ -1,12 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Room } from './Room';
-import {Timer} from "./Timer";
+import { Timer } from "./Timer";
 import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
 import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
 import { Puzzle } from './Puzzles/Puzzle';
 import { generateEndingText, generateIntroText } from './ChatGPTTextGenerator';
-import { Direction } from './Direction';
 import { Jigsaw } from './Puzzles/Jigsaw';
 
 
@@ -22,12 +21,9 @@ export class EscapeRoom {
     endText!: string;
     currentRoom!: Room;
 
-    private constructor(theme: Theme, exclusions: string[]) { //for synchronous creation operations
+    private constructor(theme: Theme) { //for synchronous creation operations
         this.theme = theme;
         //let totalTime: number = (difficulty + 19) * Math.log2(players);
-        EscapeRoom.connectRooms(this.rooms);
-        this.rooms[0].isLocked = false;
-
         this.timer.start();
         EscapeRoom.escapeRooms[this.id] = this;
     }
@@ -38,7 +34,7 @@ export class EscapeRoom {
         instance.startText = await generateIntroText(theme);
         instance.endText = await generateEndingText(theme);
 
-        [instance.rooms, instance.endPuzzle] = await EscapeRoom.createRooms(totalTime, difficulty, theme);
+        [instance.rooms, instance.endPuzzle] = await EscapeRoom.createRooms(totalTime, difficulty, theme, exclusions);
         EscapeRoom.connectRooms(instance.rooms);
         instance.rooms[0].isLocked = false;
         instance.currentRoom = instance.rooms[0];
@@ -57,13 +53,14 @@ export class EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
     }
     
-    static async createRooms(totalTime: number, difficulty: number, theme: Theme, exclusions: string[], theme: Theme): Promise<[Room[], Puzzle]> {
+    static async createRooms(totalTime: number, difficulty: number, theme: Theme, exclusions: string[]): Promise<[Room[], Puzzle]> {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20);
-        let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions, theme);
+        let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions);
         let nodes = graph.nodes();
+        let nodeNumber = nodes.length;
 
         let promises = nodes.map(async nodeId => { //change the text for all puzzles into themed text using OPENAI
             let puzzle = graph.node(nodeId) as Puzzle;
@@ -94,6 +91,8 @@ export class EscapeRoom {
                 possible_locations.push(pos);
             })
         }
+        console.log('number of rooms created: ', rooms.length);
+        console.log('number of puzzles created: ', nodeNumber);
         return [rooms, endPuzzle];
     }
     
@@ -104,23 +103,6 @@ export class EscapeRoom {
             room.up = rooms.findIndex((r) => r.x === room.x && r.y === room.y+1);
             room.down = rooms.findIndex((r) => r.x === room.x && r.y === room.y-1);
         })
-    }
-
-    move(dir: Direction): void {
-        switch (dir) {
-            case Direction.LEFT:
-                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.left) as Room;
-                break;
-            case Direction.RIGHT:
-                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.right) as Room;
-                break;
-            case Direction.UP:
-                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.up) as Room;
-                break;
-            case Direction.DOWN:
-                this.currentRoom = this.rooms.find((room) => room.id === this.currentRoom.down) as Room;
-                break;
-        }
     }
 
     strip() {

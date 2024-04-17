@@ -47,15 +47,15 @@ app.get('/creategame', async (req: Request, res: Response) => {
             res.status(400).send("The theme parameter is missing");
             return;
         }
-    if (req.query.exclusions === undefined) {
-        res.status(400).send("The exclusions parameter is missing");
-        return;
-    }
+        if (req.query.exclusions === undefined) {
+            res.status(400).send("The exclusions parameter is missing");
+            return;
+        }
     
         let players = parseInt(String(req.query.players));
         let difficulty = parseInt(String(req.query.difficulty));
         let theme = String(req.query.theme);
-    let exclusions = String(req.query.exclusions).split(',');
+        let exclusions = String(req.query.exclusions).split(',');
     
         if (Number.isNaN(players)) {
             res.status(400).send("The player query parameter is invalid");
@@ -68,6 +68,7 @@ app.get('/creategame', async (req: Request, res: Response) => {
             res.status(200).send(er.id);
         }
     } catch (error: any) {
+        console.error(error);
         res.status(500).send("Internal server error: " + error.message);
     }
 });
@@ -85,30 +86,6 @@ app.get('/escaperoom', (req: Request, res: Response) => {
         res.status(404).send("The entered gameId does not exist");
     } else {
         res.send(er.strip());
-    }
-});
-
-app.get('/escaperoom/move', (req: Request, res: Response) => {
-    if (req.query.gameId === undefined) {
-        res.status(400).send("The gameId parameter is missing");
-        return;
-    }
-    if (req.query.direction === undefined) {
-        res.status(400).send("The direction parameter is missing");
-        return;
-    }
-
-    let gameId = String(req.query.gameId);
-    let direction = String(req.query.direction);
-    let er = EscapeRoom.get(gameId);
-
-    if (direction === "" || !(Object.values(Direction) as string[]).includes(direction)){
-        res.status(400).send("The direction query parameter is invalid");
-    }else if (er === null) {
-        res.status(404).send("The entered gameId does not exist");
-    } else {
-        er.move(direction as Direction);
-        res.status(200).send(er.strip());
     }
 });
 
