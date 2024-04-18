@@ -11,17 +11,13 @@ function StartPage() {
     const [charIndex, setCharIndex] = useState<number>(0);
 
     function startEscapeRoom() {
+        sessionStorage.clear();
         window.location.pathname = `/escaperoom/${gameId}`;
     }
 
     async function fetchIntroText(){
-        if (localStorage.getItem('introText')) {
-            setIntroText(localStorage.getItem('introText')!.split('\n'));
-            return;
-        }
         try {
             const response = await axios.post(`http://localhost:8080/chatGPT/introText`, {gameId: gameId});
-            localStorage.setItem('introText', response.data);
             setIntroText(response.data.split('\n'));
         } catch (error) {
             console.error('Failed to fetch intro text:', error);
@@ -30,12 +26,6 @@ function StartPage() {
 
     useEffect(() => {
         fetchIntroText();
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            localStorage.removeItem('introText');
-        };
     }, []);
 
     useEffect(() => {

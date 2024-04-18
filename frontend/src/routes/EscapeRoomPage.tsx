@@ -15,6 +15,7 @@ import './EscapeRoomPage.css'
 function EscapeRoomPage() {
     const {gameId} = useParams();
     const navigate = useNavigate();
+    const [timer, setTimer] = useState<number>(() => Number(sessionStorage.getItem('timer')) || 0);
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>();
     const [currentRoom, setCurrentRoom] = useState<Room>();
     const [currentRoomIdx, setCurrentRoomIdx] = useState(0);
@@ -85,6 +86,7 @@ function EscapeRoomPage() {
         setEscapeRoom(structuredClone(escapeRoom))
     }
     function handleSolve() {
+        sessionStorage.removeItem('timer');
         setShowNotification(true);
     }
     function move(roomIdx: number) {
@@ -154,6 +156,18 @@ function EscapeRoomPage() {
             getEndingText();
         }
     }, [showNotification]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimer(timer => timer + 1);
+        }, 1000);
+        window.onbeforeunload = () => sessionStorage.setItem('timer', timer.toString());
+
+        return () => {
+            clearInterval(interval);
+            sessionStorage.setItem('timer', timer.toString());
+        };
+    }, []);
 
     useEffect(() => {
         if (escapeRoom) {
@@ -229,6 +243,9 @@ function EscapeRoomPage() {
                         escapeRoom={escapeRoom}
                         currentRoom={currentRoom}
                     />
+                    <div className="text-center timer">
+                        Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}{timer % 60}
+                    </div>
                     <NavigationPanel
                         gameId={gameId}
                         currentRoom={currentRoom}

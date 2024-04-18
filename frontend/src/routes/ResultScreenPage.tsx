@@ -66,7 +66,7 @@ function ResultScreenPage() {
                 <p>Hints Used: {hintUsed}</p>
             </Row>
             <Row>
-                <Link to="/" onClick={() => sessionStorage.removeItem('timeTaken')}>Back to Home Page</Link>
+                <Link to="/">Back to Home Page</Link>
             </Row>
         </div>
     );
