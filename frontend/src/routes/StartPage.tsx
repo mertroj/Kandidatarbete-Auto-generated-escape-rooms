@@ -62,14 +62,16 @@ function StartPage() {
     }, [introText, paraIndex, charIndex]);
 
     return (
-        <div className='text-center' style={{margin:'5% 10% 0 10%'}}>
+        <div style={{margin:'5% 10% 0 10%'}}>
             {(displayedText !== '') &&
                 <>
                     <p dangerouslySetInnerHTML={{ __html: displayedText }} />
                     {showStartButton &&
-                    <button onClick={startEscapeRoom}>
-                        Enter the room
-                    </button>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <button onClick={startEscapeRoom}>
+                                Enter the room
+                            </button>
+                        </div>
                     }
                 </>
             }
