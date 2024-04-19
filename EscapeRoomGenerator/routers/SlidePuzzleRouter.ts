@@ -46,9 +46,9 @@ SlidePuzzleRouter.patch('/movePiece', (req: MovePieceRequest, res: Response) => 
         const col: number = req.body.pos[1];
         if(!req.body.autoMove){
             const newPos = new Position(req.body.newPos![0], req.body.newPos![1]); //safe to use ! since we check for undefined above
-            res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col], newPos), puzzle: puzzle.strip()});
+            res.status(200).send(puzzle.movePiece(puzzle.pieces[row][col], newPos));
         }else{
-            res.status(200).send({isSuccessful: puzzle.movePiece(puzzle.pieces[row][col]), puzzle: puzzle.strip()});
+            res.status(200).send(puzzle.movePiece(puzzle.pieces[row][col]));
         }
 
     }catch(error: any){
@@ -86,7 +86,7 @@ SlidePuzzleRouter.get('/hint', (req: HintRequest, res: Response) => {
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        res.status(200).send({isSuccessful: puzzle.getHint(), puzzle: puzzle.strip()});
+        res.status(200).send(puzzle.getHint());
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
     }

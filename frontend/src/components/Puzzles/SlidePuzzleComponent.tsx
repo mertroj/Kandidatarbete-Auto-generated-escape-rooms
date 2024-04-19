@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SlidePuzzle } from '../../interfaces';
+import { Piece, SlidePuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
 import './puzzles.css';
@@ -28,12 +28,12 @@ interface SlidePuzzleProps {
     puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
 }
 interface PatchResponse {
-    isSuccessful: boolean;
-    puzzle: SlidePuzzle;
+    result: boolean;
+    pieces: (Piece|null)[][];
 }
 interface HintResponse {
-    isSuccessful: boolean;
-    puzzle: SlidePuzzle;
+    result: boolean;
+    pieces: (Piece|null)[][];
 }
 interface GuessResponse {
     result: boolean;
@@ -41,7 +41,6 @@ interface GuessResponse {
 }
 
 function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: SlidePuzzleProps) {
-    const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>, autoMove: boolean, dir?: Direction) {
@@ -65,8 +64,9 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             }else{
                 throw new Error('Invalid move request with no direction and autoMove = false');
             }
-            if (response.data.isSuccessful) {
-                setPuzzle(response.data.puzzle);
+            if (response.data.result) {
+                puzzle.pieces = response.data.pieces;
+                updateRoom();
             }else{
                 // TODO: error handling for 'Invalid move'
             }
@@ -95,8 +95,10 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
     async function handleHintRequest(){
         try{
             const response = await axios.get<HintResponse>(`http://localhost:8080/slidePuzzles/hint/?puzzleId=${puzzle.id}`);
-            if (response.data.isSuccessful) {
-                setPuzzle(response.data.puzzle);
+            if (response.data.result) {
+                puzzle.pieces = response.data.pieces;
+                puzzle.hints++;
+                updateRoom();
             }else{
                 // TODO: 'No more hints. Question already answered. Alert instead? Should not be needed later on
             }
@@ -119,50 +121,47 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             children={
                 <Container className='text-center'>
                     <Row className='mb-3'>
-                        <h5>{updatedPuzzle.description}</h5>
+                        <h5>{puzzle.description}</h5>
                     </Row>
                     <Row>
-                        {updatedPuzzle.pieces.map((row, i) => (
-                            <Row key={i} className="justify-content-md-center">
+                        {puzzle.pieces.map((row, i) => (
+                            <div key={i} className="d-flex justify-content-center">
                             {row.map((cell, j) => (
-                                <Col xs={1} key={j}>
-                                    <div 
-                                        className='cell-button'
-                                        style={
-                                            {
-                                                color: cell === null ? 'transparent': 'black'
-                                            }
+                                <div 
+                                    key={j}
+                                    className='cell-button'
+                                    style={{
+                                        color: cell === null ? 'transparent': 'black'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (puzzle.hints === 0){ 
+                                            e.currentTarget.style.cursor = 'pointer';
+                                            e.currentTarget.style.backgroundColor = 'DodgerBlue';
+                                            if (cell !== null) e.currentTarget.style.color = 'white';
                                         }
-                                        onMouseEnter={(e) => {
-                                            if (updatedPuzzle.hints === 0){ 
-                                                e.currentTarget.style.cursor = 'pointer';
-                                                e.currentTarget.style.backgroundColor = 'DodgerBlue';
-                                                if (cell !== null) e.currentTarget.style.color = 'white';
-                                            }
-                                            
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (updatedPuzzle.hints === 0){ 
-                                                e.currentTarget.style.cursor = 'default';
-                                                e.currentTarget.style.backgroundColor = 'white';
-                                                if (cell !== null) e.currentTarget.style.color = 'black';
-                                            }
-                                        }}
-                                        onClick={(e) => {
-                                            if (updatedPuzzle.hints === 0){
-                                                handleClick(i, j, e, true);
-                                            }
-                                        }}
-                                    >
-                                        <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
-                                        <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
-                                        <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
-                                        <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(updatedPuzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
-                                        {cell !== null ? cell.number : 0}
-                                    </div>
-                                </Col>
+                                        
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (puzzle.hints === 0){ 
+                                            e.currentTarget.style.cursor = 'default';
+                                            e.currentTarget.style.backgroundColor = 'white';
+                                            if (cell !== null) e.currentTarget.style.color = 'black';
+                                        }
+                                    }}
+                                    onClick={(e) => {
+                                        if (puzzle.hints === 0){
+                                            handleClick(i, j, e, true);
+                                        }
+                                    }}
+                                >
+                                    <div className={`${cell !== null ? 'arrow up': ''}`} style={{top: 0, ...(puzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.UP)}>↑</div>
+                                    <div className={`${cell !== null ? 'arrow left': ''}`} style={{left: 0, ...(puzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.LEFT)}>←</div>
+                                    <div className={`${cell !== null ? 'arrow right': ''}`} style={{right: 0, ...(puzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.RIGHT)}>→</div>
+                                    <div className={`${cell !== null ? 'arrow down': ''}`} style={{bottom: 0, ...(puzzle.hints === 0 ? {display: 'none'}: {})}} onClick={e => handleClick(i, j, e, false, Direction.DOWN)}>↓</div>
+                                    {cell !== null ? cell.number : 0}
+                                </div>
                             ))}
-                            </Row>
+                            </div>
                         ))}
                         <Row className="justify-content-md-center">
                             <Col xs="auto">

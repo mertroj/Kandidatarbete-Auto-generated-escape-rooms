@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -68,7 +68,13 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
     const handleSelectChange = (index: number, value: string) => {
         answer[index] = value;
         setAnswer([...answer]);
+        sessionStorage.setItem(puzzle.id, answer.join(''));
     };
+
+    useEffect(() => {
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
+        if (prevAnswer) setAnswer(prevAnswer.split(''));
+    }, [])
 
     return (
         <div className='puzzle-card'>
@@ -76,12 +82,12 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div className='w-100 d-flex justify-content-around'>
-                {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
+                {answer.map((val, index) => (
                     <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
-                        <option value="+">+</option>
-                        <option value="-">-</option>
-                        <option value="*">×</option>
-                        <option value="/">÷</option>
+                        <option value="+" selected={val === '+'}>+</option>
+                        <option value="-" selected={val === '-'}>-</option>
+                        <option value="*" selected={val === '*'}>×</option>
+                        <option value="/" selected={val === '/'}>÷</option>
                     </select>
                 ))}
             </div>
