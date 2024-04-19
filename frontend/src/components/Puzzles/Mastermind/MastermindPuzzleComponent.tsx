@@ -56,6 +56,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.volume = volume;
                 incorrectAudio.play();
+                notifyIncorrectAnswer();
             }
 
 

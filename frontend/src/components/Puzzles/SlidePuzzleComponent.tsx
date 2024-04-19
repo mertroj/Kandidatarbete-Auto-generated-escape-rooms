@@ -91,7 +91,6 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
                 incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
-
             }
         }catch(error: any){
             console.error(error);
