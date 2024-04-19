@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { MemoryPuzzle, Cell } from '../../../interfaces';
+import { MemoryPuzzle } from '../../interfaces';
 import axios from 'axios';
-import Popup from '../../PopupComponent/Popup';
-import './memoryPuzzle.css';
+import Popup from '../PopupComponent/Popup';
+import './puzzles.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import hintClickSound from '../../../assets/sounds/arcade-hint-click.wav';
-import correctSound from '../../../assets/sounds/correct-answer.wav';
-import incorrectSound from '../../../assets/sounds/incorrect-answer.wav';
-import withClickAudio from '../../withClickAudioComponent';
+import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
+import correctSound from '../../assets/sounds/correct-answer.wav';
+import withClickAudio from '../withClickAudioComponent';
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
-const incorrectAudio = new Audio(incorrectSound);
+
 interface PatchResponse {
     puzzle: MemoryPuzzle;
 }

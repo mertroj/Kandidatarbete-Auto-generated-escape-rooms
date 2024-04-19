@@ -10,7 +10,7 @@ import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleCom
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
-import MemoryPuzzleComponent from '../Puzzles/Memory/MemoryPuzzleComponent';
+import MemoryPuzzleComponent from '../Puzzles/MemoryPuzzleComponent';
 
 interface RoomComponentProps {
     room: Room;

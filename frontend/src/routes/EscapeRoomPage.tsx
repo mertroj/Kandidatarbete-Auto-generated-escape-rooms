@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Button, Row} from "react-bootstrap";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import HintingComponent from "../components/Hinting/hinting";
 import { EscapeRoom, JigsawPuzzle, Puzzle, Room, RoomStatus } from "../interfaces";
@@ -11,10 +11,15 @@ import NavigationPanel from "../components/NavigationPanel/NavigationPanel";
 import FeedbackComponent from "../components/Feedback/FeedbackComponent";
 import {FeedbackMessages} from "../interfaces";
 import './EscapeRoomPage.css'
+import { VolumeContext } from "../utils/volumeContext";
+import VolumeSlider from "../components/Volume/volumeSliderComponent";
+import VolumeIconComponent from "../components/Volume/volumeIconComponent";
 
 function EscapeRoomPage() {
     const {gameId} = useParams();
     const navigate = useNavigate();
+    const [volume, setVolume] = useState(1.0);
+    const [isMouseOverVolume, setIsMouseOverVolume] = useState(false);
     const [timer, setTimer] = useState<number>(() => Number(sessionStorage.getItem('timer')) || 0);
     const [escapeRoom, setEscapeRoom] = useState<EscapeRoom>();
     const [currentRoom, setCurrentRoom] = useState<Room>();
@@ -26,6 +31,8 @@ function EscapeRoomPage() {
     const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: FeedbackMessages, bgCol:string}>>([]);
     const [roomStatus, setRoomStatus] = useState<RoomStatus[]>([]);
     const [endingText, setEndingText] = useState<string>('');
+    const timerRef = useRef(timer);
+    timerRef.current = timer;
     let feedbackId = 0;
 
     // Fetch
@@ -93,6 +100,12 @@ function EscapeRoomPage() {
         setCurrentRoomIdx(roomIdx);
         fetchImage();
     }
+    function handleMouseEnterVolume(){
+        setIsMouseOverVolume(true);
+    }
+    function handleMouseLeaveVolume(){
+        setIsMouseOverVolume(false);
+    }
 
     // Larger functions
     function solvePuzzle(puzzleId: string) {
@@ -159,13 +172,16 @@ function EscapeRoomPage() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setTimer(timer => timer + 1);
+            setTimer(timer => {
+                timerRef.current = timer + 1;
+                return timerRef.current;
+            });
         }, 1000);
-        window.onbeforeunload = () => sessionStorage.setItem('timer', timer.toString());
+        window.onbeforeunload = () => sessionStorage.setItem('timer', timerRef.current.toString());
 
         return () => {
             clearInterval(interval);
-            sessionStorage.setItem('timer', timer.toString());
+            sessionStorage.setItem('timer', timerRef.current.toString());
         };
     }, []);
 
@@ -204,76 +220,94 @@ function EscapeRoomPage() {
     }, [feedbackList]);
 
     return (
-        <div 
-            className="d-flex w-100"
-        >
-            <img
-                src={backgroundImageURL}
-                alt="background"
-                className="background-image"
-            />
-
-            <div className="feedback-container">
-                {feedbackList.map((feedback, index) => 
-                    <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor={feedback.bgCol} delay={index*0.5}/>
-                )}
-            </div>
-
-            {!showNotification && !showEndPuzzle &&
-                <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
-                    {currentRoom && 
-                        <RoomComponent 
-                            room={currentRoom} 
-                            updateRoom={update}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
-                        />
-                    }
-                </div>
-            }
-
-            {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
-
-            {!showNotification && !showEndPuzzle && escapeRoom && currentRoom && gameId && 
-                <div 
-                    style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
-                    className="panel-container"
-                >
-                    <HintingComponent 
-                        escapeRoom={escapeRoom}
-                        currentRoom={currentRoom}
-                    />
-                    <div className="text-center timer">
-                        Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}{timer % 60}
-                    </div>
-                    <NavigationPanel
-                        gameId={gameId}
-                        currentRoom={currentRoom}
-                        escapeRoom={escapeRoom}
-                        roomStatus={roomStatus}
-                        move={move}
-                    />
-                </div>
-            }
-
-            {showNotification && 
-                <PopupComponent
-                    navbarRemove={true}
-                    isOpen={showNotification}
-                    onOpen={() => setShowNotification(true)}
-                    onClose={() => {}}
-                    trigger={<div></div>}
-                    children={
-                        <div className={'text-center'}>
-                            {endingText}
-                            <Row className={'mt-5'}>
-                                <Button variant='outline-success' onClick={() => navigate(resultScreenUrl)}>Leave</Button>
-                            </Row>
+        <VolumeContext.Provider value={{ volume, setVolume }}>
+            <div 
+                className="d-flex w-100"
+            >
+                <div className="volume-slider-container">
+                    <div 
+                        style={{position: 'relative'}}
+                        onMouseEnter={handleMouseEnterVolume}
+                        onMouseLeave={handleMouseLeaveVolume}
+                    >
+                        <div className="volume-icon">
+                            <VolumeIconComponent />
                         </div>
-                    }
+                        {isMouseOverVolume && (
+                            <div className="volume-slider">
+                                <VolumeSlider />
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <img
+                    src={backgroundImageURL}
+                    alt="background"
+                    className="background-image"
                 />
-            }
-        </div>
+
+                <div className="feedback-container">
+                    {feedbackList.map((feedback, index) => 
+                        <FeedbackComponent key={feedback.id} message={feedback.message} backgroundColor={feedback.bgCol} delay={index*0.5}/>
+                    )}
+                </div>
+
+                {!showNotification && !showEndPuzzle &&
+                    <div className="w-100 d-flex flex-column justify-content-between mh-100 h-100">
+                        {currentRoom && 
+                            <RoomComponent 
+                                room={currentRoom} 
+                                updateRoom={update}
+                                notifyIncorrectAnswer={notifyIncorrectAnswer}
+                                puzzleSolved={puzzleSolved}
+                            />
+                        }
+                    </div>
+                }
+
+                {showEndPuzzle && escapeRoom && getEndPuzzleComponent()}
+
+                {!showNotification && !showEndPuzzle && escapeRoom && currentRoom && gameId && 
+                    <div 
+                        style={{height: "100vh", width:"400px", maxWidth: "400px"}} 
+                        className="panel-container"
+                    >
+                        <HintingComponent 
+                            escapeRoom={escapeRoom}
+                            currentRoom={currentRoom}
+                        />
+                        <div className="text-center timer">
+                            Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}{timer % 60}
+                        </div>
+                        <NavigationPanel
+                            gameId={gameId}
+                            currentRoom={currentRoom}
+                            escapeRoom={escapeRoom}
+                            roomStatus={roomStatus}
+                            move={move}
+                        />
+                    </div>
+                }
+
+                {showNotification && 
+                    <PopupComponent
+                        navbarRemove={true}
+                        isOpen={showNotification}
+                        onOpen={() => setShowNotification(true)}
+                        onClose={() => {}}
+                        trigger={<div></div>}
+                        children={
+                            <div className={'text-center'}>
+                                {endingText}
+                                <Row className={'mt-5'}>
+                                    <Button variant='outline-success' onClick={() => navigate(resultScreenUrl)}>Leave</Button>
+                                </Row>
+                            </div>
+                        }
+                    />
+                }
+            </div>
+        </VolumeContext.Provider>
     );
 }
 
