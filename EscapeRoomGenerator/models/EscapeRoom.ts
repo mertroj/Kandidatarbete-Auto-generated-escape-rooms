@@ -60,7 +60,6 @@ export class EscapeRoom {
         let nrOfRooms: number = Math.floor(totalTime / 20);
         let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions);
         let nodes = graph.nodes();
-        let nodeNumber = nodes.length;
 
         let promises = nodes.map(async nodeId => { //change the text for all puzzles into themed text using OPENAI
             let puzzle = graph.node(nodeId) as Puzzle;

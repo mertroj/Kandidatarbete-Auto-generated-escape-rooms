@@ -104,7 +104,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
                 <div className='puzzle-card'>
                     <p className='puzzle-number'>#{i}</p>
                     <Button variant='outline-primary'>
-                        Placeholder text for mastermind puzzle. To be chosen depending on the theme
+                        {puzzle.description}
                     </Button>
                 </div>
             }

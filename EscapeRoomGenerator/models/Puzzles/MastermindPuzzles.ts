@@ -21,6 +21,7 @@ export class MastermindPuzzle implements Observable, Observer {
     hints: string[] = [];
     isSolved: boolean = false;
     isLocked: boolean = false;
+    description: string = 'The code seems to have disappeared, but maybe you can figure it out by guessing';
     estimatedTime: number = 3; //TODO - Testing
 
     length: number; //Decides the length of the array - Easy: 3 | Medium: 4 | Hard: 5

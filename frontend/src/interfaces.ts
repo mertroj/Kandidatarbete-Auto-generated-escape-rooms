@@ -98,6 +98,7 @@ export interface MastermindPuzzle {
     isLocked: boolean;
     hints: string[];
     question: string;
+    description: string;
     length: number;
     previousGuesses: [string, string][];
 }
