@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MemoryPuzzle } from '../../interfaces';
+import { Cell, MemoryPuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
 import './puzzles.css';
@@ -12,14 +12,16 @@ const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
 
 interface PatchResponse {
-    puzzle: MemoryPuzzle;
+    result: boolean;
+    cellsMatrix: Cell[][];
 }
 interface HintResponse {
-    puzzle: MemoryPuzzle;
+    result: boolean;
+    cellsMatrix: Cell[][];
 }
 interface CheckMatchResponse {
     isSolved: boolean;
-    puzzle: MemoryPuzzle;
+    cellsMatrix: Cell[][];
     unlockedPuzzles: string[];
 }
 interface MemoryPuzzleProps {
@@ -32,11 +34,14 @@ interface MemoryPuzzleProps {
 
 function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MemoryPuzzleProps) {
     const hintDuration = 1000 + (((puzzle.difficulty - 1)/2)) * 1000; //1 second, 1.5 seconds or 2 seconds
-    const [updatedPuzzle, setPuzzle] = useState<MemoryPuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isHintLoading, setIsHintLoading] = useState(false);
     const [valueImages, setValueImages] = useState<Array<[number, string]>>([]);
+
+    function setCellsMatrix(cellsMatrix: Cell[][]) {
+        puzzle.cellsMatrix = cellsMatrix;
+    }
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>) {
         if (isLoading || isHintLoading) {
@@ -47,10 +52,10 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
         setIsLoading(true);
         try{
             let response = await axios.patch<PatchResponse>(`http://localhost:8080/memoryPuzzles/flipCell`, {pos: [row, col], puzzleId: puzzle.id});
-            setPuzzle(response.data.puzzle);
+            setCellsMatrix(response.data.cellsMatrix);
             setTimeout(async () => {
                 let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkAnswer/?puzzleId=${puzzle.id}`);
-                setPuzzle(matchResponse.data.puzzle);
+                setCellsMatrix(matchResponse.data.cellsMatrix);
                 let resp = matchResponse.data;
                 if (resp.isSolved) {
                     correctAudio.play(); 
@@ -66,7 +71,7 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
     }
     async function fetchImages(){
         try{
-            const imagePromises = updatedPuzzle.valuesToSymbols.map(async ([value, fileLocation]) => {
+            const imagePromises = puzzle.valuesToSymbols.map(async ([value, fileLocation]) => {
                 const response = await axios.get(`http://localhost:8080/memoryPuzzles/symbol/?puzzleId=${puzzle.id}&fileLocation=${fileLocation}`, { responseType: 'blob' });
                 const imageUrl = URL.createObjectURL(response.data);
                 return [value, imageUrl] as [number, string];
@@ -87,12 +92,15 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
         setIsHintLoading(true);
         try{
             const response = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
-            setPuzzle(response.data.puzzle);
-            setTimeout(async () =>{
-                let hintResponse = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
-                setPuzzle(hintResponse.data.puzzle);
-                setIsHintLoading(false);
-            }, hintDuration); //1 second, 1.5 seconds or 2 seconds
+            if (response.data.result) {
+                setCellsMatrix(response.data.cellsMatrix);
+                puzzle.hints++;
+                setTimeout(async () =>{
+                    let hintResponse = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
+                    setCellsMatrix(hintResponse.data.cellsMatrix);
+                    setIsHintLoading(false);
+                }, hintDuration); //1 second, 1.5 seconds or 2 seconds
+            }
         }catch(error: any){
             console.error(error);
             setIsLoading(false);
@@ -120,10 +128,10 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
             children={
                 <Container className='text-center'>
                     <Row className='mb-3'>
-                        <h5>{updatedPuzzle.description}</h5>
+                        <h5>{puzzle.description}</h5>
                     </Row>
                     <Row>
-                        {updatedPuzzle.cellsMatrix.map((row, i) => (
+                        {puzzle.cellsMatrix.map((row, i) => (
                             <Row key={i} className="justify-content-md-center">
                             {row.map((cell, j) => (
                                 <Col xs={1} key={j} className="cell-col">
@@ -161,7 +169,7 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                         ))}
                         <Row className="justify-content-md-center">
                             <Col xs="auto">
-                                <HintAudioClickButton variant="primary" disabled={updatedPuzzle.hints === 3} className='mt-1' onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleHintRequest(e)}>{"Get help " + `(${updatedPuzzle.hints}/3)`}</HintAudioClickButton>
+                                <HintAudioClickButton variant="primary" disabled={puzzle.hints === 3} className='mt-1' onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleHintRequest(e)}>{"Get help " + `(${puzzle.hints}/3)`}</HintAudioClickButton>
                             </Col>
                         </Row>
                     </Row>
