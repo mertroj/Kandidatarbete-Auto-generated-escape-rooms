@@ -110,6 +110,7 @@ export class MastermindPuzzle implements Observable, Observer {
         for (let i = 0; i < this.hints.length - 1; i++){
             this.hints[i] = await generateThemedPuzzleText(this.hints[i], theme);
         }
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

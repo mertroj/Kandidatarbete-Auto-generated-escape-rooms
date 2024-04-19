@@ -39,8 +39,8 @@ export async function generateIntroText(theme: Theme): Promise<string> {
             throw new Error("Empty response from GPT-3");
         }
         return response.choices[0].message.content;
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Good luck!";
     }
 }
@@ -73,8 +73,8 @@ export async function generateEndingText(theme: Theme): Promise<string> {
             throw new Error("Empty response from GPT-3");
         }
         return response.choices[0].message.content;
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return "Congratulations! You have successfully escaped the " + theme + " themed escape room. We hope you enjoyed the experience and look forward to seeing you again soon!";
     }
 }
@@ -105,8 +105,8 @@ export async function generateThemedPuzzleText(textToChange: string, theme: Them
             throw new Error("Empty response from GPT-3");
         }
         return response.choices[0].message.content;
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error(error.message);
         return textToChange;
     }
 }

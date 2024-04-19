@@ -32,6 +32,9 @@ function EscapeRoomPage() {
     const [feedbackList, setFeedbackList] = useState<Array<{id: number, message: FeedbackMessages, bgCol:string}>>([]);
     const [roomStatus, setRoomStatus] = useState<RoomStatus[]>([]);
     const [endingText, setEndingText] = useState<string>('');
+    const [displayedEndText, setDisplayedEndText] = useState<string>('');
+    const [currentEndIndex, setCurrentEndIndex] = useState<number>(0);
+
     const timerRef = useRef(timer);
     timerRef.current = timer;
     let feedbackId = 0;
@@ -214,6 +217,21 @@ function EscapeRoomPage() {
     }, []);
 
     useEffect(() => {
+        if (endingText !== '') {
+            const intervalId = setInterval(() => {
+                if (currentEndIndex < endingText.length) {
+                    setDisplayedEndText(prevText => prevText + endingText[currentEndIndex]);
+                    setCurrentEndIndex(prevIndex => prevIndex + 1);
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 25);
+        
+            return () => clearInterval(intervalId);
+        }
+    }, [endingText, currentEndIndex]);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             setFeedbackList(feedbackList => feedbackList.slice(1));
         }, 2000); // wait for fadeOut time (2s)
@@ -297,7 +315,7 @@ function EscapeRoomPage() {
                         trigger={<div></div>}
                         children={
                             <div className={'text-center'}>
-                                {endingText}
+                                {displayedEndText}
                                 <Row className={'mt-5'}>
                                     <Button variant='outline-success' onClick={() => navigate(resultScreenUrl)}>Leave</Button>
                                 </Row>
