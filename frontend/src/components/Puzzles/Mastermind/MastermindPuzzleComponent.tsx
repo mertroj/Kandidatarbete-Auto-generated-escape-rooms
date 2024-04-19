@@ -80,7 +80,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
                 }
                 if (currentInputRef.current.length < length){
                     setCurrentInput(prevInput => prevInput + key);
-                    localStorage.setItem(puzzle.id, currentInputRef.current);
+                    sessionStorage.setItem(puzzle.id, currentInputRef.current);
                 }
             }else if (key === 'Enter') {
                 handleGuess(currentInputRef.current);
@@ -98,7 +98,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
     }, [currentInput]);
 
     useEffect(() => {
-        let prevAnswer = localStorage.getItem(puzzle.id);
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setCurrentInput(prevAnswer);
     }, []);
 

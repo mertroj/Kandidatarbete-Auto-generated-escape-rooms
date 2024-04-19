@@ -68,11 +68,11 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
     const handleSelectChange = (index: number, value: string) => {
         answer[index] = value;
         setAnswer([...answer]);
-        localStorage.setItem(puzzle.id, answer.join(''));
+        sessionStorage.setItem(puzzle.id, answer.join(''));
     };
 
     useEffect(() => {
-        let prevAnswer = localStorage.getItem(puzzle.id);
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer.split(''));
     }, [])
 

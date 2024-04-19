@@ -30,7 +30,7 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
 
     function handleChange(value: string) {
         setAnswer(value);
-        localStorage.setItem(puzzle.id, value);
+        sessionStorage.setItem(puzzle.id, value);
     }
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -62,7 +62,7 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
     }
 
     useEffect(() => {
-        let prevAnswer = localStorage.getItem(puzzle.id);
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer);
     }, [])
 

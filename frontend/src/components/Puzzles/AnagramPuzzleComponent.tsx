@@ -30,7 +30,7 @@ function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, 
 
     function handleChange(value: string) {
         setAnswer(value);
-        localStorage.setItem(puzzle.id, value);
+        sessionStorage.setItem(puzzle.id, value);
     }
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -62,7 +62,7 @@ function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, 
     }
 
     useEffect(() => {
-        let prevAnswer = localStorage.getItem(puzzle.id);
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer);
     }, [])
 
