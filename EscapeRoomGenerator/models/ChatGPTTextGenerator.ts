@@ -41,7 +41,7 @@ export async function generateIntroText(theme: Theme): Promise<string> {
         return response.choices[0].message.content;
     } catch (error: any) {
         console.error(error.message);
-        return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Good luck!";
+        return "Welcome to the " + theme + " escape room! You have 60 minutes to escape the room. Don't forget to ask for help when you need it. Good luck!";
     }
 }
 
