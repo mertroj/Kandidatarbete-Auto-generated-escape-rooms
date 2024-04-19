@@ -1,0 +1,166 @@
+{
+  "MagicalWorkshop": [
+    {
+      "image": "MagicalWorkshop1",
+      "originalImagePath": "Images/magicalWorkshop1.jpg",
+      "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop1_Changed.jpg",
+      "estimatedTime": 5,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "MagicalWorkshop2",
+      "originalImagePath": "Images/magicalWorkshop4.jpg",
+      "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop4_Changed.png",
+      "estimatedTime": 5,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "MagicalWorkshop7",
+      "originalImagePath": "Images/magicalWorkshop7.jpg",
+      "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop7_Changed.png",
+      "estimatedTime": 5,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "MagicalWorkshop8",
+      "originalImagePath": "Images/magicalWorkshop8.jpg",
+      "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop8_Changed.png",
+      "estimatedTime": 5,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "MagicalWorkshop9",
+      "originalImagePath": "Images/magicalWorkshop9.jpg",
+      "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop9_Changed.png",
+      "estimatedTime": 5,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    }
+  ],
+  "PharaohsTomb": [
+    {
+      "image": "PharaohsTomb1",
+      "originalImagePath": "Images/SpotTheDifference/PharaohsTomb1_Original.png",
+      "changedImagePath": "Images/SpotTheDifference/PharaohsTomb1_Changed.png",
+      "estimatedTime": 4,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "PharaohsTomb2",
+      "originalImagePath": "Images/SpotTheDifference/PharaohsTomb2_Original.png",
+      "changedImagePath": "Images/SpotTheDifference/PharaohsTomb2_Changed.png",
+      "estimatedTime": 4,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "PharaohsTomb3",
+      "originalImagePath": "Images/SpotTheDifference/PharaohsTomb3_Original.png",
+      "changedImagePath": "Images/SpotTheDifference/PharaohsTomb3_Changed.png",
+      "estimatedTime": 4,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "PharaohsTomb4",
+      "originalImagePath": "Images/SpotTheDifference/PharaohsTomb4_Original.png",
+      "changedImagePath": "Images/SpotTheDifference/PharaohsTomb4_Changed.png",
+      "estimatedTime": 4,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    },
+    {
+      "image": "PharaohsTomb5",
+      "originalImagePath": "Images/SpotTheDifference/PharaohsTomb5_Original.png",
+      "changedImagePath": "Images/SpotTheDifference/PharaohsTomb5_Changed.png",
+      "estimatedTime": 4,
+      "difficulty": 2,
+      "differences": [
+        {"x1": 10, "y1": 20, "x2": 30, "y2": 40, "x3": 50, "y3": 60, "x4": 70, "y4": 80},
+        {"x1": 15, "y1": 25, "x2": 35, "y2": 45, "x3": 55, "y3": 65, "x4": 75, "y4": 85},
+        {"x1": 20, "y1": 30, "x2": 40, "y2": 50, "x3": 60, "y3": 70, "x4": 80, "y4": 90},
+        {"x1": 25, "y1": 35, "x2": 45, "y2": 55, "x3": 65, "y3": 75, "x4": 85, "y4": 95},
+        {"x1": 30, "y1": 40, "x2": 50, "y2": 60, "x3": 70, "y3": 80, "x4": 90, "y4": 100},
+        {"x1": 35, "y1": 45, "x2": 55, "y2": 65, "x3": 75, "y3": 85, "x4": 95, "y4": 105},
+        {"x1": 40, "y1": 50, "x2": 60, "y2": 70, "x3": 80, "y3": 90, "x4": 100, "y4": 110}
+      ]
+    }
+  ]
+}
