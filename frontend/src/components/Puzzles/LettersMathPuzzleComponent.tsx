@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -28,8 +28,12 @@ interface GuessResponse {
 
 function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: LettersMathPuzzleProps) {
     const {volume} = React.useContext(VolumeContext);
-    const [answer, setAnswer] = useState<string>();
+    const [answer, setAnswer] = useState<string>('');
 
+    function handleChange(value: string) {
+        setAnswer(value);
+        sessionStorage.setItem(puzzle.id, value);
+    }
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try{
@@ -50,7 +54,6 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
             console.error(error);
         }
     }
-    
     async function getHint() {
         try{
             const response = await axios.get(`http://localhost:8080/lettersMathPuzzles/hint/?puzzleId=${puzzle.id}`);
@@ -63,6 +66,11 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
         }
     }
 
+    useEffect(() => {
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
+        if (prevAnswer) setAnswer(prevAnswer);
+    }, [])
+
     return (
         <div className='puzzle-card'>
             <p className='puzzle-number'>#{i}</p>
@@ -70,7 +78,13 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
             <p>{puzzle.question}</p>
             <div>
                 <form action="" onSubmit={handleSubmit}>
-                    <input className='w-100' type="text" placeholder='Enter the answer here' onChange={e => setAnswer(e.target.value)} />
+                    <input 
+                        className='w-100' 
+                        type="text" 
+                        value={answer}
+                        placeholder='Enter the answer here' 
+                        onChange={e => handleChange(e.target.value)} 
+                    />
                     <button className='w-100' type='submit'>Test answer</button>
                 </form>
                 <HintAudioClickButton className="w-100" onClick={async() => getHint()}>
