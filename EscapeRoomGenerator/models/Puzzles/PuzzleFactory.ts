@@ -6,6 +6,7 @@ import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { Jigsaw } from "./Jigsaw";
 import { MastermindPuzzle } from "./MastermindPuzzles";
+import { SpotTheDifference } from "./SpotTheDifference";
 
 export class PuzzleFactory{
     private static anagramCounter = 0;
@@ -13,8 +14,9 @@ export class PuzzleFactory{
     private static operatorCounter = 0;
     private static slideCounter = 0;
     private static mastermindCounter = 0;
+    private static spotTheDifferenceCounter = 0;
 
-    //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
+    //1000 gives more granularity than 100 or 10 without affecting the relative probabilities since the weight are relative, not absolute
     static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
         return frequencies<() => Puzzle>([
             [1000 - (this.anagramCounter/1000), () =>
@@ -45,6 +47,14 @@ export class PuzzleFactory{
                 {
                     this.mastermindCounter++;
                     return new MastermindPuzzle(difficulty, dependentPuzzles);
+                }
+            ],
+            [1000 - (this.spotTheDifferenceCounter/1000), () =>
+                {
+                    this.spotTheDifferenceCounter++;
+                    console.log("dependentpuzzle:")
+                    console.log(dependentPuzzles)
+                    return new SpotTheDifference(dependentPuzzles);
                 }
             ]
         ])();

@@ -124,3 +124,17 @@ export interface JigsawPuzzle {
     pieces: JigsawPiece[];
     size: {rows: number, columns: number};
 }
+
+export interface SpotTheDifferencePuzzle {
+    id: string;
+    type: string;
+    isSolved: boolean;
+    isLocked: boolean;
+    hints: number;
+    question: string;
+    description: string;
+    estimatedTime: number;
+    differences: any[];
+    originalImagePath: string;
+    changedImagePath: string;
+}
