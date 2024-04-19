@@ -1,0 +1,82 @@
+[
+  {
+    "theme": "MagicalWorkshop",
+    "image": "MagicalWorkshop1",
+    "originalImagePath": "Images/magicalWorkshop1.jpg",
+    "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop1_Changed.jpg",
+    "estimatedTime": 5,
+    "difficulty": 3
+  },
+  {
+    "theme": "MagicalWorkshop",
+    "image": "MagicalWorkshop2",
+    "originalImagePath": "Images/magicalWorkshop4.jpg",
+    "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop4_Changed.png",
+    "estimatedTime": 5,
+    "difficulty": 3
+  },
+  {
+    "theme": "MagicalWorkshop",
+    "image": "MagicalWorkshop7",
+    "originalImagePath": "Images/magicalWorkshop7.jpg",
+    "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop7_Changed.png",
+    "estimatedTime": 5,
+    "difficulty": 3
+  },
+  {
+    "theme": "MagicalWorkshop",
+    "image": "MagicalWorkshop8",
+    "originalImagePath": "Images/magicalWorkshop8.jpg",
+    "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop8_Changed.png",
+    "estimatedTime": 5,
+    "difficulty": 3
+  },
+  {
+    "theme": "MagicalWorkshop",
+    "image": "MagicalWorkshop9",
+    "originalImagePath": "Images/magicalWorkshop9.jpg",
+    "changedImagePath": "Images/SpotTheDifference/MagicalWorkshop9_Changed.png",
+    "estimatedTime": 5,
+    "difficulty": 3
+  },
+  {
+    "theme": "PharaohsTomb",
+    "image": "PharaohsTomb1",
+    "originalImagePath": "Images/SpotTheDifference/PharaohsTomb1_Original.png",
+    "changedImagePath": "Images/SpotTheDifference/PharaohsTomb1_Changed.png",
+    "estimatedTime": 4,
+    "difficulty": 2
+  },
+  {
+    "theme": "PharaohsTomb",
+    "image": "PharaohsTomb2",
+    "originalImagePath": "Images/SpotTheDifference/PharaohsTomb2_Original.png",
+    "changedImagePath": "Images/SpotTheDifference/PharaohsTomb2_Changed.png",
+    "estimatedTime": 4,
+    "difficulty": 2
+  },
+  {
+    "theme": "PharaohsTomb",
+    "image": "PharaohsTomb3",
+    "originalImagePath": "Images/SpotTheDifference/PharaohsTomb3_Original.png",
+    "changedImagePath": "Images/SpotTheDifference/PharaohsTomb3_Changed.png",
+    "estimatedTime": 4,
+    "difficulty": 2
+  },
+  {
+    "theme": "PharaohsTomb",
+    "image": "PharaohsTomb4",
+    "originalImagePath": "Images/SpotTheDifference/PharaohsTomb4_Original.png",
+    "changedImagePath": "Images/SpotTheDifference/PharaohsTomb4_Changed.png",
+    "estimatedTime": 4,
+    "difficulty": 2
+  },
+  {
+    "theme": "PharaohsTomb",
+    "image": "PharaohsTomb5",
+    "originalImagePath": "Images/SpotTheDifference/PharaohsTomb5_Original.png",
+    "changedImagePath": "Images/SpotTheDifference/PharaohsTomb5_Changed.png",
+    "estimatedTime": 4,
+    "difficulty": 2
+  }
+]
