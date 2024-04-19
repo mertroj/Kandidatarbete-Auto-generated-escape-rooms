@@ -41,12 +41,10 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
             let resp = response.data;
             if(resp.result){
                 correctAudio.currentTime = 0;
-                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
-                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }
@@ -70,6 +68,11 @@ function LettersMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnsw
         let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer);
     }, [])
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <div className='puzzle-card'>

@@ -47,14 +47,12 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
 
             if (resp.bools === '2'.repeat(length)) {
                 setTimeout(async () => {
-                    correctAudio.volume = volume;
                     correctAudio.play();
                     puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsShowing(false);
                 }, 500*length);
             } else {
                 incorrectAudio.currentTime = 0;
-                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }
@@ -101,6 +99,11 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
     useEffect(() => {
         currentInputRef.current = currentInput;
     }, [currentInput]);
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     useEffect(() => {
         let prevAnswer = sessionStorage.getItem(puzzle.id);

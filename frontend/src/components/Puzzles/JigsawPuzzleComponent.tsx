@@ -53,7 +53,6 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
             const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data) {
                 correctAudio.currentTime = 0;
-                correctAudio.volume = volume;
                 correctAudio.play();
                 onSolve();
             }
@@ -73,6 +72,10 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
     useEffect(() => {
         jigsawImage();
     }, []);
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+    }, [volume]);
 
     useEffect(() => {
         // Call handleResize on window resize to resize canvas dynamically

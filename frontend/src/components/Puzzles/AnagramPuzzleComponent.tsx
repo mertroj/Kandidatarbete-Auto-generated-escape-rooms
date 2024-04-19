@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -41,12 +41,10 @@ function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, 
             let resp = response.data;
             if(resp.result){
                 correctAudio.currentTime = 0;
-                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
-                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }
@@ -70,6 +68,11 @@ function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, 
         let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer);
     }, [])
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <div className='puzzle-card'>

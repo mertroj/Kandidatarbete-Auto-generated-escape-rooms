@@ -44,12 +44,10 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             let resp = response.data;
             if(resp.result){
                 correctAudio.currentTime = 0;
-                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
-                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }
@@ -80,6 +78,11 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
         let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer.split(''));
     }, [])
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <div className='puzzle-card'>

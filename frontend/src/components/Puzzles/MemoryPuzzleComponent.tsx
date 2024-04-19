@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Cell, MemoryPuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
@@ -60,7 +60,6 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                 let resp = matchResponse.data;
                 if (resp.isSolved) {
                     correctAudio.currentTime = 0;
-                    correctAudio.volume = volume;
                     correctAudio.play(); 
                     puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsOpen(false);
@@ -115,6 +114,10 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
     useEffect(() => {
         fetchImages();
     }, []);
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+    }, [volume]);
 
     if (valueImages.length === 0) return (<div>Loading...</div>);
 

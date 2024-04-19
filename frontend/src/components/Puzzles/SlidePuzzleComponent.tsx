@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Piece, SlidePuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
@@ -82,13 +82,11 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             let resp = response.data;
             if(resp.result){
                 correctAudio.currentTime = 0;
-                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
                 setIsOpen(false);
             }else{
                 incorrectAudio.currentTime = 0;
-                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }
@@ -110,6 +108,11 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             console.error(error);
         }
     }
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <Popup 
