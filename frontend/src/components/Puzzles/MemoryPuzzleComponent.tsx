@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Cell, MemoryPuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
@@ -37,13 +37,10 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
     const {volume} = React.useContext(VolumeContext);
     const hintDuration = 1000 + (((puzzle.difficulty - 1)/2)) * 1000; //1 second, 1.5 seconds or 2 seconds
     const [isOpen, setIsOpen] = useState(false);
+    const [cellsMatrix, setCellsMatrix] = useState<Cell[][]>(puzzle.cellsMatrix);
     const [isLoading, setIsLoading] = useState(false);
     const [isHintLoading, setIsHintLoading] = useState(false);
     const [valueImages, setValueImages] = useState<Array<[number, string]>>([]);
-
-    function setCellsMatrix(cellsMatrix: Cell[][]) {
-        puzzle.cellsMatrix = cellsMatrix;
-    }
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>) {
         if (isLoading || isHintLoading) {
@@ -55,9 +52,11 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
         try{
             let response = await axios.patch<PatchResponse>(`http://localhost:8080/memoryPuzzles/flipCell`, {pos: [row, col], puzzleId: puzzle.id});
             setCellsMatrix(response.data.cellsMatrix);
+            puzzle.cellsMatrix = response.data.cellsMatrix;
             setTimeout(async () => {
                 let matchResponse = await axios.get<CheckMatchResponse>(`http://localhost:8080/memoryPuzzles/checkAnswer/?puzzleId=${puzzle.id}`);
                 setCellsMatrix(matchResponse.data.cellsMatrix);
+                puzzle.cellsMatrix = matchResponse.data.cellsMatrix;
                 let resp = matchResponse.data;
                 if (resp.isSolved) {
                     correctAudio.currentTime = 0;
@@ -98,10 +97,12 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
             const response = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
             if (response.data.result) {
                 setCellsMatrix(response.data.cellsMatrix);
+                puzzle.cellsMatrix = response.data.cellsMatrix;
                 puzzle.hints++;
                 setTimeout(async () =>{
                     let hintResponse = await axios.get<HintResponse>(`http://localhost:8080/memoryPuzzles/toggleAllUnflippedCells/?puzzleId=${puzzle.id}`);
                     setCellsMatrix(hintResponse.data.cellsMatrix);
+                    puzzle.cellsMatrix = response.data.cellsMatrix;
                     setIsHintLoading(false);
                 }, hintDuration); //1 second, 1.5 seconds or 2 seconds
             }
@@ -135,23 +136,12 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                         <h5>{puzzle.description}</h5>
                     </Row>
                     <Row>
-                        {puzzle.cellsMatrix.map((row, i) => (
+                        {cellsMatrix.map((row, i) => (
                             <Row key={i} className="justify-content-md-center">
                             {row.map((cell, j) => (
                                 <Col xs={1} key={j} className="cell-col">
                                     <div 
                                         className={`cell ${cell.isFlipped ? 'cell-flip' : ''}`}
-                                        onMouseEnter={(e) => {
-                                            if (!cell.isFlipped){
-
-                                            }
-                                            
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!cell.isFlipped){
-
-                                            }
-                                        }}
                                         onClick={(e) => {
                                             handleClick(i, j, e);
                                         }}

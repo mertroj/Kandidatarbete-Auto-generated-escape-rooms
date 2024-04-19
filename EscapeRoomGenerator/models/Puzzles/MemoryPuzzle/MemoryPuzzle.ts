@@ -80,14 +80,15 @@ export class MemoryPuzzle implements Observer, Observable{
         return {isSolved: false, unlockedPuzzles: []};
     }
 
-    flipCell(row: number, col: number): void {
-        if (this.cellsMatrix[row][col].isFlipped) return;
+    flipCell(row: number, col: number): boolean {
+        if (this.cellsMatrix[row][col].isFlipped) return false;
         this.cellsMatrix[row][col].flip();
         this.currentlyFlipped.push([row, col]);
+        return true;
     }
 
-    toggleAllUnflippedCells(): void{
-        if (this.hints === 4) return; //3 hints allowed, but 4 because of the toggle functionality
+    toggleAllUnflippedCells(): boolean{
+        if (this.hints === 4) return false; //3 hints allowed, but 4 because of the toggle functionality
         const flipCells = (cells: number[][], checkFlipped: boolean) => {
             const cellsCopy = [...cells];
             cellsCopy.forEach(cell => {
@@ -106,6 +107,7 @@ export class MemoryPuzzle implements Observer, Observable{
                 flipCells(this.cellsMatrix.flatMap((row, r) => row.map((cell, c) => [r, c])), true);
             }
         }
+        return true;
     }
 
     initCells(): Cell[][] {

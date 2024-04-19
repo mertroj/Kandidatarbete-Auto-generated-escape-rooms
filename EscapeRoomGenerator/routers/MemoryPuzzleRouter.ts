@@ -47,9 +47,10 @@ MemoryPuzzleRouter.patch('/flipCell', (req: FlipCellRequest, res: Response) => {
             res.status(404).send("The pos parameter is invalid");
             return;
         }
-        puzzle.flipCell(pos[0], pos[1]);
+        let flipRes = puzzle.flipCell(pos[0], pos[1]);
         res.status(200).send({
-            puzzle: puzzle.strip()
+            result: flipRes,
+            cellsMatrix: puzzle.cellsMatrix
         });
 
     }catch(error: any){
@@ -95,7 +96,7 @@ MemoryPuzzleRouter.get('/checkAnswer', (req: CheckMatchRequest, res: Response) =
         res.status(200).send({
             unlockedPuzzles: unlockedPuzzles,
             isSolved: isSolved,
-            puzzle: puzzle.strip()
+            cellsMatrix: puzzle.cellsMatrix
         });
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
@@ -114,9 +115,10 @@ MemoryPuzzleRouter.get('/toggleAllUnflippedCells', (req: HintRequest, res: Respo
             res.status(404).send("The puzzleId parameter is invalid");
             return;
         }
-        puzzle.toggleAllUnflippedCells();
+        let hintRes = puzzle.toggleAllUnflippedCells();
         res.status(200).send({
-            puzzle: puzzle.strip()
+            result: hintRes,
+            cellsMatrix: puzzle.cellsMatrix
         });
     }catch(error: any){
         res.status(500).send('Internal server error' + error.message);
