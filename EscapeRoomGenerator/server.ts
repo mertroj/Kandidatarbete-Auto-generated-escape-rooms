@@ -13,6 +13,7 @@ import { JigsawRouter } from "./routers/JigsawRouter";
 import { ImageRouter } from "./routers/ImageRouter";
 import { Theme } from "./models/Theme";
 import { DescriptionRouter } from "./routers/DescriptionRouter";
+import { SpotTheDifferenceRouter } from "./routers/SpotTheDifferenceRouter";
 
 const app: Express = express();
 const port: number = 8080;
@@ -27,6 +28,7 @@ app.use('/lockedPuzzle', DescriptionRouter);
 app.use('/anagrams', AnagramRouter);
 app.use('/jigsaw', JigsawRouter);
 app.use('/images', ImageRouter);
+app.use('/spotTheDifference', SpotTheDifferenceRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
     if (req.query.players === undefined) {

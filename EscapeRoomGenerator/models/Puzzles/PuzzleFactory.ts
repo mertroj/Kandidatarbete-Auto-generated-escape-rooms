@@ -52,8 +52,6 @@ export class PuzzleFactory{
             [1000 - (this.spotTheDifferenceCounter/1000), () =>
                 {
                     this.spotTheDifferenceCounter++;
-                    console.log("dependentpuzzle:")
-                    console.log(dependentPuzzles)
                     return new SpotTheDifference(dependentPuzzles);
                 }
             ]

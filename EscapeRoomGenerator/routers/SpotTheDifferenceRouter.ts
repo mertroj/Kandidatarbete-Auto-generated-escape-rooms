@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
 import { SpotTheDifference } from "../models/Puzzles/SpotTheDifference";
+import { Request, Response } from 'express';
+
 
 export const SpotTheDifferenceRouter = require('express').Router();
 

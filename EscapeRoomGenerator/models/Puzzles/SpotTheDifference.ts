@@ -1,6 +1,9 @@
 import { Observable, Observer } from './ObserverPattern';
 import { v4 as uuidv4 } from "uuid";
-import * as fs from 'fs'; // Import file system module to read JSON file
+import * as fs from 'fs';
+import * as path from 'path';
+
+const spotTheDifferenceData = path.join(__dirname, '../../spotTheDifference.json');
 
 interface PuzzleData {
     theme: string;
@@ -32,7 +35,7 @@ export class SpotTheDifference implements Observable, Observer {
     private dependentPuzzles: string[] = [];
     private differences: Difference[] = [];
     description: string = "Wait, are these the same?";
-    estimatedTime: number;
+    estimatedTime: number = 3;
     hints: string[] = [];
     question: string = "";
     isSolved: boolean = false;
@@ -49,38 +52,28 @@ export class SpotTheDifference implements Observable, Observer {
         SpotTheDifference.puzzles[this.id] = this;
     }
     initializePuzzle(theme: string) {
-        const jsonData: PuzzleData[] = this.readPuzzleDataFromJSON();
-        const themePuzzles = jsonData.filter(puzzle => puzzle.theme === theme);
-        if (themePuzzles.length === 0) {
+        const themePuzzles = spotTheDifferenceData[theme];
+        if (!themePuzzles || themePuzzles.length === 0) {
             throw new Error(`No puzzles found for theme '${theme}'.`);
         }
-        const randomPuzzle = themePuzzles[Math.floor(Math.random() * themePuzzles.length)];
+        const randomIndex = Math.floor(Math.random() * themePuzzles.length);
+        const randomPuzzle = themePuzzles[randomIndex];
+
+        // Set the properties of the SpotTheDifference instance based on the randomly selected puzzle
         this.estimatedTime = randomPuzzle.estimatedTime;
+        this.originalImagePath = randomPuzzle.originalImagePath;
+        this.changedImagePath = randomPuzzle.changedImagePath;
+
+        // Initialize the differences array for the selected puzzle
         this.differences = randomPuzzle.differences.map(difference => ({
             ...difference,
             found: false // Initialize all differences as unfound
         }));
-        this.originalImagePath = randomPuzzle.originalImagePath;
-        this.changedImagePath = randomPuzzle.changedImagePath;
     }
+
 
     static get(puzzleId: string): SpotTheDifference {
         return SpotTheDifference.puzzles[puzzleId]
-    }
-
-
-
-    private readPuzzleDataFromJSON(): PuzzleData[] {
-        const jsonData = fs.readFileSync('spotTheDifference.json', 'utf-8');
-        return JSON.parse(jsonData);
-    }
-
-
-    private selectRandomImage(): string {
-        // Read image paths from JSON or fetch from a directory
-        const images = ["image1.jpg", "image2.jpg", "image3.jpg"]; // Example image paths
-        // Choose a random image
-        return images[Math.floor(Math.random() * images.length)];
     }
 
     checkSelection(x: number, y: number): boolean {
