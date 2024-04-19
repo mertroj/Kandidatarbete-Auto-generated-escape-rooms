@@ -14,6 +14,7 @@ import './EscapeRoomPage.css'
 import { VolumeContext } from "../utils/volumeContext";
 import VolumeSlider from "../components/Volume/volumeSliderComponent";
 import VolumeIconComponent from "../components/Volume/volumeIconComponent";
+import TimerComponent from "../components/Timer/TimerComponent";
 
 function EscapeRoomPage() {
     const {gameId} = useParams();
@@ -276,9 +277,7 @@ function EscapeRoomPage() {
                             escapeRoom={escapeRoom}
                             currentRoom={currentRoom}
                         />
-                        <div className="text-center timer">
-                            Timer: {Math.floor(timer / 60)}:{timer % 60 < 10 ? '0' : ''}{timer % 60}
-                        </div>
+                        <TimerComponent timer={timer}/>
                         <NavigationPanel
                             gameId={gameId}
                             currentRoom={currentRoom}

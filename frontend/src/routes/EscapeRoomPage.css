@@ -17,12 +17,6 @@
     z-index: -1;
 }
 
-.timer{
-    background-color: rgb(210, 210, 210);
-    height: 4%;
-    font-size: 20px;
-}
-
 .volume-slider-container{
     position: absolute;
     top: 0%;
