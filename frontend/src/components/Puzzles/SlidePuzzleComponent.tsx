@@ -8,6 +8,7 @@ import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -41,6 +42,7 @@ interface GuessResponse {
 }
 
 function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: SlidePuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [updatedPuzzle, setPuzzle] = useState<SlidePuzzle>(puzzle);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -79,11 +81,14 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             const response = await axios.post<GuessResponse>(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             let resp = response.data;
             if(resp.result){
+                correctAudio.currentTime = 0;
+                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
                 setIsOpen(false);
             }else{
                 incorrectAudio.currentTime = 0;
+                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
 

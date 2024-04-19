@@ -119,6 +119,7 @@ export class MastermindPuzzle implements Observable, Observer {
             isSolved: this.isSolved,
             isLocked: this.isLocked,
             hints: this.hints,
+            description: this.description,
             length: this.length,
             question: this.question,
             previousGuesses: this.previousGuesses

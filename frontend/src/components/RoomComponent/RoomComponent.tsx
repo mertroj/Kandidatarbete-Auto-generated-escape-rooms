@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle, MemoryPuzzle} from '../../interfaces';
-// import JigsawPuzzleComponent from "../Puzzles/JigsawPuzzleComponent";
+import {SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle, MemoryPuzzle} from '../../interfaces';
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
 import LockedPuzzleComponent from '../Puzzles/LockedPuzzleComponent';

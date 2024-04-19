@@ -7,6 +7,7 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -33,6 +34,7 @@ interface MemoryPuzzleProps {
 }
 
 function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MemoryPuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const hintDuration = 1000 + (((puzzle.difficulty - 1)/2)) * 1000; //1 second, 1.5 seconds or 2 seconds
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +60,8 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
                 setCellsMatrix(matchResponse.data.cellsMatrix);
                 let resp = matchResponse.data;
                 if (resp.isSolved) {
+                    correctAudio.currentTime = 0;
+                    correctAudio.volume = volume;
                     correctAudio.play(); 
                     puzzleSolved(puzzle.id, resp.unlockedPuzzles);
                     setIsOpen(false);

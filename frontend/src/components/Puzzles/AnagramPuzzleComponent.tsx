@@ -7,6 +7,7 @@ import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -26,6 +27,7 @@ interface GuessResponse {
 }
 
 function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: AnagramProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [answer, setAnswer] = useState<string>();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -34,10 +36,13 @@ function AnagramPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, 
             const response = await axios.post<GuessResponse>(`http://localhost:8080/anagrams/checkAnswer`, {answer: answer, puzzleId: puzzle.id});
             let resp = response.data;
             if(resp.result){
+                correctAudio.currentTime = 0;
+                correctAudio.volume = volume;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
                 incorrectAudio.currentTime = 0;
+                incorrectAudio.volume = volume;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
             }

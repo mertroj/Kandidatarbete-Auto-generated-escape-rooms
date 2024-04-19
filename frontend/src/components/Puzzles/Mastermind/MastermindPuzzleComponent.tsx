@@ -10,6 +10,7 @@ import correctSound from '../../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../../assets/sounds/incorrect-answer.wav';
 import hintClickSound from '../../../assets/sounds/arcade-hint-click.wav';
 import withClickAudio from '../../withClickAudioComponent';
+import { VolumeContext } from "../../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -29,6 +30,7 @@ interface GuessResponse {
 }
 
 function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MasterMindPuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [isShowing, setIsShowing] = useState<boolean>(false);
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
@@ -45,12 +47,14 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
 
             if (resp.bools === '2'.repeat(length)) {
                 setTimeout(async () => {
-                    setIsShowing(false);
+                    correctAudio.volume = volume;
                     correctAudio.play();
-                    puzzleSolved(puzzle.id, resp.unlockedPuzzles)
+                    puzzleSolved(puzzle.id, resp.unlockedPuzzles);
+                    setIsShowing(false);
                 }, 500*length);
             } else {
                 incorrectAudio.currentTime = 0;
+                incorrectAudio.volume = volume;
                 incorrectAudio.play();
             }
 

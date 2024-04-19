@@ -17,7 +17,6 @@ function withClickAudio(WrappedComponent: React.ElementType, clickSound: string 
             if (onClick) {
                 onClick(event);
             }
-            console.log('click', clickSound);
         };
 
         return <WrappedComponent {...rest} onClick={handleClick} />;
