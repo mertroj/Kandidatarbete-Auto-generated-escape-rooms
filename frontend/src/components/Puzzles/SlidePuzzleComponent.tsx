@@ -116,6 +116,7 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
 
     return (
         <Popup 
+            puzzleNumber={i}
             navbarRemove={false}
             isOpen={isOpen}
             onOpen={() => setIsOpen(true)}

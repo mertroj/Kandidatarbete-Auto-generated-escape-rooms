@@ -57,7 +57,7 @@ export class EscapeRoom {
         let visited = new Set();
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
-        let nrOfRooms: number = Math.floor(totalTime / 20);
+        let nrOfRooms: number = Math.floor(totalTime / 20) + 1; //1 player: 2 rooms, 2 players: 3 rooms, 3 players: 4 rooms, 4 players: 5 rooms
         let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions);
         let nodes = graph.nodes();
 

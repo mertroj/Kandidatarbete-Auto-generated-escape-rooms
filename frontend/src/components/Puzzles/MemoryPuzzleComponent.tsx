@@ -123,6 +123,7 @@ function MemoryPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, p
 
     return (
         <Popup 
+            puzzleNumber={i}
             navbarRemove={false}
             isOpen={isOpen}
             onOpen={() => setIsOpen(true)}

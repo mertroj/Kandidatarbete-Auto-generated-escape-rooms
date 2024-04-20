@@ -112,6 +112,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
 
     return (
         <PopupComponent
+            puzzleNumber={i}
             navbarRemove={false}
             trigger={
                 <div className='puzzle-card'>

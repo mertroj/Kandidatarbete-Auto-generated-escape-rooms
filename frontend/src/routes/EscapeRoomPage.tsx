@@ -243,19 +243,22 @@ function EscapeRoomPage() {
             <div 
                 className="d-flex w-100"
             >
-                <div className="volume-slider-container">
+                <div className="volume-slider-container"
+                    onMouseEnter={handleMouseEnterVolume}
+                    onMouseLeave={handleMouseLeaveVolume}
+                >
                     <div 
-                        style={{position: 'relative'}}
-                        onMouseEnter={handleMouseEnterVolume}
-                        onMouseLeave={handleMouseLeaveVolume}
+                        style={{position: 'relative', width:'45px'}}
                     >
-                        <div className="volume-icon">
+                        <div 
+                            className="volume-icon"
+                            style={{marginBottom:`${isMouseOverVolume ? '320%' : '0px'}`}}
+                        >
                             <VolumeIconComponent />
                         </div>
                         {isMouseOverVolume && (
-                            <div className="volume-slider">
-                                <VolumeSlider />
-                            </div>
+
+                            <VolumeSlider />
                         )}
                     </div>
                 </div>
