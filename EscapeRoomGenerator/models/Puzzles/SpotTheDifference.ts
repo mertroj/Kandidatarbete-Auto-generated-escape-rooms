@@ -1,9 +1,7 @@
 import { Observable, Observer } from './ObserverPattern';
 import { v4 as uuidv4 } from "uuid";
-import * as fs from 'fs';
-import * as path from 'path';
 
-const spotTheDifferenceData = path.join(__dirname, '../../spotTheDifference.json');
+const spotTheDifferenceData = require('../../spotTheDifference.json');
 
 interface PuzzleData {
     theme: string;
@@ -65,7 +63,7 @@ export class SpotTheDifference implements Observable, Observer {
         this.changedImagePath = randomPuzzle.changedImagePath;
 
         // Initialize the differences array for the selected puzzle
-        this.differences = randomPuzzle.differences.map(difference => ({
+        this.differences = randomPuzzle.differences.map((difference: any) => ({
             ...difference,
             found: false // Initialize all differences as unfound
         }));
