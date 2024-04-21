@@ -3,16 +3,20 @@ import { Piece } from "./Piece";
 import { Position } from "./Position";
 import {shuffleArray} from "../../Helpers";
 import { Observable, Observer } from '../ObserverPattern';
+import { Theme } from '../../Theme';
+import { generateThemedPuzzleText } from '../../ChatGPTTextGenerator';
 
 export class SlidePuzzle implements Observer, Observable{
     private static puzzles: {[key: string]: SlidePuzzle} = {}
+    static type = "slidePuzzle";
+    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "slidePuzzle";
-    question: string = "Someone messed up the the scientist's decorational puzzle. Can you fix it?";
+    type: string = SlidePuzzle.type;
+    question: string = "Someone messed up the the order of the numbers here. Can you fix it?";
     description: string = "The last squares are the ones to be empty, the rest should be in order";
     isSolved: boolean = false;
     hints: number = 0;
@@ -40,7 +44,9 @@ export class SlidePuzzle implements Observer, Observable{
     static get(puzzleId: string): SlidePuzzle {
         return SlidePuzzle.puzzles[puzzleId];
     }
-
+    increaseCounter(): void {
+        SlidePuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void{
         this.observers.push(observer);
     }
@@ -115,6 +121,10 @@ export class SlidePuzzle implements Observer, Observable{
             return true;
         }
         return false;
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.question = await generateThemedPuzzleText(this.question, theme);
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     //TODO: Implement hint system

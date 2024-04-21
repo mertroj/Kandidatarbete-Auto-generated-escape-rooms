@@ -6,54 +6,55 @@ import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { Jigsaw } from "./Jigsaw";
 import { MastermindPuzzle } from "./MastermindPuzzles";
+import { MemoryPuzzle } from "./MemoryPuzzle/MemoryPuzzle";
+import { Theme } from "../Theme";
 
 export class PuzzleFactory{
-    private static anagramCounter = 0;
-    private static lettersCounter = 0;
-    private static operatorCounter = 0;
-    private static slideCounter = 0;
-    private static mastermindCounter = 0;
-
-    //1000 gives more granularity than 100 or 10 whitout affecting the relative probabilities since the weight are relative, not absolute
-    static createRandomPuzzle(difficulty: number, dependentPuzzles: string[] = []): Puzzle{
-        return frequencies<() => Puzzle>([
-            [1000 - (this.anagramCounter/1000), () =>
-                {
-                    this.anagramCounter++;
-                    return new Anagram(difficulty, dependentPuzzles);
-                }
-            ],            
-            [500 - (this.lettersCounter/500), () =>
-                {
-                    this.lettersCounter++;
-                    return new LettersMathPuzzle(dependentPuzzles);
-                }
-            ],
-            [400 - (this.operatorCounter/400), () =>
-                {
-                    this.operatorCounter++;
-                    return new OperatorMathPuzzle(difficulty, dependentPuzzles);
-                }
-            ],
-            [1000 - (this.slideCounter/1000), () => 
-                {
-                    this.slideCounter++;
-                    return new SlidePuzzle(difficulty, dependentPuzzles);
-                }
-            ],
-            [1000 - (this.mastermindCounter/1000), () =>
-                {
-                    this.mastermindCounter++;
-                    return new MastermindPuzzle(difficulty, dependentPuzzles);
-                }
-            ]
-        ])();
+    private puzzleInitializers: {[key: string]: (difficulty: number, dependentPuzzles: string[], theme: Theme) => Puzzle};
+    private puzzleTypeMap: {    
+        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw]
+    } = {
+        'anagram': [60, Anagram],
+        'lettersMathPuzzle': [40, LettersMathPuzzle],
+        'operatorMathPuzzle': [40, OperatorMathPuzzle],
+        'slidePuzzle': [100, SlidePuzzle],
+        'mastermindPuzzle': [100, MastermindPuzzle],
+        'memoryPuzzle': [100, MemoryPuzzle],
+        'jigsawPuzzle': [100, Jigsaw]
+    };
+    
+    constructor(excludedPuzzleTypes: string[]){
+        //TODO: do the same for converging and end puzzles when more types are available
+        this.puzzleInitializers = {
+            'anagram': (difficulty, dependentPuzzles) => new Anagram(difficulty, dependentPuzzles),
+            'lettersMathPuzzle': (difficulty, dependentPuzzles) => new LettersMathPuzzle(dependentPuzzles),
+            'operatorMathPuzzle': (difficulty, dependentPuzzles) => new OperatorMathPuzzle(difficulty, dependentPuzzles),
+            'slidePuzzle': (difficulty, dependentPuzzles) => new SlidePuzzle(difficulty, dependentPuzzles),
+            'mastermindPuzzle': (difficulty, dependentPuzzles) => new MastermindPuzzle(difficulty, dependentPuzzles),
+            'memoryPuzzle': (difficulty, dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme),
+        };
+      
+        excludedPuzzleTypes.forEach(puzzleType => {
+            delete this.puzzleInitializers[puzzleType];
+            delete this.puzzleTypeMap[puzzleType];
+        });
     }
-    static createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
+
+    createRandomPuzzle(difficulty: number, theme: Theme, dependentPuzzles: string[] = []): Puzzle{
+        const puzzleFrequencies = Object.entries(this.puzzleInitializers).map(([puzzleType, initializer]) => {
+            let [granularity, Puzzle] = this.puzzleTypeMap[puzzleType];
+            return [granularity - Puzzle.objectCounter, () => initializer(difficulty, dependentPuzzles, theme)] as [number, () => Puzzle];
+        });
+    
+        return frequencies<() => Puzzle>(puzzleFrequencies)();
+    }
+    
+    createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles); //TODO: Add more types of converging puzzles
         return puzzle;
     }
-    static createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
+    
+    createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         return frequencies<() => Puzzle>([
             [1, () => new Jigsaw(difficulty, dependentPuzzles)]
         ])();

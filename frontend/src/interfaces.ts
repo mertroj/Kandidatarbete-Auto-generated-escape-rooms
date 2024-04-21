@@ -9,6 +9,7 @@ export interface EscapeRoom {
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
+    currentRoom: Room;
     theme: string;
 }
 
@@ -39,7 +40,7 @@ export interface RoomStatus {
     unlocked: boolean;
 }
 
-export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle;
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
 
 export interface AnagramPuzzle {
     id: string;
@@ -61,6 +62,24 @@ export interface LettersMathPuzzle {
     description: string;
 }
 
+export interface MemoryPuzzle {
+    id: string;
+    type: string;
+    isSolved: boolean;
+    isLocked: boolean;
+    hints: number;
+    difficulty: number;
+    question: string;
+    description: string;
+    cellsMatrix: Cell[][];
+    valuesToSymbols: Array<[number, string]>;
+}
+
+export interface Cell{
+    value: number;
+    isFlipped: boolean;
+}
+
 export interface OperatorsMathPuzzle {
     id: string;
     type: string;
@@ -79,6 +98,7 @@ export interface MastermindPuzzle {
     isLocked: boolean;
     hints: string[];
     question: string;
+    description: string;
     length: number;
     previousGuesses: [string, string][];
 }

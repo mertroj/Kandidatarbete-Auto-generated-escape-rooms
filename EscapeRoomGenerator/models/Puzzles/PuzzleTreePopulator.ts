@@ -2,6 +2,8 @@ import {Edge, Graph, alg} from "graphlib";
 import { divergingTree } from "../DivergingTree";
 import { Puzzle } from "./Puzzle";
 import { PuzzleFactory } from "./PuzzleFactory";
+import { Theme } from "../Theme";
+import { Jigsaw } from "./Jigsaw";
 
 //TODO: generate puzzles based on difficulty and/or time: TO BE EXPETED FROM THE PUZZLES?
 //TODO: make sure to always be under the estimatedTime: DONE
@@ -14,7 +16,8 @@ class TimeoutError extends Error {
     }
 }
 
-export function puzzleTreePopulator(estimatedTime: number, difficulty: number): Graph {
+export async function puzzleTreePopulator(estimatedTime: number, difficulty: number, theme: Theme, excludedPuzzleTypes: string[]): Promise<Graph> {
+    let factory = new PuzzleFactory(excludedPuzzleTypes);
     let puzzleBox: Puzzle[] = [];
     let counter = 0;
     let remainingTime: number;
@@ -22,7 +25,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
         remainingTime = estimatedTime;
         puzzleBox = [];
         while(remainingTime > 0){ //Should never be under 0 bcz of recursiveness in generatePuzzle(), but just in case
-            let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty);
+            let tempPuzzleObject: Puzzle = generatePuzzle(remainingTime, difficulty, theme, factory);
             remainingTime -= tempPuzzleObject.estimatedTime;
             puzzleBox.push(tempPuzzleObject);
         }
@@ -39,7 +42,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
         throw new Error("Diverging tree does not have as many nodes as required");
     }
     graph.removeNode('startNode');
-    let sortedGraph = alg.topsort(graph); //Topological sort of the graph
+    let sortedGraph = alg.topsort(graph); //Topological sort of the graph in order to generate dependentPuzzles first
 
     //let nodes = graph.nodes();
     for (let i = 0; i < sortedGraph.length; i++){
@@ -51,7 +54,7 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }
             const incomingPuzzles: Puzzle[] = incomingEdges.map((edge) => (graph.node(edge.v) as Puzzle));
             const incomingPuzzlesIds: string[] = incomingPuzzles.map(puzzle => puzzle.id);
-            if(nodeId === 'startNode'){
+            if(nodeId === 'startNode'){ //TODO: remove this since we remove startNode before the loop
                 continue;
             }
             if(nodeId === '0'){ //if the node is the final node
@@ -59,11 +62,14 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
                 if(!incomingEdges){
                     throw new Error("Invalid end node with no edges pointing towards it"); //is catched and rethrown
                 }
-                puzzleBox[i] = generateEndPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
+                puzzleBox[i] = generateEndPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds, factory);
+                puzzleBox[i].increaseCounter();
             }else if(graph.node(nodeId) === true){ //if the node is a converging node
-                puzzleBox[i] = generateConvergingPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
+                puzzleBox[i] = generateConvergingPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds, factory);
+                puzzleBox[i].increaseCounter();
             }else{ //if the node is a normal node but has which can still have incoming edges
-                puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds);
+                puzzleBox[i] = generateDependentPuzzle(puzzleBox[i].estimatedTime, difficulty, incomingPuzzlesIds, theme, factory);
+                puzzleBox[i].increaseCounter();
             }
             addObservers(puzzleBox[i], incomingPuzzles);
             graph.setNode(nodeId, puzzleBox[i]);
@@ -76,57 +82,56 @@ export function puzzleTreePopulator(estimatedTime: number, difficulty: number): 
             }
         }
     }
-    
+
     return graph;
 }
 
 
 //Recursive functions to generate puzzles with approperiate time and difficulty:
-function generatePuzzle(requiredTime: number, difficulty: number, counter: number = 1): Puzzle {
-    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty);
+function generatePuzzle(requiredTime: number, difficulty: number, theme: Theme, factory: PuzzleFactory, counter: number = 1): Puzzle {
+    let puzzle = factory.createRandomPuzzle(difficulty, theme);
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
 
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generatePuzzle(requiredTime, difficulty, counter + 1);
+        return generatePuzzle(requiredTime, difficulty, theme, factory, counter + 1);
     }
     return puzzle;
 }
-function generateDependentPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], counter: number = 1): Puzzle {
-    let puzzle = PuzzleFactory.createRandomPuzzle(difficulty, incomingPuzzles);
+function generateDependentPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], theme: Theme, factory: PuzzleFactory, counter: number = 1): Puzzle {
+    let puzzle = factory.createRandomPuzzle(difficulty, theme, incomingPuzzles);
 
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generateDependentPuzzle(requiredTime, difficulty, incomingPuzzles, counter + 1);
+        return generateDependentPuzzle(requiredTime, difficulty, incomingPuzzles, theme, factory, counter + 1);
     }
     return puzzle;
 }
-function generateEndPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], counter: number = 1): Puzzle { //is supposed to be converging always
+function generateEndPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], factory: PuzzleFactory, counter: number = 1): Puzzle { //is supposed to be converging always
     if (incomingPuzzles.length < 2) throw new Error("Converging node with less than 2 incoming edges");
-    let puzzle = PuzzleFactory.createRandomEndPuzzle(difficulty, incomingPuzzles);
+    let puzzle = factory.createRandomEndPuzzle(difficulty, incomingPuzzles);
     
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generateEndPuzzle(requiredTime, difficulty, incomingPuzzles, counter + 1);
+        return generateEndPuzzle(requiredTime, difficulty, incomingPuzzles, factory, counter + 1);
     }
 
     return puzzle;
 }
-function generateConvergingPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], counter: number = 1): Puzzle{
+function generateConvergingPuzzle(requiredTime: number, difficulty: number, incomingPuzzles: string[], factory: PuzzleFactory, counter: number = 1): Puzzle{
     if(incomingPuzzles.length < 2) throw new Error("Converging node with less than 2 incoming edges");
-    //if(inEdges.length > 3) throw new Error("Converging node with more than 3 incoming edges"); //later
 
-    let puzzle = PuzzleFactory.createRandomConvergingPuzzle(difficulty, incomingPuzzles);
+    let puzzle = factory.createRandomConvergingPuzzle(difficulty, incomingPuzzles);
     //tries to generate until it finds a puzzle with approperiate time or has ran 100 times with no such puzzle
     if(counter > 100){
         return puzzle; //if it has tried 100 times, it will return the puzzle anyway
     }else if(puzzle.estimatedTime > requiredTime) {
-        return generateConvergingPuzzle(requiredTime, difficulty, incomingPuzzles, counter + 1);
+        return generateConvergingPuzzle(requiredTime, difficulty, incomingPuzzles, factory, counter + 1);
     }
     return puzzle;
 }
@@ -135,3 +140,4 @@ function addObservers(puzzle: Puzzle, incomingPuzzles: Puzzle[]): void{
         p.addObserver(puzzle);
     });
 }
+

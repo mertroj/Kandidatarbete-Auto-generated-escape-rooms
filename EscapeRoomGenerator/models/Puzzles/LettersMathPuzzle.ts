@@ -2,17 +2,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from '../Helpers';
 import { Observable, Observer } from './ObserverPattern';
 import { shuffleArray } from '../Helpers';
+import { Theme } from '../Theme';
+import { generateThemedPuzzleText } from '../ChatGPTTextGenerator';
 
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Observable, Observer {
     private static puzzles: {[key: string]: LettersMathPuzzle} = {}
+    static type = 'lettersMathPuzzle';
+    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "lettersMathPuzzle";
+    type: string = LettersMathPuzzle.type;
     question: string;
     description: string = `Hmm, all the numbers in this equation have been replaced with letters. What is the result of the equation in numbers?`;
     hints: string[] = [];
@@ -72,7 +76,9 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
 
-
+    increaseCounter(){
+        LettersMathPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
@@ -108,6 +114,9 @@ export class LettersMathPuzzle implements Observable, Observer {
             return {result, unlockedPuzzles}
         }
         return {result, unlockedPuzzles: []};
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     strip() {

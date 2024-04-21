@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Piece, SlidePuzzle } from '../../interfaces';
 import axios from 'axios';
 import Popup from '../PopupComponent/Popup';
@@ -8,6 +8,7 @@ import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -41,6 +42,7 @@ interface GuessResponse {
 }
 
 function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: SlidePuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [isOpen, setIsOpen] = useState(false);
 
     async function handleClick(row: number, col: number, e: React.MouseEvent<HTMLDivElement>, autoMove: boolean, dir?: Direction) {
@@ -79,6 +81,7 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             const response = await axios.post<GuessResponse>(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             let resp = response.data;
             if(resp.result){
+                correctAudio.currentTime = 0;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
                 setIsOpen(false);
@@ -86,7 +89,6 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
                 notifyIncorrectAnswer();
-
             }
         }catch(error: any){
             console.error(error);
@@ -107,8 +109,15 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
         }
     }
 
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
+
     return (
         <Popup 
+            puzzleNumber={i}
+            navbarRemove={false}
             isOpen={isOpen}
             onOpen={() => setIsOpen(true)}
             onClose={() => setIsOpen(false)}

@@ -7,6 +7,7 @@ import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -31,6 +32,7 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [answer, setAnswer] = useState<string[]>(Array(puzzle.numberOfOperators).fill('+'));
 
     async function handleSubmit() {
@@ -41,6 +43,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             });
             let resp = response.data;
             if(resp.result){
+                correctAudio.currentTime = 0;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
@@ -75,6 +78,11 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
         let prevAnswer = sessionStorage.getItem(puzzle.id);
         if (prevAnswer) setAnswer(prevAnswer.split(''));
     }, [])
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <div className='puzzle-card'>

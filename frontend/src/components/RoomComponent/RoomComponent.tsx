@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {JigsawPuzzle, SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle} from '../../interfaces';
-// import JigsawPuzzleComponent from "../Puzzles/JigsawPuzzleComponent";
+import {SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle, MemoryPuzzle} from '../../interfaces';
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
 import LockedPuzzleComponent from '../Puzzles/LockedPuzzleComponent';
@@ -10,6 +8,7 @@ import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleCom
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
+import MemoryPuzzleComponent from '../Puzzles/MemoryPuzzleComponent';
 
 interface RoomComponentProps {
     room: Room;
@@ -70,6 +69,16 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                         return <MastermindPuzzleComponent 
                             key={puzzle.id}
                             puzzle={puzzle as MastermindPuzzle}
+                            i={i+1}
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
+                        />
+
+                    if (puzzle.type === 'memoryPuzzle')
+                        return <MemoryPuzzleComponent
+                            key={puzzle.id}
+                            puzzle={puzzle as MemoryPuzzle}
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}

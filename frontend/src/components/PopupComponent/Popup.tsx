@@ -13,6 +13,8 @@ export type Position =
     |   'right';
 
 export interface PopupProps {
+    puzzleNumber?: number;
+    navbarRemove: boolean;
     trigger: JSX.Element; 
     isOpen: boolean;
     onOpen: () => void;
@@ -32,11 +34,14 @@ function Popup (popupProps: PopupProps) {
                     <div className='overlay-background' onClick={popupProps.onClose}>
                     </div>
                     <div className='overlay'>
+                        {!popupProps.navbarRemove &&
                         <div className='bg-light sticky-top'>
-                            <Navbar className='p-0 justify-content-end'>
+                            <Navbar className={`p-0 ${popupProps.puzzleNumber ? 'justify-content-between ms-3' : 'justify-content-end'}`}>                                
+                                {popupProps.puzzleNumber && `#${popupProps.puzzleNumber}`}
                                 <AudioClickButton style={{borderRadius:'0px'}} className='p-3 btn-close'onClick={popupProps.onClose} type='button' variant='outline-danger'></AudioClickButton>
                             </Navbar>
                         </div>
+                        }
                         <div className='m-5'>
                             {popupProps.children}
                         </div>

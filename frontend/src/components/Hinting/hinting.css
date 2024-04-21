@@ -3,9 +3,8 @@
     opacity: 100%;
     width: 100%;
     padding: 8px 32px;
-    margin-bottom: 3%;
     box-shadow: 0px 0px 10px rgb(150, 150, 150);
-    height: 50%;
+    height: 49%;
 }
 
 .hint-dropdown-button {

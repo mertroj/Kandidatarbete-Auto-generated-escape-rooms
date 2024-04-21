@@ -23,9 +23,9 @@ ImageRouter.get("/themeImage", async (req: ImageRequest, res: Response) => {
             res.status(404).send("The gameId parameter is invalid");
             return;
         }
-        const images = imagesData[escapeRoom.theme];
+        const images = imagesData[escapeRoom.theme].backgrounds;
         const randomImage = images[Math.floor(Math.random() * images.length)];
-        res.status(200).sendFile(path.join(__dirname, '../Images/' + randomImage));
+        res.status(200).sendFile(path.join(__dirname, '../Images/backgrounds/' + randomImage));
     } catch (error) {
         res.status(500).send("Internal server error");
     }
