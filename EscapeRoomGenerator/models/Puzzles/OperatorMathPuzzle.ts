@@ -14,7 +14,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
     description: string = "What is the sequence of operators used in the following expression?"
     hints: string[] = [];
     isSolved: boolean = false;
-    estimatedTime: number;
+    estimatedTime: number = 100;
     isLocked: boolean;
     
     numberOfOperands: number;
