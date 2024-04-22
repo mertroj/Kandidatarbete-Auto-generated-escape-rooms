@@ -74,7 +74,7 @@ function SlidePuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, pu
             console.error(error);
         }
     }
-    async function handleSubmit(){ //closes the Popup if the answer is correct
+    async function handleSubmit(){ //closes the LargePopup if the answer is correct
         try{
             const response = await axios.post<GuessResponse>(`http://localhost:8080/slidePuzzles/checkAnswer`, {puzzleId: puzzle.id});
             let resp = response.data;

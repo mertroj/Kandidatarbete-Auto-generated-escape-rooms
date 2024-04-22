@@ -35,7 +35,7 @@ export class SpotTheDifference implements Observable, Observer {
     description: string = "Wait, are these the same?";
     estimatedTime: number = 3;
     hints: string[] = [];
-    question: string = "";
+    question: string = "Somethings not right over here";
     isSolved: boolean = false;
     isLocked: boolean = false;
     type: string = 'spotTheDifference';
@@ -127,8 +127,10 @@ export class SpotTheDifference implements Observable, Observer {
     }
 
     strip() {
+        console.log(this)
         return {
             type: this.type,
+            differences: this.differences,
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,

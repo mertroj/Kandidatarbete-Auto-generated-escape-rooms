@@ -5,13 +5,13 @@ import { Request, Response } from 'express';
 export const SpotTheDifferenceRouter = require('express').Router();
 
 SpotTheDifferenceRouter.get('/puzzle', (req: Request, res: Response) => {
-    const puzzleId = String(req.body.puzzleId);
+    const puzzleId = String(req.query.puzzleId);
     const puzzle = SpotTheDifference.get(puzzleId);
     if (puzzle === undefined) {
         res.status(404).send("The puzzleId parameter is invalid");
         return;
     }
-    res.send(puzzle.strip);
+    res.send(puzzle.strip());
 });
 
 SpotTheDifferenceRouter.post('/checkSelection', (req: Request, res: Response) => {

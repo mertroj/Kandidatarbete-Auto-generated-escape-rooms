@@ -10,6 +10,7 @@ import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleCom
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
+import SpotTheDifferenceComponent from "../Puzzles/SpotTheDifferencePuzzleComponent";
 
 interface RoomComponentProps {
     room: Room;
@@ -70,6 +71,15 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                         return <MastermindPuzzleComponent 
                             key={puzzle.id}
                             puzzle={puzzle as MastermindPuzzle}
+                            i={i+1}
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
+                        />
+                    if (puzzle.type === 'spotTheDifference')
+                        return <SpotTheDifferenceComponent
+                            key={puzzle.id}
+                            puzzleId={puzzle.id}
                             i={i+1}
                             updateRoom={updateRoom}
                             notifyIncorrectAnswer={notifyIncorrectAnswer}

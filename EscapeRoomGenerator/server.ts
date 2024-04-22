@@ -28,6 +28,7 @@ app.use('/lockedPuzzle', DescriptionRouter);
 app.use('/anagrams', AnagramRouter);
 app.use('/jigsaw', JigsawRouter);
 app.use('/images', ImageRouter);
+app.use('/Images', express.static('Images'));
 app.use('/spotTheDifference', SpotTheDifferenceRouter);
 
 app.get('/creategame', (req: Request, res: Response) => {
