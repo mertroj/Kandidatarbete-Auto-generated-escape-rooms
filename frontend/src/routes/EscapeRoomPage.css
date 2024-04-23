@@ -17,23 +17,20 @@
     z-index: -1;
 }
 
-/*
-.notification-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
-    border-radius: .25rem;
-    z-index: 9999; 
-    text-align: center; 
-    width: 200px;
-    height: 100px;
+.volume-slider-container{
+    position: absolute;
+    text-align: center;
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
+    top: 0%;
+    right: 21.5%;
+    z-index: 102;
 }
-*/
+.volume-icon{
+    font-size: 25px;
+}
+.volume-slider-container input[type=range] {
+    transform: rotate(270deg);
+    transform-origin: 17% 100%;
+}

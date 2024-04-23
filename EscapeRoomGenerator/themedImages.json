@@ -1,28 +1,46 @@
 {
-    "magical_workshop": 
-    [
-        "magicalWorkshop.jpg",
-        "magicalWorkshop1.jpg",
-        "magicalWorkshop2.jpg",
-        "magicalWorkshop3.jpg",
-        "magicalWorkshop4.jpg",
-        "magicalWorkshop5.jpg",
-        "magicalWorkshop6.jpg",
-        "magicalWorkshop7.jpg",
-        "magicalWorkshop8.jpg",
-        "magicalWorkshop9.jpg"
-    ],
-    "pharoah's_tomb":
-    [
-        "pharoahsTomb.jpg",
-        "pharoahsTomb1.jpg",
-        "pharoahsTomb2.jpg",
-        "pharoahsTomb3.jpg",
-        "pharoahsTomb4.jpg",
-        "pharoahsTomb5.jpg",
-        "pharoahsTomb6.jpg",
-        "pharoahsTomb7.jpg",
-        "pharoahsTomb8.jpg",
-        "pharoahsTomb9.jpg"
-    ]
+    "magical_workshop": { 
+        "backgrounds": [
+            "magicalWorkshop.jpg",
+            "magicalWorkshop1.jpg",
+            "magicalWorkshop2.jpg",
+            "magicalWorkshop3.jpg",
+            "magicalWorkshop4.jpg",
+            "magicalWorkshop5.jpg",
+            "magicalWorkshop6.jpg",
+            "magicalWorkshop7.jpg",
+            "magicalWorkshop8.jpg",
+            "magicalWorkshop9.jpg"
+        ],
+        "symbols": [
+            "workshopSymbol1.jpg", "workshopSymbol2.jpg", "workshopSymbol3.jpg",
+            "workshopSymbol4.jpg", "workshopSymbol5.jpg", "workshopSymbol6.jpg",
+            "workshopSymbol7.jpg", "workshopSymbol8.jpg", "workshopSymbol9.jpg",
+            "workshopSymbol10.jpg", "workshopSymbol11.jpg", "workshopSymbol12.jpg",
+            "workshopSymbol13.jpg", "workshopSymbol14.jpg", "workshopSymbol15.jpg",
+            "workshopSymbol16.jpg", "workshopSymbol17.jpg", "workshopSymbol18.jpg"
+        ]
+    },
+    "pharoah's_tomb": {
+        "backgrounds": [
+            "pharoahsTomb.jpg",
+            "pharoahsTomb1.jpg",
+            "pharoahsTomb2.jpg",
+            "pharoahsTomb3.jpg",
+            "pharoahsTomb4.jpg",
+            "pharoahsTomb5.jpg",
+            "pharoahsTomb6.jpg",
+            "pharoahsTomb7.jpg",
+            "pharoahsTomb8.jpg",
+            "pharoahsTomb9.jpg"
+        ],
+        "symbols": [
+            "pharoah'sSymbol1.jpg", "pharoah'sSymbol2.jpg", "pharoah'sSymbol3.jpg",
+            "pharoah'sSymbol4.jpg", "pharoah'sSymbol5.jpg", "pharoah'sSymbol6.jpg",
+            "pharoah'sSymbol7.jpg", "pharoah'sSymbol8.jpg", "pharoah'sSymbol9.jpg",
+            "pharoah'sSymbol10.jpg", "pharoah'sSymbol11.jpg", "pharoah'sSymbol12.jpg",
+            "pharoah'sSymbol13.jpg", "pharoah'sSymbol14.jpg", "pharoah'sSymbol15.jpg",
+            "pharoah'sSymbol16.jpg", "pharoah'sSymbol17.jpg", "pharoah'sSymbol18.jpg"
+        ]
+    }
 }

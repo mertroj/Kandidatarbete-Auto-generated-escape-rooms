@@ -10,6 +10,7 @@ import correctSound from '../../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../../assets/sounds/incorrect-answer.wav';
 import hintClickSound from '../../../assets/sounds/arcade-hint-click.wav';
 import withClickAudio from '../../withClickAudioComponent';
+import { VolumeContext } from "../../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -29,6 +30,7 @@ interface GuessResponse {
 }
 
 function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MasterMindPuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [isShowing, setIsShowing] = useState<boolean>(false);
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
@@ -45,13 +47,14 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
 
             if (resp.bools === '2'.repeat(length)) {
                 setTimeout(async () => {
-                    setIsShowing(false);
                     correctAudio.play();
-                    puzzleSolved(puzzle.id, resp.unlockedPuzzles)
+                    puzzleSolved(puzzle.id, resp.unlockedPuzzles);
+                    setIsShowing(false);
                 }, 500*length);
             } else {
                 incorrectAudio.currentTime = 0;
                 incorrectAudio.play();
+                notifyIncorrectAnswer();
             }
 
 
@@ -80,6 +83,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
                 }
                 if (currentInputRef.current.length < length){
                     setCurrentInput(prevInput => prevInput + key);
+                    sessionStorage.setItem(puzzle.id, currentInputRef.current);
                 }
             }else if (key === 'Enter') {
                 handleGuess(currentInputRef.current);
@@ -96,14 +100,25 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
         currentInputRef.current = currentInput;
     }, [currentInput]);
 
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
+
+    useEffect(() => {
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
+        if (prevAnswer) setCurrentInput(prevAnswer);
+    }, []);
 
     return (
         <PopupComponent
+            puzzleNumber={i}
+            navbarRemove={false}
             trigger={
                 <div className='puzzle-card'>
                     <p className='puzzle-number'>#{i}</p>
                     <Button variant='outline-primary'>
-                        Placeholder text for mastermind puzzle. To be chosen depending on the theme
+                        {puzzle.description}
                     </Button>
                 </div>
             }

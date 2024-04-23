@@ -1,16 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import { choice, randomIntRange, repeat } from '../Helpers'
 import { Observable, Observer } from './ObserverPattern';
+import {generateThemedPuzzleText } from '../ChatGPTTextGenerator';
+import { Theme } from '../Theme';
 
 
 export class OperatorMathPuzzle implements Observable, Observer {
     private static puzzles: {[key:string]: OperatorMathPuzzle} = {}
+    static type = 'operatorMathPuzzle';
+    static objectCounter: number = 0;
     
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = "operatorMathPuzzle"
+    type: string = OperatorMathPuzzle.type;
     description: string = "What is the sequence of operators used in the following expression?"
     hints: string[] = [];
     isSolved: boolean = false;
@@ -41,7 +45,9 @@ export class OperatorMathPuzzle implements Observable, Observer {
     static get(puzzleId: string): OperatorMathPuzzle {
         return OperatorMathPuzzle.puzzles[puzzleId]
     }
-
+    increaseCounter(): void {
+        OperatorMathPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
@@ -77,6 +83,9 @@ export class OperatorMathPuzzle implements Observable, Observer {
         question.push(this.answer.toString());
 
         return question.join(' ')
+    }
+    async applyTheme(theme: Theme): Promise<void> {
+        this.description = await generateThemedPuzzleText(this.description, theme);
     }
 
     getHint(): {hint: string, question: string} {

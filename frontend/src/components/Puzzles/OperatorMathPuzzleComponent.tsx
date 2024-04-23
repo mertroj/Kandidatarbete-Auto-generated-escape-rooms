@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './puzzles.css'
@@ -7,6 +7,7 @@ import hintClickSound from '../../assets/sounds/arcade-hint-click.wav';
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import incorrectSound from '../../assets/sounds/incorrect-answer.wav';
 import withClickAudio from '../withClickAudioComponent';
+import { VolumeContext } from "../../utils/volumeContext";
 
 const HintAudioClickButton = withClickAudio('button', hintClickSound);
 const correctAudio = new Audio(correctSound);
@@ -31,6 +32,7 @@ interface HintI {
 }
 
 function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: OperatorMathPuzzleProps) {
+    const {volume} = React.useContext(VolumeContext);
     const [answer, setAnswer] = useState<string[]>(Array(puzzle.numberOfOperators).fill('+'));
 
     async function handleSubmit() {
@@ -41,6 +43,7 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             });
             let resp = response.data;
             if(resp.result){
+                correctAudio.currentTime = 0;
                 correctAudio.play();
                 puzzleSolved(puzzle.id, resp.unlockedPuzzles)
             }else{
@@ -68,7 +71,18 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
     const handleSelectChange = (index: number, value: string) => {
         answer[index] = value;
         setAnswer([...answer]);
+        sessionStorage.setItem(puzzle.id, answer.join(''));
     };
+
+    useEffect(() => {
+        let prevAnswer = sessionStorage.getItem(puzzle.id);
+        if (prevAnswer) setAnswer(prevAnswer.split(''));
+    }, [])
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+        incorrectAudio.volume = volume;
+    }, [volume]);
 
     return (
         <div className='puzzle-card'>
@@ -76,12 +90,12 @@ function OperatorMathPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAns
             <p>{puzzle.description}</p>
             <p>{puzzle.question}</p>
             <div className='w-100 d-flex justify-content-around'>
-                {Array.from({length: puzzle.numberOfOperators}).map((_, index) => (
+                {answer.map((val, index) => (
                     <select key={index} onChange={e => handleSelectChange(index, e.target.value)}>
-                        <option value="+">+</option>
-                        <option value="-">-</option>
-                        <option value="*">×</option>
-                        <option value="/">÷</option>
+                        <option value="+" selected={val === '+'}>+</option>
+                        <option value="-" selected={val === '-'}>-</option>
+                        <option value="*" selected={val === '*'}>×</option>
+                        <option value="/" selected={val === '/'}>÷</option>
                     </select>
                 ))}
             </div>

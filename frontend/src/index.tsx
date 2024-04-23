@@ -7,6 +7,7 @@ import './index.css';
 import HomePage from './routes/HomePage';
 import PuzzleStart from './routes/EscapeRoomPage';
 import ResultScreenPage from "./routes/ResultScreenPage";
+import StartPage from './routes/StartPage';
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: "/escaperoom/:gameId",
     element: <PuzzleStart/>
+  },
+  {
+    path: "/escaperoom/:gameId/start",
+    element: <StartPage/>
   },
   {
     path: "/escaperoom/:gameId/result",

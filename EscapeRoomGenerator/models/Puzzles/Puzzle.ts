@@ -5,5 +5,6 @@ import { OperatorMathPuzzle } from "./OperatorMathPuzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { MastermindPuzzle } from "./MastermindPuzzles";
 import { SpotTheDifference } from "./SpotTheDifference";
+import { MemoryPuzzle } from "./MemoryPuzzle/MemoryPuzzle";
 
-export type Puzzle = Anagram | LettersMathPuzzle | OperatorMathPuzzle | SlidePuzzle | Jigsaw | MastermindPuzzle | SpotTheDifference;
+export type Puzzle = Anagram | LettersMathPuzzle | OperatorMathPuzzle | SlidePuzzle | Jigsaw | MastermindPuzzle | SpotTheDifference | MemoryPuzzle;

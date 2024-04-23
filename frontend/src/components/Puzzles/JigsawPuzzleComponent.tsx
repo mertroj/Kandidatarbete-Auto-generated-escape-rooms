@@ -3,9 +3,11 @@ import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
 import correctSound from '../../assets/sounds/correct-answer.wav';
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import { VolumeContext } from "../../utils/volumeContext";
 
 const correctAudio = new Audio(correctSound);
 function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
+    const {volume} = React.useContext(VolumeContext);
     const {gameId} = useParams();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     let IMAGE: HTMLImageElement;
@@ -49,6 +51,7 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
         try {
             const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
             if (response.data) {
+                correctAudio.currentTime = 0;
                 correctAudio.play();
                 onSolve();
             }
@@ -68,6 +71,10 @@ function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolv
     useEffect(() => {
         jigsawImage();
     }, []);
+
+    useEffect(() => {
+        correctAudio.volume = volume;
+    }, [volume]);
 
     useEffect(() => {
         // Call handleResize on window resize to resize canvas dynamically

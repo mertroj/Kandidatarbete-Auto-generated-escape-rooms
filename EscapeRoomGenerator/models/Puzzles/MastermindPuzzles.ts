@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import { generateThemedPuzzleText } from "../ChatGPTTextGenerator";
+import { Theme } from "../Theme";
 import { Observable, Observer } from "./ObserverPattern";
 import { randomInt, repeat } from '../Helpers';
 
@@ -7,16 +9,19 @@ export class MastermindPuzzle implements Observable, Observer {
     private static possibleHints: string[] = ['After each guess some numbers change colours, maybe that means something', 
                             'Green numbers are correct and in correct position, yellow are correct but wrong position', 
                             'The solution is: '];
+    static type = 'mastermindPuzzle';
+    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
 
     id: string = uuidv4();
-    type: string = 'mastermindPuzzle';
+    type: string = MastermindPuzzle.type;
     question: string;
     hints: string[] = [];
     isSolved: boolean = false;
     isLocked: boolean = false;
+    description: string = 'The code seems to have disappeared, but maybe you can figure it out by guessing';
     estimatedTime: number = 3; //TODO - Testing
 
     length: number; //Decides the length of the array - Easy: 3 | Medium: 4 | Hard: 5
@@ -35,7 +40,9 @@ export class MastermindPuzzle implements Observable, Observer {
     static get(puzzleId: string): MastermindPuzzle {
         return MastermindPuzzle.puzzles[puzzleId];
     }
-
+    increaseCounter(): void {
+        MastermindPuzzle.objectCounter++;
+    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
@@ -95,10 +102,17 @@ export class MastermindPuzzle implements Observable, Observer {
         if(result && !this.isSolved){
             this.isSolved = true;
             let unlockedPuzzles = this.notifyObservers();
-            return {result, bools: boolsStr, unlockedPuzzles}
+            return {result, bools: boolsStr, unlockedPuzzles: unlockedPuzzles}
         }
         return {result, bools: boolsStr, unlockedPuzzles: []};
     }
+    async applyTheme(theme: Theme): Promise<void> {
+        for (let i = 0; i < this.hints.length - 1; i++){
+            this.hints[i] = await generateThemedPuzzleText(this.hints[i], theme);
+        }
+        this.description = await generateThemedPuzzleText(this.description, theme);
+    }
+
     strip() {
         return {
             id: this.id,
@@ -106,6 +120,7 @@ export class MastermindPuzzle implements Observable, Observer {
             isSolved: this.isSolved,
             isLocked: this.isLocked,
             hints: this.hints,
+            description: this.description,
             length: this.length,
             question: this.question,
             previousGuesses: this.previousGuesses
