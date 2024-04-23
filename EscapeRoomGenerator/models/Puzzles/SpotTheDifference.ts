@@ -77,7 +77,7 @@ export class SpotTheDifference implements Observable, Observer {
     }
 
     checkSelection(x: number, y: number): boolean {
-        const tolerance = this.width / 50; // Define the tolerance
+        const tolerance = this.width / 100; // Define the tolerance
 
         // Loop through differences and check if the selection matches any
         for (const difference of this.differences) {
