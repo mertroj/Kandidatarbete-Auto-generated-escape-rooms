@@ -137,4 +137,6 @@ export interface SpotTheDifferencePuzzle {
     differences: any[];
     originalImagePath: string;
     changedImagePath: string;
+    width: number;
+    height: number;
 }

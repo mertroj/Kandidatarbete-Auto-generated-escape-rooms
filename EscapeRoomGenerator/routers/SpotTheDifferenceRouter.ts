@@ -1,7 +1,6 @@
 import { SpotTheDifference } from "../models/Puzzles/SpotTheDifference";
 import { Request, Response } from 'express';
 
-
 export const SpotTheDifferenceRouter = require('express').Router();
 
 SpotTheDifferenceRouter.get('/puzzle', (req: Request, res: Response) => {
@@ -14,35 +13,42 @@ SpotTheDifferenceRouter.get('/puzzle', (req: Request, res: Response) => {
     res.send(puzzle.strip());
 });
 
-SpotTheDifferenceRouter.post('/checkSelection', (req: Request, res: Response) => {
+SpotTheDifferenceRouter.post('/click', async (req: Request, res: Response) => {
+    const { x, y, puzzleId } = req.body;
+
+    // Validate the received data
+    if (typeof x !== 'number' || typeof y !== 'number' || typeof puzzleId !== 'string') {
+        return res.status(400).json({ error: 'Invalid request data' });
+    }
+
+    // Process the click event
     try {
-        if (req.body.puzzleId === undefined || req.body.puzzleId === "") {
+        const puzzle = SpotTheDifference.get(puzzleId);
+        if (!puzzle) {
+            return res.status(404).json({ error: 'Puzzle not found' });
+        }
+
+        const isCorrect = puzzle.checkSelection(x, y);
+        if (isCorrect) {
+            // Update puzzle state, save changes, etc.
+        }
+
+        // Send a response back to the client
+        res.json({ isCorrect });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+SpotTheDifferenceRouter.post('/checkAnswer', (req: Request, res: Response) => {
+    try {
+        if(req.body.puzzleId === undefined || req.body.puzzleId === ""){
             res.status(400).send("The puzzleId parameter is missing");
             return;
         }
         const puzzleId = String(req.body.puzzleId);
         const puzzle = SpotTheDifference.get(puzzleId);
-        if (puzzle === undefined) {
-            res.status(404).send("The puzzleId parameter is invalid");
-            return;
-        }
-        const x = req.body.x;
-        const y = req.body.y;
-        const isCorrect = puzzle.checkSelection(x, y);
-        res.status(200).send(isCorrect);
-    } catch (error) {
-        res.status(500).send("Internal server error");
-    }
-});
-
-SpotTheDifferenceRouter.get('/checkAnswer', (req: Request, res: Response) => {
-    try {
-        const puzzleId = String(req.body.puzzleId);
-        const puzzle = SpotTheDifference.get(puzzleId);
-        if (puzzle === undefined) {
-            res.status(404).send("The puzzleId parameter is invalid");
-            return;
-        }
         // Check if the puzzle is solved
         puzzle.checkAnswer();
         res.status(200).send(puzzle.isSolved);
@@ -52,17 +58,22 @@ SpotTheDifferenceRouter.get('/checkAnswer', (req: Request, res: Response) => {
 });
 
 SpotTheDifferenceRouter.get('/hint', (req: Request, res: Response) => {
-    try {
-        const puzzleId = String(req.body.puzzleId);
-        const puzzle = SpotTheDifference.get(puzzleId);
-        if (puzzle === undefined) {
-            res.status(404).send("The puzzleId parameter is invalid");
-            return;
-        }
-        // Get a hint
-        const hint = puzzle.getHint();
-        res.status(200).send(hint);
-    } catch (error) {
-        res.status(500).send("Internal server error");
+    if (req.query.puzzleId === undefined) {
+        return res.status(400).send("The puzzleId parameter is missing");
     }
+
+    const puzzleId = String(req.query.puzzleId);
+    const puzzle = SpotTheDifference.get(puzzleId);
+
+    if (!puzzle) {
+        return res.status(404).send("The puzzleId parameter is invalid");
+    }
+
+    const hint = puzzle.getHint();
+
+    if (!hint) {
+        return res.status(404).send("No hint available for this puzzle");
+    }
+
+    res.send(hint);
 });

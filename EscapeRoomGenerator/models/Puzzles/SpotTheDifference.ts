@@ -41,6 +41,8 @@ export class SpotTheDifference implements Observable, Observer {
     type: string = 'spotTheDifference';
     originalImagePath: string = "";
     changedImagePath: string = "";
+    width: number = 1024; //for now all images have these dimensions, if that's not the case in the future change this to a dynamic value
+    height: number = 1024;
 
     constructor(dependentPuzzles: string[]) { // TODO: add theme as a parameter when a solution is found
         this.dependentPuzzles = dependentPuzzles;
@@ -75,14 +77,16 @@ export class SpotTheDifference implements Observable, Observer {
     }
 
     checkSelection(x: number, y: number): boolean {
+        const tolerance = this.width / 50; // Define the tolerance
+
         // Loop through differences and check if the selection matches any
         for (const difference of this.differences) {
-            // Check if click is within the boundaries of the difference square
+            // Check if click is within the expanded boundaries of the difference square
             if (
-                x >= Math.min(difference.x1, difference.x2, difference.x3, difference.x4) &&
-                x <= Math.max(difference.x1, difference.x2, difference.x3, difference.x4) &&
-                y >= Math.min(difference.y1, difference.y2, difference.y3, difference.y4) &&
-                y <= Math.max(difference.y1, difference.y2, difference.y3, difference.y4)
+                x >= Math.min(difference.x1, difference.x2, difference.x3, difference.x4) - tolerance &&
+                x <= Math.max(difference.x1, difference.x2, difference.x3, difference.x4) + tolerance &&
+                y >= Math.min(difference.y1, difference.y2, difference.y3, difference.y4) - tolerance &&
+                y <= Math.max(difference.y1, difference.y2, difference.y3, difference.y4) + tolerance
             ) {
                 difference.found = true; // Mark the difference as found
                 return true; // Difference found
@@ -102,8 +106,15 @@ export class SpotTheDifference implements Observable, Observer {
             return "You've found all the differences!";
         }
 
-        const number = unfoundDifferences.length;
-        const hint = `I found a difference! that should make it ${number} in total!`;
+        // Randomly select one of the unfound differences
+        const randomIndex = Math.floor(Math.random() * unfoundDifferences.length);
+        const randomDifference = unfoundDifferences[randomIndex];
+
+        // Mark the randomly selected difference as found
+        randomDifference.found = true;
+
+        const number = unfoundDifferences.length - 1; // Subtract 1 because one difference has been found
+        const hint = `I found a difference! that should make it ${number} left to find!`;
         this.hints.push(hint);
 
         return hint;
@@ -127,7 +138,6 @@ export class SpotTheDifference implements Observable, Observer {
     }
 
     strip() {
-        console.log(this)
         return {
             type: this.type,
             differences: this.differences,
@@ -138,7 +148,9 @@ export class SpotTheDifference implements Observable, Observer {
             question: this.question,
             description: this.description,
             originalImagePath: this.originalImagePath,
-            changedImagePath: this.changedImagePath
+            changedImagePath: this.changedImagePath,
+            width: this.width,
+            height: this.height
         }
     }
 }
