@@ -4,7 +4,6 @@ import correctSound from '../../assets/sounds/correct-answer.wav';
 import {useParams} from "react-router-dom";
 import axios from "axios";
 
-//TODO:  Fix the bug with the pieces not always being drawn.
 const correctAudio = new Audio(correctSound);
 function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {gameId} = useParams();
