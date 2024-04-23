@@ -27,6 +27,7 @@ interface Difference {
 export class SpotTheDifference implements Observable, Observer {
     private static puzzles: { [key: string]: SpotTheDifference } = {}
     id: string = uuidv4();
+    static objectCounter: number = 0;
 
     private difficulty: number;
     private observers: Observer[] = [];
@@ -44,11 +45,11 @@ export class SpotTheDifference implements Observable, Observer {
     width: number = 1024; //for now all images have these dimensions, if that's not the case in the future change this to a dynamic value
     height: number = 1024;
 
-    constructor(dependentPuzzles: string[]) { // TODO: add theme as a parameter when a solution is found
+    constructor(difficulty: number, dependentPuzzles: string[], theme: string) { // TODO: add theme as a parameter when a solution is found
         this.dependentPuzzles = dependentPuzzles;
         if (this.dependentPuzzles.length > 0) this.isLocked = true;
-        this.difficulty = 1; // TODO: implement difficulty levels
-        this.initializePuzzle("MagicalWorkshop");
+        this.difficulty = difficulty; // TODO: implement difficulty levels
+        this.initializePuzzle(theme);
         SpotTheDifference.puzzles[this.id] = this;
     }
     initializePuzzle(theme: string) {

@@ -13,7 +13,7 @@ import { Theme } from "../Theme";
 export class PuzzleFactory{
     private puzzleInitializers: {[key: string]: (difficulty: number, dependentPuzzles: string[], theme: Theme) => Puzzle};
     private puzzleTypeMap: {
-        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw]
+        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw | typeof SpotTheDifference]
     } = {
         'anagram': [60, Anagram],
         'lettersMathPuzzle': [40, LettersMathPuzzle],
@@ -34,7 +34,7 @@ export class PuzzleFactory{
             'slidePuzzle': (difficulty, dependentPuzzles) => new SlidePuzzle(difficulty, dependentPuzzles),
             'mastermindPuzzle': (difficulty, dependentPuzzles) => new MastermindPuzzle(difficulty, dependentPuzzles),
             'memoryPuzzle': (difficulty, dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme),
-            'spotTheDifference': (dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme)
+            'spotTheDifference': (difficulty, dependentPuzzles, theme) => new SpotTheDifference(difficulty, dependentPuzzles, theme)
         };
 
         excludedPuzzleTypes.forEach(puzzleType => {
