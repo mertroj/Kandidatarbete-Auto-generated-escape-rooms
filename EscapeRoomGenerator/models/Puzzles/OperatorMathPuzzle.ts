@@ -18,7 +18,7 @@ export class OperatorMathPuzzle implements Observable, Observer {
     description: string = "What is the sequence of operators used in the following expression?"
     hints: string[] = [];
     isSolved: boolean = false;
-    estimatedTime: number;
+    estimatedTime: number = 100;
     isLocked: boolean;
     
     numberOfOperands: number;
@@ -29,7 +29,10 @@ export class OperatorMathPuzzle implements Observable, Observer {
     constructor(difficulty: number, dependentPuzzles: string[]) {
         this.dependentPuzzles = dependentPuzzles;
         this.isLocked = this.dependentPuzzles.length > 0
-        this.estimatedTime = difficulty; //tests gave 1 min average for easy. We can assume 2 min for medium and 3 min for hard
+        //make estimatedTime 1 min for easy, 4 min for medium, 5 min for hard
+        if (difficulty === 1) this.estimatedTime = 2;
+        if (difficulty === 2) this.estimatedTime = 4;
+        if (difficulty === 3) this.estimatedTime = 6;
         this.numberOfOperands = 3 + difficulty; //easy: 4, medium: 5, hard: 6
         this.numbers = repeat(this.numberOfOperands, () => randomIntRange(1, 11))
         this.operators = repeat(this.numberOfOperands-1, () => choice(['+', '-', '*'])).join('')

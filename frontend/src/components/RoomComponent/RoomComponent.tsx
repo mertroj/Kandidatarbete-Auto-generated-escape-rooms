@@ -1,6 +1,16 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './RoomComponent.css'
-import {SlidePuzzle, Room, AnagramPuzzle, LettersMathPuzzle, OperatorsMathPuzzle, Puzzle, MastermindPuzzle, MemoryPuzzle} from '../../interfaces';
+import {
+    SlidePuzzle,
+    Room,
+    AnagramPuzzle,
+    LettersMathPuzzle,
+    OperatorsMathPuzzle,
+    Puzzle,
+    MastermindPuzzle,
+    MemoryPuzzle,
+    SpotTheDifferencePuzzle
+} from '../../interfaces';
 import SlidePuzzleComponent from '../Puzzles/SlidePuzzleComponent';
 import SolvedPuzzleComponent from '../Puzzles/SolvedPuzzleComponent';
 import LockedPuzzleComponent from '../Puzzles/LockedPuzzleComponent';
@@ -8,6 +18,7 @@ import MastermindPuzzleComponent from "../Puzzles/Mastermind/MastermindPuzzleCom
 import AnagramComponent from "../Puzzles/AnagramPuzzleComponent";
 import LettersMathPuzzleComponent from "../Puzzles/LettersMathPuzzleComponent";
 import OperatorMathPuzzleComponent from "../Puzzles/OperatorMathPuzzleComponent";
+import SpotTheDifferenceComponent from "../Puzzles/SpotTheDifferencePuzzleComponent";
 import MemoryPuzzleComponent from '../Puzzles/MemoryPuzzleComponent';
 
 interface RoomComponentProps {
@@ -74,6 +85,15 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                             puzzleSolved={puzzleSolved}
                         />
+                    if (puzzle.type === 'spotTheDifference')
+                        return <SpotTheDifferenceComponent
+                            key={puzzle.id}
+                            puzzle={puzzle as SpotTheDifferencePuzzle}
+                            i={i+1}
+                            updateRoom={updateRoom}
+                            notifyIncorrectAnswer={notifyIncorrectAnswer}
+                            puzzleSolved={puzzleSolved}
+                        />
 
                     if (puzzle.type === 'memoryPuzzle')
                         return <MemoryPuzzleComponent
@@ -84,7 +104,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             notifyIncorrectAnswer={notifyIncorrectAnswer}
                             puzzleSolved={puzzleSolved}
                         />
-        
+
                     else return <p>Invalid puzzle</p>
                 })
             }

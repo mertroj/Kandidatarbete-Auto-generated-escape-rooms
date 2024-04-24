@@ -16,6 +16,7 @@ import { DescriptionRouter } from "./routers/DescriptionRouter";
 import { MemoryPuzzleRouter } from "./routers/MemoryPuzzleRouter";
 import { ChatGPTRouter } from "./routers/ChatGPTRouter";
 import { Direction } from "./models/Direction";
+import { SpotTheDifferenceRouter } from "./routers/SpotTheDifferenceRouter";
 
 const app: Express = express();
 const port: number = 8080;
@@ -32,13 +33,15 @@ app.use('/anagrams', AnagramRouter);
 app.use('/chatGPT', ChatGPTRouter);
 app.use('/jigsaw', JigsawRouter);
 app.use('/images', ImageRouter);
+app.use('/Images', express.static('Images'));
+app.use('/spotTheDifference', SpotTheDifferenceRouter);
 
 app.get('/creategame', async (req: Request, res: Response) => {
     try {
         if (req.query.players === undefined) {
             res.status(400).send("The players parameter is missing");
             return;
-        } 
+        }
         if (req.query.difficulty === undefined) {
             res.status(400).send("The difficulty parameter is missing");
             return;
@@ -51,12 +54,12 @@ app.get('/creategame', async (req: Request, res: Response) => {
             res.status(400).send("The exclusions parameter is missing");
             return;
         }
-    
+
         let players = parseInt(String(req.query.players));
         let difficulty = parseInt(String(req.query.difficulty));
         let theme = String(req.query.theme);
         let exclusions = String(req.query.exclusions).split(',');
-    
+
         if (Number.isNaN(players)) {
             res.status(400).send("The player query parameter is invalid");
         } else if (Number.isNaN(difficulty)) {

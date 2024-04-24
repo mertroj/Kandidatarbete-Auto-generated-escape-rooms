@@ -6,13 +6,14 @@ import { Puzzle } from "./Puzzle";
 import { SlidePuzzle } from "./SlidePuzzle/SlidePuzzle";
 import { Jigsaw } from "./Jigsaw";
 import { MastermindPuzzle } from "./MastermindPuzzles";
+import { SpotTheDifference } from "./SpotTheDifference";
 import { MemoryPuzzle } from "./MemoryPuzzle/MemoryPuzzle";
 import { Theme } from "../Theme";
 
 export class PuzzleFactory{
     private puzzleInitializers: {[key: string]: (difficulty: number, dependentPuzzles: string[], theme: Theme) => Puzzle};
-    private puzzleTypeMap: {    
-        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw]
+    private puzzleTypeMap: {
+        [key: string]: [number, typeof Anagram | typeof LettersMathPuzzle | typeof OperatorMathPuzzle | typeof SlidePuzzle | typeof MastermindPuzzle | typeof MemoryPuzzle | typeof Jigsaw | typeof SpotTheDifference]
     } = {
         'anagram': [60, Anagram],
         'lettersMathPuzzle': [40, LettersMathPuzzle],
@@ -20,9 +21,10 @@ export class PuzzleFactory{
         'slidePuzzle': [100, SlidePuzzle],
         'mastermindPuzzle': [100, MastermindPuzzle],
         'memoryPuzzle': [100, MemoryPuzzle],
-        'jigsawPuzzle': [100, Jigsaw]
+        'jigsawPuzzle': [100, Jigsaw],
+        'spotTheDifference': [50, SpotTheDifference]
     };
-    
+
     constructor(excludedPuzzleTypes: string[]){
         //TODO: do the same for converging and end puzzles when more types are available
         this.puzzleInitializers = {
@@ -32,8 +34,9 @@ export class PuzzleFactory{
             'slidePuzzle': (difficulty, dependentPuzzles) => new SlidePuzzle(difficulty, dependentPuzzles),
             'mastermindPuzzle': (difficulty, dependentPuzzles) => new MastermindPuzzle(difficulty, dependentPuzzles),
             'memoryPuzzle': (difficulty, dependentPuzzles, theme) => new MemoryPuzzle(difficulty, dependentPuzzles, theme),
+            'spotTheDifference': (difficulty, dependentPuzzles, theme) => new SpotTheDifference(difficulty, dependentPuzzles, theme)
         };
-      
+
         excludedPuzzleTypes.forEach(puzzleType => {
             delete this.puzzleInitializers[puzzleType];
             delete this.puzzleTypeMap[puzzleType];
@@ -45,15 +48,15 @@ export class PuzzleFactory{
             let [granularity, Puzzle] = this.puzzleTypeMap[puzzleType];
             return [granularity - Puzzle.objectCounter, () => initializer(difficulty, dependentPuzzles, theme)] as [number, () => Puzzle];
         });
-    
+
         return frequencies<() => Puzzle>(puzzleFrequencies)();
     }
-    
+
     createRandomConvergingPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         let puzzle = new SlidePuzzle(difficulty, dependentPuzzles); //TODO: Add more types of converging puzzles
         return puzzle;
     }
-    
+
     createRandomEndPuzzle(difficulty: number, dependentPuzzles: string[]): Puzzle{
         return frequencies<() => Puzzle>([
             [1, () => new Jigsaw(difficulty, dependentPuzzles)]

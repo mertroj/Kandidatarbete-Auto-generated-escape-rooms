@@ -5,7 +5,6 @@ import {useParams} from "react-router-dom";
 import axios from "axios";
 import { VolumeContext } from "../../utils/volumeContext";
 
-//TODO:  Fix the bug with the pieces not always being drawn.
 const correctAudio = new Audio(correctSound);
 function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
     const {volume} = React.useContext(VolumeContext);
