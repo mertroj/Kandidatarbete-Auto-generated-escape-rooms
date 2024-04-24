@@ -28,13 +28,8 @@ SpotTheDifferenceRouter.post('/click', async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Puzzle not found' });
         }
 
-        const isCorrect = puzzle.checkSelection(x, y);
-        if (isCorrect) {
-            // Update puzzle state, save changes, etc.
-        }
-
         // Send a response back to the client
-        res.json({ isCorrect });
+        res.json(puzzle.checkSelection(x, y));
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });

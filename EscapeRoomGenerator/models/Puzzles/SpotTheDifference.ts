@@ -1,5 +1,7 @@
 import { Observable, Observer } from './ObserverPattern';
 import { v4 as uuidv4 } from "uuid";
+import {Theme} from "../Theme";
+import {generateThemedPuzzleText} from "../ChatGPTTextGenerator";
 
 const spotTheDifferenceData = require('../../spotTheDifference.json');
 
@@ -42,14 +44,16 @@ export class SpotTheDifference implements Observable, Observer {
     type: string = 'spotTheDifference';
     originalImagePath: string = "";
     changedImagePath: string = "";
+    theme: Theme;
     width: number = 1024; //for now all images have these dimensions, if that's not the case in the future change this to a dynamic value
     height: number = 1024;
 
-    constructor(difficulty: number, dependentPuzzles: string[], theme: string) { // TODO: add theme as a parameter when a solution is found
+    constructor(difficulty: number, dependentPuzzles: string[], theme: Theme) { // TODO: add theme as a parameter when a solution is found
         this.dependentPuzzles = dependentPuzzles;
         if (this.dependentPuzzles.length > 0) this.isLocked = true;
         this.difficulty = difficulty; // TODO: implement difficulty levels
-        this.initializePuzzle(theme);
+        this.theme = theme;
+        this.initializePuzzle(this.theme);
         SpotTheDifference.puzzles[this.id] = this;
     }
     initializePuzzle(theme: string) {
@@ -77,34 +81,33 @@ export class SpotTheDifference implements Observable, Observer {
         return SpotTheDifference.puzzles[puzzleId]
     }
 
-    checkSelection(x: number, y: number): boolean {
+    checkSelection(x: number, y: number): {res: boolean, difference?: Difference} {
         const tolerance = this.width / 100; // Define the tolerance
 
-        // Loop through differences and check if the selection matches any
-        for (const difference of this.differences) {
-            // Check if click is within the expanded boundaries of the difference square
-            if (
-                x >= Math.min(difference.x1, difference.x2, difference.x3, difference.x4) - tolerance &&
-                x <= Math.max(difference.x1, difference.x2, difference.x3, difference.x4) + tolerance &&
-                y >= Math.min(difference.y1, difference.y2, difference.y3, difference.y4) - tolerance &&
-                y <= Math.max(difference.y1, difference.y2, difference.y3, difference.y4) + tolerance
-            ) {
-                difference.found = true; // Mark the difference as found
-                return true; // Difference found
-            }
+        let difference = this.differences.find((difference) => (
+            x >= Math.min(difference.x1, difference.x2, difference.x3, difference.x4) - tolerance &&
+            x <= Math.max(difference.x1, difference.x2, difference.x3, difference.x4) + tolerance &&
+            y >= Math.min(difference.y1, difference.y2, difference.y3, difference.y4) - tolerance &&
+            y <= Math.max(difference.y1, difference.y2, difference.y3, difference.y4) + tolerance
+        ));
+
+        if (difference && !this.isSolved) {
+            difference.found = true;
+            this.checkAnswer();
+            return {res: true, difference}; // Difference found
         }
-        return false; // No difference found
+        return {res: false}; // No difference found
     }
 
     checkAnswer(): void {
         this.isSolved = this.differences.every(difference => difference.found);
     }
 
-    getHint(): string {
+    getHint(): {hint: string, difference?: Difference} {
         const unfoundDifferences = this.differences.filter(difference => !difference.found);
 
         if (unfoundDifferences.length === 0) {
-            return "You've found all the differences!";
+            return {hint: "You've found all the differences!"};
         }
 
         // Randomly select one of the unfound differences
@@ -117,8 +120,9 @@ export class SpotTheDifference implements Observable, Observer {
         const number = unfoundDifferences.length - 1; // Subtract 1 because one difference has been found
         const hint = `I found a difference! that should make it ${number} left to find!`;
         this.hints.push(hint);
+        this.checkAnswer();
 
-        return hint;
+        return {hint, difference: randomDifference};
     }
 
     addObserver(observer: Observer): void {
@@ -127,6 +131,14 @@ export class SpotTheDifference implements Observable, Observer {
 
     notifyObservers(): string[] {
         return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    }
+
+    async applyTheme(theme: Theme): Promise<void> {
+       this.theme = theme;
+    }
+
+    increaseCounter(): void {
+        SpotTheDifference.objectCounter++;
     }
 
     update(id: string): string {
@@ -141,7 +153,7 @@ export class SpotTheDifference implements Observable, Observer {
     strip() {
         return {
             type: this.type,
-            differences: this.differences,
+            differences: this.differences.filter((difference) => difference.found),
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
@@ -151,7 +163,8 @@ export class SpotTheDifference implements Observable, Observer {
             originalImagePath: this.originalImagePath,
             changedImagePath: this.changedImagePath,
             width: this.width,
-            height: this.height
+            height: this.height,
+            maximumHints: this.differences.length
         }
     }
 }

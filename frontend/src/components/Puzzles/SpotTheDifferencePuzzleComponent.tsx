@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SpotTheDifferencePuzzle } from '../../interfaces';
+import {Difference, Puzzle, SpotTheDifferencePuzzle} from '../../interfaces';
 import axios from 'axios';
 import './puzzles.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
@@ -9,33 +9,18 @@ import correctSound from "../../assets/sounds/correct-answer.wav";
 const correctAudio = new Audio(correctSound);
 
 interface SpotTheDifferenceProps {
-    puzzleId: string;
+    puzzle: SpotTheDifferencePuzzle;
     i: number;
     updateRoom: () => void;
     notifyIncorrectAnswer: () => void;
     puzzleSolved: (id: string, unlockedPuzzles: string[]) => void;
 }
 
-function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAnswer, puzzleSolved }: SpotTheDifferenceProps) {
-    const [puzzle, setPuzzle] = useState<SpotTheDifferencePuzzle | null>(null);
+function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved }: SpotTheDifferenceProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [foundDifferences, setFoundDifferences] = useState<any[]>([]);
     const [counter, setCounter] = useState(0);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
     const [paddingLeft, setPaddingLeft] = useState(0);
-
-    useEffect(() => {
-        fetchPuzzle(puzzleId);
-    }, [puzzleId]);
-
-    async function fetchPuzzle(puzzleId: string) {
-        try {
-            const response = await axios.get<SpotTheDifferencePuzzle>(`http://localhost:8080/spotTheDifference/puzzle?puzzleId=${puzzleId}`);
-            setPuzzle(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    }
 
     function handleImageLoad(event: React.SyntheticEvent<HTMLImageElement>) {
         const img = event.target as HTMLImageElement;
@@ -57,15 +42,18 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
 
         try {
             // Send relative coordinates to the backend
-            const response = await axios.post(`http://localhost:8080/spotTheDifference/click`, {
+            const response = await axios.post<{res: boolean, difference?: Difference}>(`http://localhost:8080/spotTheDifference/click`, {
                 x: scaledOffsetX,
                 y: scaledOffsetY,
-                puzzleId: puzzleId
+                puzzleId: puzzle.id
             });
 
-            await fetchAndUpdatePuzzle(puzzleId);
+            if (response.data.difference)
+                puzzle.differences.push(response.data.difference);
+
             await handleCheckAnswer()
 
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
@@ -77,11 +65,14 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
 
     async function handleCheckAnswer() {
         try {
-            const response = await axios.post<{ isSuccessful: boolean }>(`http://localhost:8080/spotTheDifference/checkAnswer`, {
-                puzzleId: puzzleId
+            const response = await axios.post<boolean>(`http://localhost:8080/spotTheDifference/checkAnswer`, {
+                puzzleId: puzzle.id
             });
-            if (response.data.isSuccessful) {
+            if (response.data) {
+                console.log(123);
                 correctAudio.play();
+                puzzle.isSolved = true;
+                updateRoom();
                 setIsOpen(false);
             } else {
                 // Handle incorrect answer
@@ -94,33 +85,26 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
     async function handleHintClick() {
         try {
             // Send a GET request to the /hint endpoint
-            const response = await axios.get(`http://localhost:8080/spotTheDifference/hint`, {
+            const response = await axios.get<{hint: string, difference?: Difference}>(`http://localhost:8080/spotTheDifference/hint`, {
                 params: {
-                    puzzleId: puzzleId
+                    puzzleId: puzzle.id
                 }
             });
-            // Log the received hint
-            console.log(response.data);
 
-            await fetchAndUpdatePuzzle(puzzleId);
+            if (!puzzle) return;
+
+            if (response.data.hint)
+                puzzle.hints.push(response.data.hint);
+
+            if (response.data.difference)
+                puzzle.differences.push(response.data.difference)
+
             await handleCheckAnswer()
 
+            updateRoom();
         } catch (error) {
             console.error(error);
         }
-    }
-
-    async function fetchAndUpdatePuzzle(puzzleId: string) {
-        // Fetch the updated puzzle from the backend
-        const updatedPuzzle = await axios.get<SpotTheDifferencePuzzle>(`http://localhost:8080/spotTheDifference/puzzle?puzzleId=${puzzleId}`);
-        setPuzzle(updatedPuzzle.data);
-
-        // Update the foundDifferences state
-        const foundDifferences = updatedPuzzle.data.differences.filter(difference => difference.found);
-        setFoundDifferences(foundDifferences);
-
-        // Update the counter
-        setCounter(foundDifferences.length);
     }
 
     return (
@@ -150,7 +134,7 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
                                         onLoad={handleImageLoad}
                                         onClick={handleImageClick}
                                     />
-                                    {foundDifferences.map((difference, index) => {
+                                    {puzzle.differences.map((difference, index) => {
                                         if (!img) return null;
 
                                         const offset = 5; // Adjust this value to change the size of the boxes
@@ -185,7 +169,7 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
                                         onLoad={handleImageLoad}
                                         onClick={handleImageClick}
                                     />
-                                    {foundDifferences.map((difference, index) => {
+                                    {puzzle.differences.map((difference, index) => {
                                         if (!img) return null;
 
                                         const offset = 5; // Adjust this value to change the size of the boxes
@@ -221,7 +205,7 @@ function SpotTheDifferenceComponent({ puzzleId, i, updateRoom, notifyIncorrectAn
                                 alignItems: 'center', // This aligns items vertically in the center
                                 gap: '20px' // This creates a little distance between the counter and the button
                             }}>
-                                <p style={{ transform: 'translateY(15px)' }}>{`${counter} / ${puzzle.differences.length}`}</p>
+                                <p style={{ transform: 'translateY(15px)' }}>{`${puzzle.differences.length} / ${puzzle.maximumHints}`}</p>
                                 <Button style={{ maxHeight: '10vh', width: 'auto' }} variant="primary" className='mt-3' onClick={handleHintClick}>Hint</Button>
                             </div>
                         </Col>

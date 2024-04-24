@@ -145,18 +145,31 @@ export interface JigsawPuzzle {
     size: {rows: number, columns: number};
 }
 
+export interface Difference {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    x3: number;
+    y3: number;
+    x4: number;
+    y4: number;
+    found: boolean;
+}
+
 export interface SpotTheDifferencePuzzle {
     id: string;
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hints: number;
+    hints: string[];
     question: string;
     description: string;
     estimatedTime: number;
-    differences: any[];
+    differences: Difference[];
     originalImagePath: string;
     changedImagePath: string;
     width: number;
     height: number;
+    maximumHints: number;
 }
