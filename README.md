@@ -3,7 +3,7 @@
 ## Backend
 - Install Node (https://nodejs.org/en)
 - Run `npm install` inside `/EscapeRoomGenerator` to install necessary packages
-- Create a file called `.env` file inside `/EscapeRoomGenerator`. Inside this file, you should define either an empty or functional OpenAI API key as follows:
+- Create a file called `.env` inside `/EscapeRoomGenerator`. Inside this file, you should define either an empty or functional OpenAI API key as follows:
 ```
 MY_API_KEY= '<optional OpenAI API key>'
 ```

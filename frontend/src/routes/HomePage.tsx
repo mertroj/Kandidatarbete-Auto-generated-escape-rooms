@@ -98,11 +98,15 @@ function HomePage() {
                     and the theme for the escape room.
                     <br></br>
                     <br></br>
-                    You will have a limited amount of minutes in order to complete the room, but don't get too hung up
-                    on a puzzle, you might not have gotten every piece necessary just yet!
+                    If you have any puzzle types you would like to exclude from the room you can do so as well, you can
+                    only exclude up to 2 puzzles.
                     <br></br>
                     <br></br>
-                    If you ever feel stuck just click on the “Hint” button on the right side of the page.
+                    You will be timed and have a hint counter, try to achieve the best time and least amount of hints
+                    used!
+                    <br></br>
+                    <br></br>
+                    If you ever feel stuck just click on the “Hint” button associated with the puzzle!
                 </p>
             </Row>
             <form className='d-flex justify-content-center flex-column align-items-center'
