@@ -1,8 +1,8 @@
 {
-  "MagicalWorkshop": [
+  "magical_workshop": [
     {
       "image": "MagicalWorkshop1",
-      "originalImagePath": "/Images/magicalWorkshop.jpg",
+      "originalImagePath": "/Images/backgrounds/magicalWorkshop.jpg",
       "changedImagePath": "/Images/SpotTheDifference/MagicalWorkshop_Changed.jpg",
       "estimatedTime": 5,
       "difficulty": 2,
@@ -18,7 +18,7 @@
     },
     {
       "image": "MagicalWorkshop4",
-      "originalImagePath": "/Images/magicalWorkshop4.jpg",
+      "originalImagePath": "/Images/backgrounds/magicalWorkshop4.jpg",
       "changedImagePath": "/Images/SpotTheDifference/MagicalWorkshop4_Changed.jpg",
       "estimatedTime": 5,
       "difficulty": 2,
@@ -34,7 +34,7 @@
     },
     {
       "image": "MagicalWorkshop7",
-      "originalImagePath": "/Images/magicalWorkshop7.jpg",
+      "originalImagePath": "/Images/backgrounds/magicalWorkshop7.jpg",
       "changedImagePath": "/Images/SpotTheDifference/MagicalWorkshop7_Changed.png",
       "estimatedTime": 5,
       "difficulty": 2,
@@ -50,7 +50,7 @@
     },
     {
       "image": "MagicalWorkshop8",
-      "originalImagePath": "/Images/magicalWorkshop8.jpg",
+      "originalImagePath": "/Images/backgrounds/magicalWorkshop8.jpg",
       "changedImagePath": "/Images/SpotTheDifference/MagicalWorkshop8_Changed.png",
       "estimatedTime": 5,
       "difficulty": 2,
@@ -66,7 +66,7 @@
     },
     {
       "image": "MagicalWorkshop9",
-      "originalImagePath": "/Images/magicalWorkshop9.jpg",
+      "originalImagePath": "/Images/backgrounds/magicalWorkshop9.jpg",
       "changedImagePath": "/Images/SpotTheDifference/MagicalWorkshop9_Changed.png",
       "estimatedTime": 5,
       "difficulty": 2,
@@ -81,7 +81,7 @@
       ]
     }
   ],
-  "PharaohsTomb": [
+  "pharoah's_tomb": [
     {
       "image": "PharaohsTomb1",
       "originalImagePath": "/Images/SpotTheDifference/PharaohsTomb1_Original.png",
