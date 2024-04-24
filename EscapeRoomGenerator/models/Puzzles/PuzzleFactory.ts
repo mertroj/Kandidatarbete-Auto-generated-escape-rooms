@@ -22,7 +22,7 @@ export class PuzzleFactory{
         'mastermindPuzzle': [100, MastermindPuzzle],
         'memoryPuzzle': [100, MemoryPuzzle],
         'jigsawPuzzle': [100, Jigsaw],
-        'spotTheDifference': [100, SpotTheDifference]
+        'spotTheDifference': [50, SpotTheDifference]
     };
 
     constructor(excludedPuzzleTypes: string[]){

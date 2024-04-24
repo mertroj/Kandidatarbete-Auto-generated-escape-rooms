@@ -36,7 +36,7 @@ export class SpotTheDifference implements Observable, Observer {
     private dependentPuzzles: string[] = [];
     private differences: Difference[] = [];
     description: string = "Wait, are these the same?";
-    estimatedTime: number = 3;
+    estimatedTime: number = 5;
     hints: string[] = [];
     question: string = "Somethings not right over here";
     isSolved: boolean = false;
