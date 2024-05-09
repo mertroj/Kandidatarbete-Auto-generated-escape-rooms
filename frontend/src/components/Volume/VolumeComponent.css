@@ -1,0 +1,21 @@
+.volume-slider-container{
+    position: absolute;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    top: 0%;
+    right: 0;
+    z-index: 101;
+    width: 3rem;
+}
+.volume-icon{
+    font-size: 25px;
+}
+.volume-slider-container input[type=range] {
+    writing-mode: vertical-lr;
+    display: none;
+}
+.volume-slider-container:hover input[type=range] {
+    display: inline;
+}

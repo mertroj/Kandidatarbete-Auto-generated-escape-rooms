@@ -6,12 +6,12 @@ interface GuessComponentProps {
     length: number;
     guess: string;
     animation: boolean;
+    animationDuration: number;
     feedback?: string;
 }
 
-function GuessComponent({length, guess, feedback, animation}: GuessComponentProps) {
+function GuessComponent({length, guess, feedback, animation, animationDuration}: GuessComponentProps) {
     const [backgroundColor, setBackgroundColor] = useState<string[]>(new Array(length).fill('transparent'));
-    const animationDuration = 500; // ms
 
     const getColor = (feedbackChar: string) => {
         switch (feedbackChar) {
@@ -27,21 +27,16 @@ function GuessComponent({length, guess, feedback, animation}: GuessComponentProp
     }
 
     useEffect(() => {
-        if (feedback) {
-            if (!animation) {
-                setBackgroundColor(feedback.split('').map(getColor));
-            } else {
-                let timeoutId: NodeJS.Timeout;
-                for (let i = 0; i < length; i++) {
-                    timeoutId = setTimeout(() => {
-                        setBackgroundColor(prevState => {
-                            const newState = [...prevState];
-                            newState[i] = getColor(feedback.charAt(i));
-                            return newState;
-                        });
-                    }, ((i + 1) * animationDuration) / 2);
-                }
-                return () => clearTimeout(timeoutId);
+        if (!feedback) return;
+        
+        if (!animation) {
+            setBackgroundColor(feedback.split('').map(getColor));
+        } else {
+            for (let i = 0; i < length; i++) {
+                setTimeout(() => {
+                    backgroundColor[i] = getColor(feedback.charAt(i));
+                    setBackgroundColor([...backgroundColor]);
+                }, ((i + 0.5) * animationDuration));
             }
         }
     }, []);
@@ -54,7 +49,7 @@ function GuessComponent({length, guess, feedback, animation}: GuessComponentProp
                             className={'grid-item ' + (animation ? 'animated' : '')} 
                             style={{
                                 backgroundColor: backgroundColor[i],
-                                animationDelay: (animation ? `${i * animationDuration / 2}ms` : '0s')
+                                animationDelay: (animation ? `${i * animationDuration}ms` : '0s')
                             }}
                         >
                             <input

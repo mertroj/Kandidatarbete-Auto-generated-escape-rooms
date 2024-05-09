@@ -1,13 +1,14 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Navbar.css'
 import { useEffect, useState } from 'react';
+import { backendURL } from '../../interfaces';
 
 
 function Navbar () {
     const [image, setImage] = useState<HTMLImageElement | null>(null);
 
     async function fetchImage() {
-        const response = await fetch('http://localhost:8080/images/logoImage');
+        const response = await fetch(backendURL + '/images/logoImage');
         const blob = await response.blob();
         const objectURL = URL.createObjectURL(blob);
         const image = new Image();

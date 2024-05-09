@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import {Difference, Puzzle, SpotTheDifferencePuzzle} from '../../interfaces';
+import { SpotTheDifferencePuzzle, backendURL } from '../../interfaces';
 import axios from 'axios';
 import './puzzles.css';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import LargePopup from "../LargePopupComponent/LargePopup";
-import correctSound from "../../assets/sounds/correct-answer.wav";
-
-const correctAudio = new Audio(correctSound);
+import { useParams } from 'react-router-dom';
 
 interface SpotTheDifferenceProps {
     puzzle: SpotTheDifferencePuzzle;
     i: number;
-    updateRoom: () => void;
-    notifyIncorrectAnswer: () => void;
-    puzzleSolved: (id: string, unlockedPuzzles: string[]) => void;
 }
 
-function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved }: SpotTheDifferenceProps) {
+function SpotTheDifferenceComponent({ puzzle, i }: SpotTheDifferenceProps) {
+    const {gameId} = useParams();
     const [isOpen, setIsOpen] = useState(false);
-    const [counter, setCounter] = useState(0);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
     const [paddingLeft, setPaddingLeft] = useState(0);
+    const [diffs, setDiffs] = useState<JSX.Element[]>([]);
 
     function handleImageLoad(event: React.SyntheticEvent<HTMLImageElement>) {
         const img = event.target as HTMLImageElement;
@@ -32,8 +28,6 @@ function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnsw
     }
 
     async function handleImageClick(event: React.MouseEvent<HTMLImageElement>) {
-        if (!puzzle) return;
-
         const img = event.target as HTMLImageElement;
         const offsetX = event.nativeEvent.offsetX;
         const offsetY = event.nativeEvent.offsetY;
@@ -42,42 +36,14 @@ function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnsw
 
         try {
             // Send relative coordinates to the backend
-            const response = await axios.post<{res: boolean, difference?: Difference}>(`http://localhost:8080/spotTheDifference/click`, {
+            const response = await axios.post<boolean>(backendURL + `/spotTheDifference/click`, {
+                gameId,
                 x: scaledOffsetX,
                 y: scaledOffsetY,
                 puzzleId: puzzle.id
             });
 
-            if (response.data.difference)
-                puzzle.differences.push(response.data.difference);
-
-            await handleCheckAnswer()
-
-            updateRoom();
         } catch (error) {
-            console.error(error);
-        }
-    }
-
-    if (!puzzle) {
-        return null;
-    }
-
-    async function handleCheckAnswer() {
-        try {
-            const response = await axios.post<boolean>(`http://localhost:8080/spotTheDifference/checkAnswer`, {
-                puzzleId: puzzle.id
-            });
-            if (response.data) {
-                console.log(123);
-                correctAudio.play();
-                puzzle.isSolved = true;
-                updateRoom();
-                setIsOpen(false);
-            } else {
-                // Handle incorrect answer
-            }
-        } catch (error: any) {
             console.error(error);
         }
     }
@@ -85,27 +51,46 @@ function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnsw
     async function handleHintClick() {
         try {
             // Send a GET request to the /hint endpoint
-            const response = await axios.get<{hint: string, difference?: Difference}>(`http://localhost:8080/spotTheDifference/hint`, {
+            const response = await axios.get<boolean>(backendURL + `/spotTheDifference/hint`, {
                 params: {
+                    gameId,
                     puzzleId: puzzle.id
                 }
             });
 
-            if (!puzzle) return;
-
-            if (response.data.hint)
-                puzzle.hints.push(response.data.hint);
-
-            if (response.data.difference)
-                puzzle.differences.push(response.data.difference)
-
-            await handleCheckAnswer()
-
-            updateRoom();
         } catch (error) {
             console.error(error);
         }
     }
+
+    useEffect(() => {
+        if (!img) return;
+        
+        let newDiffs = puzzle.differences.map((difference, index) => {
+            const offset = 5; // Adjust this value to change the size of the boxes
+            const left = difference.x1 * (img.width / puzzle.width) + img.offsetLeft - offset/2;
+            const top = difference.y1 * (img.height / puzzle.height) + img.offsetTop - offset/2;
+            const width = (difference.x2 - difference.x1) * ((img.width - 2) / puzzle.width) + offset;
+            const height = (difference.y2 - difference.y1) * (img.height / puzzle.height) + offset;
+    
+            return (
+                <div
+                    key={index}
+                    style={{
+                        position: 'absolute',
+                        left: `${left}px`,
+                        top: `${top}px`,
+                        width: `${width}px`,
+                        height: `${height}px`,
+                        border: '2px solid red',
+                        boxShadow: '0 0 0 2px black',
+                    }}
+                />
+            );
+        })
+        setDiffs(newDiffs);
+    }, [img, puzzle])
+    
 
     return (
         <LargePopup
@@ -129,70 +114,24 @@ function SpotTheDifferenceComponent({ puzzle, i, updateRoom, notifyIncorrectAnsw
                                 <div style={{ position: 'relative' }}>
                                     <img
                                         style={{ width: 'calc(100% - 2px)', height: '100%', paddingRight: '2px' }}
-                                        src={`http://localhost:8080${puzzle.changedImagePath}`}
+                                        src={backendURL + puzzle.changedImagePath}
                                         alt="Changed"
                                         onLoad={handleImageLoad}
                                         onClick={handleImageClick}
                                     />
-                                    {puzzle.differences.map((difference, index) => {
-                                        if (!img) return null;
-
-                                        const offset = 5; // Adjust this value to change the size of the boxes
-                                        const left = Math.min(difference.x1, difference.x2, difference.x3, difference.x4) * (img.width / puzzle.width) + img.offsetLeft - offset/2;
-                                        const top = Math.min(difference.y1, difference.y2, difference.y3, difference.y4) * (img.height / puzzle.height) + img.offsetTop - offset/2;
-                                        const width = (Math.max(difference.x1, difference.x2, difference.x3, difference.x4) - Math.min(difference.x1, difference.x2, difference.x3, difference.x4)) * ((img.width - 2) / puzzle.width) + offset;
-                                        const height = (Math.max(difference.y1, difference.y2, difference.y3, difference.y4) - Math.min(difference.y1, difference.y2, difference.y3, difference.y4)) * (img.height / puzzle.height) + offset;
-
-                                        return (
-                                            <div
-                                                key={index}
-                                                style={{
-                                                    position: 'absolute',
-                                                    left: `${left}px`,
-                                                    top: `${top}px`,
-                                                    width: `${width}px`,
-                                                    height: `${height}px`,
-                                                    border: '2px solid red',
-                                                    boxShadow: '0 0 0 2px black',
-                                                }}
-                                            />
-                                        );
-                                    })}
+                                    {diffs}
                                 </div>
                             </Col>
                             <Col xs={6} className='no-padding-margin'>
                                 <div style={{ position: 'relative' }}>
                                     <img
                                         style={{ width: 'calc(100% - 2px)', height: '100%', paddingLeft: '2px' }}
-                                        src={`http://localhost:8080${puzzle.originalImagePath}`}
+                                        src={backendURL + puzzle.originalImagePath}
                                         alt="Original"
                                         onLoad={handleImageLoad}
                                         onClick={handleImageClick}
                                     />
-                                    {puzzle.differences.map((difference, index) => {
-                                        if (!img) return null;
-
-                                        const offset = 5; // Adjust this value to change the size of the boxes
-                                        const left = Math.min(difference.x1, difference.x2, difference.x3, difference.x4) * (img.width / puzzle.width) + img.offsetLeft - offset/2;
-                                        const top = Math.min(difference.y1, difference.y2, difference.y3, difference.y4) * (img.height / puzzle.height) + img.offsetTop - offset/2;
-                                        const width = (Math.max(difference.x1, difference.x2, difference.x3, difference.x4) - Math.min(difference.x1, difference.x2, difference.x3, difference.x4)) * ((img.width - 2) / puzzle.width) + offset;
-                                        const height = (Math.max(difference.y1, difference.y2, difference.y3, difference.y4) - Math.min(difference.y1, difference.y2, difference.y3, difference.y4)) * (img.height / puzzle.height) + offset;
-
-                                        return (
-                                            <div
-                                                key={index}
-                                                style={{
-                                                    position: 'absolute',
-                                                    left: `${left}px`,
-                                                    top: `${top}px`,
-                                                    width: `${width}px`,
-                                                    height: `${height}px`,
-                                                    border: '2px solid red',
-                                                    boxShadow: '0 0 0 2px black',
-                                                }}
-                                            />
-                                        );
-                                    })}
+                                    {diffs}
                                 </div>
                             </Col>
                         </div>

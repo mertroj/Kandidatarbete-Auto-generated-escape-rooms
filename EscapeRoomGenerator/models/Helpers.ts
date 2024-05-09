@@ -17,6 +17,16 @@ export function randomFloatRange(min: number, max: number) : number {
 export function randomFloat(max: number) : number {
     return Math.random() * max;
 }
+export function range(start: number, end: number, step?: number) {
+    if (!step) step = 1;
+    let cur = start;
+    let nums: number[] = [];
+    while (cur < end) {
+        nums.push(cur);
+        cur += step;
+    } 
+    return nums;
+}
 export function choice<t>(array: t[]): t {
     return array[randomInt(array.length)];
 }
@@ -29,7 +39,7 @@ export function frequencies<t>(array: [number,t][]): t{
     }
     return array[i][1];
 }
-export function repeat<t>(n: number, fn: Function): t[] {
+export function repeat<t>(n: number, fn: () => t): t[] {
     let array = new Array(n);
     for (let i=0; i < n; i++) {
         array[i] = fn()

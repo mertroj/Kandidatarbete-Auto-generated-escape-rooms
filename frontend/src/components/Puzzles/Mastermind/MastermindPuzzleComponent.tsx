@@ -1,78 +1,73 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import PopupComponent from '../../PopupComponent/Popup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../puzzles.css';
-import { MastermindPuzzle } from '../../../interfaces';
-import { Button, Container } from 'react-bootstrap';
+import { MastermindPuzzle, backendURL } from '../../../interfaces';
+import { Button } from 'react-bootstrap';
 import Guess from './GuessComponent';
-import correctSound from '../../../assets/sounds/correct-answer.wav';
-import incorrectSound from '../../../assets/sounds/incorrect-answer.wav';
 import hintClickSound from '../../../assets/sounds/arcade-hint-click.wav';
 import withClickAudio from '../../withClickAudioComponent';
-import { VolumeContext } from "../../../utils/volumeContext";
+import { useParams } from 'react-router-dom';
 
 const HintAudioClickButton = withClickAudio(Button, hintClickSound);
-const correctAudio = new Audio(correctSound);
-const incorrectAudio = new Audio(incorrectSound);
 
 interface MasterMindPuzzleProps {
     puzzle: MastermindPuzzle;
     i: number;
-    updateRoom: () => void;
-    notifyIncorrectAnswer: () => void;
-    puzzleSolved: (id:string, unlockedPuzzles: string[]) => void;
+    incorrectAnswer: () => void;
 }
-interface GuessResponse {
-    result: boolean;
-    bools: string;
-    unlockedPuzzles: string[];
-}
+function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzzleProps) {
+    const {gameId} = useParams();
 
-function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswer, puzzleSolved}: MasterMindPuzzleProps) {
-    const {volume} = React.useContext(VolumeContext);
     const [isShowing, setIsShowing] = useState<boolean>(false);
+    const [isAnimating, setIsAnimating] = useState<boolean>(false)
+
     const [currentInput, setCurrentInput] = useState<string>('');
     const currentInputRef = useRef(currentInput);
+
     const length = puzzle.length;
+    const animationDuration = 300;
+
+    const guessesDiv = useRef<HTMLDivElement>(null);
 
     async function handleGuess(guess: string){
         try{
-            const response = await axios.post<GuessResponse>('http://localhost:8080/mastermindPuzzle/checkAnswer', {puzzleId: puzzle.id, answer: guess});
-            let resp = response.data
+            const response = await axios.post<boolean>(backendURL + '/mastermindPuzzle/checkAnswer', {
+                gameId,
+                puzzleId: puzzle.id, 
+                answer: guess
+            });
 
-            puzzle.previousGuesses.push([guess, resp.bools]);
-            setCurrentInput('')
-            updateRoom();
-
-            if (resp.bools === '2'.repeat(length)) {
-                setTimeout(async () => {
-                    correctAudio.play();
-                    puzzleSolved(puzzle.id, resp.unlockedPuzzles);
-                    setIsShowing(false);
-                }, 500*length);
-            } else {
-                incorrectAudio.currentTime = 0;
-                incorrectAudio.play();
-                notifyIncorrectAnswer();
-            }
-
-
+            setCurrentInput('');
         }catch(error){
             console.error(error + currentInput);
         }
     }
     async function getHint() {
         try{
-            const response = await axios.get(`http://localhost:8080/mastermindPuzzle/hint/?puzzleId=${puzzle.id}`);
-            let hint : string = response.data;
-            if (hint === 'No more hints.') return;
-            puzzle.hints.push(hint);
-            updateRoom();
+            const response = await axios.get<string | null>(backendURL + `/mastermindPuzzle/hint/?`, {
+                params: {
+                    gameId,
+                    puzzleId: puzzle.id
+                }
+            });
         } catch (error) {
             console.error(error);
         }
     }
+
+    useEffect(() => {
+        setIsAnimating(true);
+        setTimeout(() => {
+            setIsAnimating(false);
+        }, animationDuration*(length+1));
+    }, [puzzle])
+
+    useEffect(() => {
+        if (!guessesDiv.current) return;
+        guessesDiv.current.scrollTop = guessesDiv.current.scrollHeight;
+    }, [isAnimating, isShowing])
 
     useEffect(() => {
         const handleKeyUp = (event: KeyboardEvent) => {
@@ -87,6 +82,7 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
                 }
             }else if (key === 'Enter') {
                 handleGuess(currentInputRef.current);
+                sessionStorage.removeItem(puzzle.id);
             }else if (key === 'Backspace') {
                 setCurrentInput(prevInput => prevInput.slice(0, -1));
             }
@@ -99,11 +95,6 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
     useEffect(() => {
         currentInputRef.current = currentInput;
     }, [currentInput]);
-
-    useEffect(() => {
-        correctAudio.volume = volume;
-        incorrectAudio.volume = volume;
-    }, [volume]);
 
     useEffect(() => {
         let prevAnswer = sessionStorage.getItem(puzzle.id);
@@ -127,29 +118,40 @@ function MastermindPuzzleComponent ({puzzle, i, updateRoom, notifyIncorrectAnswe
             onClose={() => setIsShowing(false)}
             children=
             {
-                <div className='d-flex flex-column position-relative'>
-                    <HintAudioClickButton variant="primary" className='position-absolute top-0 end-0' onClick={getHint}>Get a hint</HintAudioClickButton>
-                    <div className='flex-grow-1'>
-                        <div className='text-center d-flex align-items-center flex-column'>
-                            <div className='mb-4'>
-                                <h5>{puzzle.question}</h5>
-                            </div>
-                            {
-                                puzzle.previousGuesses.map((guess, guessI) => {
-                                    return <Guess 
-                                        key={guessI}
-                                        length={length}
-                                        guess={guess[0]}
-                                        feedback={guess[1]}
-                                        animation={guessI === puzzle.previousGuesses.length - 1}
-                                    />
-                                })
-                            }
-                            
-                            {!puzzle.isSolved &&
-                                <Guess length={length} guess={currentInput} animation={false}/>
-                            }
-                        </div>
+                <div className='d-flex position-relative text-center align-items-center flex-column h-100'>
+                    <HintAudioClickButton 
+                        variant="primary" 
+                        className='position-absolute top-0 end-0' 
+                        onClick={getHint}
+                    >Get a hint</HintAudioClickButton>
+
+                    <div className='mb-4'>
+                        <h5>{puzzle.question}</h5>
+                    </div>
+
+                    <div 
+                        ref={guessesDiv}
+                        className='overflow-y-scroll h-75 mh-75'
+                    >
+                        {puzzle.previousGuesses.map((guess, guessI) => {
+                            return <Guess 
+                                key={guessI}
+                                length={length}
+                                guess={guess[0]}
+                                feedback={guess[1]}
+                                animation={guessI === puzzle.previousGuesses.length - 1}
+                                animationDuration={animationDuration}
+                            />
+                        })}
+                        
+                        {!isAnimating &&
+                            <Guess 
+                                length={length} 
+                                guess={currentInput}
+                                animation={false}
+                                animationDuration={animationDuration}
+                            />
+                        }
                     </div>
                 </div>
             }

@@ -1,46 +1,36 @@
-export enum FeedbackMessages{
-    CORRECT = "Puzzle Solved!",
-    INCORRECT = "Incorrect answer!",
-    UNLOCKED = "Puzzle Unlocked!",
-}
+export const backendURL = `http://${window.location.hostname}:8080`
+export const socketsURL = `ws://${window.location.hostname}:8081`
 
 export interface EscapeRoom {
-    timer: Timer;
+    startTime: number;
     id: string;
     rooms: Room[];
     endPuzzle: Puzzle;
-    currentRoom: Room;
     theme: string;
+    allRoomsSolved: boolean;
+    isSolved: boolean;
 }
 
 export interface Room {
     id: string;
-    pos: Point;
+    x: number;
+    y: number;
     left: number;
     right: number;
     up: number;
     down: number;
-    isLocked: boolean;
+    isSolved: boolean;
     puzzles: Puzzle[];
-}
-
-export type Point = [number, number]
-
-export interface Position {
-    x: number;
-    y: number;
-}
-
-export interface Timer {
-    elapsedTime: number;
+    hasLockedPuzzles: boolean;
 }
 
 export interface RoomStatus {
     solved: boolean;
     unlocked: boolean;
+    hint: boolean;
 }
 
-export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle;
+export type Puzzle = AnagramPuzzle | LettersMathPuzzle | OperatorsMathPuzzle | SlidePuzzle | JigsawPuzzle | MastermindPuzzle | MemoryPuzzle | SpotTheDifferencePuzzle;
 
 export interface AnagramPuzzle {
     id: string;
@@ -71,13 +61,15 @@ export interface MemoryPuzzle {
     difficulty: number;
     question: string;
     description: string;
-    cellsMatrix: Cell[][];
+    cells: Cell[];
     valuesToSymbols: Array<[number, string]>;
+    hintActive: boolean;
 }
 
 export interface Cell{
     value: number;
     isFlipped: boolean;
+    isMatched: boolean;
 }
 
 export interface OperatorsMathPuzzle {
@@ -112,25 +104,23 @@ export interface SlidePuzzle {
 
     question: string;
     description: string;
-    pieces: (Piece | null)[][];
-}
-
-export interface Piece {
-    number: number;
-    position: Position;
+    pieces: (number | null)[][];
 }
 
 export interface JigsawPiece {
-    id: string;
-    rowIndex: number;
-    colIndex: number;
-    correct: boolean;
-    bottom: any;
-    right: any;
-    left: any;
-    top: any;
-
-    setCorrect(correct: boolean): void;
+    id: number;
+    row: number;
+    col: number;
+    curRow: number | null;
+    curCol: number | null;
+    left:   number;
+    right:  number;
+    top:    number;
+    bottom: number;
+    x: number;
+    y: number;
+    prevX: number;
+    prevY: number;
 }
 
 export interface JigsawPuzzle {
@@ -142,7 +132,8 @@ export interface JigsawPuzzle {
     question: string;
     description: string;
     pieces: JigsawPiece[];
-    size: {rows: number, columns: number};
+    rows: number;
+    columns: number;
 }
 
 export interface Difference {
@@ -150,10 +141,6 @@ export interface Difference {
     y1: number;
     x2: number;
     y2: number;
-    x3: number;
-    y3: number;
-    x4: number;
-    y4: number;
     found: boolean;
 }
 
@@ -162,7 +149,7 @@ export interface SpotTheDifferencePuzzle {
     type: string;
     isSolved: boolean;
     isLocked: boolean;
-    hints: string[];
+    hints: number;
     question: string;
     description: string;
     estimatedTime: number;

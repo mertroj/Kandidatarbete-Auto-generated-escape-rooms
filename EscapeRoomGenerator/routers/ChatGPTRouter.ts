@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { EscapeRoom } from "../models/EscapeRoom";
+import { EscapeRoom } from "../Models/EscapeRoom";
 export const ChatGPTRouter = express.Router();
 
 ChatGPTRouter.post('/introText', async (req: Request, res: Response) => {

@@ -5,12 +5,13 @@ import axios from 'axios';
 import Select, { ActionMeta } from 'react-select';
 import clickSound from '../assets/sounds/navigation-click.wav';
 import withClickAudio from '../components/withClickAudioComponent';
+import { backendURL } from '../interfaces';
 const NavigationAudioClickButton = withClickAudio('button', clickSound);
 
 type OptionType = { value: string; label: string; };
 
 function HomePage() {
-    const [gameCode, setGameCode] = useState('');
+    const [gameId, setGameId] = useState('');
     const [selectedExclusions, setSelectedExclusions] = useState<readonly OptionType[]>([]);
     const exclusionLimit = 2;
 
@@ -60,16 +61,18 @@ function HomePage() {
             fontSize: '1em', // Set this to your desired font size
         }),
     };
-    const [gameId, setGameId] = useState('');
 
     const startEscapeRoom = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log('starting');    
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const searchParams = 'players=' + formData.get('players') + '&difficulty=' + formData.get('difficulty') + '&theme=' + formData.get('theme') +
-            '&exclusions=' + (formData.getAll('exclusions') as string[]).join(',');
-        axios.get('http://localhost:8080/creategame/?'+searchParams).then((res) => {
+        axios.post(backendURL + '/escaperoom/', {
+            players: formData.get('players'),
+            difficulty: formData.get('difficulty'),
+            theme: formData.get('theme'),
+            exclusions: (formData.getAll('exclusions') as string[]).join(',')
+        }).then((res) => {
             window.location.pathname = '/escaperoom/' + res.data + '/start';
         }).catch((error) => {
             console.error(error);

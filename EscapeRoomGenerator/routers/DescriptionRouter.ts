@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
-import { EscapeRoom } from "../models/EscapeRoom";
+import { EscapeRoom } from "../Models/EscapeRoom";
 
 export const DescriptionRouter = express.Router();
-const descriptionData = require('../lockedPuzzleDescriptions.json');
+const descriptionData = require('../data/lockedPuzzleDescriptions.json');
 
 interface DescriptionRequest extends Request{
     query: {

@@ -18,7 +18,7 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
 
     function totalHintsUsed(): number {
         return escapeRoom?.rooms.reduce((total, room) => total + room.puzzles.reduce((acc, puzzle) => 
-            acc + (typeof puzzle.hints === 'number' ? puzzle.hints : puzzle.hints.length)
+            acc + (puzzle.hints ? (typeof puzzle.hints === 'number' ? puzzle.hints : puzzle.hints.length) : 0)
         , 0), 0);
     }
 
@@ -29,7 +29,7 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
             <div className='hint-container overflow-y-scroll'>
                 {
                     currentRoom.puzzles.map((puzzle, puzzleI) => {
-                        if (puzzle.isLocked || puzzle.isSolved) return null;
+                        if (puzzle.isLocked || puzzle.isSolved || !puzzle.hints) return null;
                         // console.log(puzzle.hints)
             
                         if (typeof puzzle.hints === "number"){

@@ -1,47 +1,36 @@
-import { Observable, Observer } from './ObserverPattern';
+import { Observable, Observer } from '../ObserverPattern';
 import { v4 as uuidv4 } from "uuid";
-import {Theme} from "../Theme";
+import { Theme } from "../Theme";
 import {generateThemedPuzzleText} from "../ChatGPTTextGenerator";
+import { choice } from '../Helpers';
 
-const spotTheDifferenceData = require('../../spotTheDifference.json');
-
-interface PuzzleData {
-    theme: string;
-    changedImagePath: string;
-    originalImagePath: string;
-    difficulty: number;
-    estimatedTime: number;
-    differences: Difference[];
-}
+const spotTheDifferenceData = require('../../data/spotTheDifference.json');
 
 interface Difference {
     x1: number;
     y1: number;
     x2: number;
     y2: number;
-    x3: number;
-    y3: number;
-    x4: number;
-    y4: number;
     found: boolean;
 }
 
 export class SpotTheDifference implements Observable, Observer {
-    private static puzzles: { [key: string]: SpotTheDifference } = {}
-    id: string = uuidv4();
-    static objectCounter: number = 0;
+    private static puzzles: { [key: string]: SpotTheDifference } = {};
+    static type = 'spotTheDifference';
 
-    private difficulty: number;
     private observers: Observer[] = [];
     private dependentPuzzles: string[] = [];
-    private differences: Difference[] = [];
+    
+    id: string = uuidv4();
+    type: string = SpotTheDifference.type;
     description: string = "Wait, are these the same?";
     estimatedTime: number = 5;
-    hints: string[] = [];
+    hintLevel: number = 0;
     question: string = "Somethings not right over here";
     isSolved: boolean = false;
     isLocked: boolean = false;
-    type: string = 'spotTheDifference';
+
+    differences: Difference[] = [];
     originalImagePath: string = "";
     changedImagePath: string = "";
     theme: Theme;
@@ -51,11 +40,20 @@ export class SpotTheDifference implements Observable, Observer {
     constructor(difficulty: number, dependentPuzzles: string[], theme: Theme) { // TODO: add theme as a parameter when a solution is found
         this.dependentPuzzles = dependentPuzzles;
         if (this.dependentPuzzles.length > 0) this.isLocked = true;
-        this.difficulty = difficulty; // TODO: implement difficulty levels
+        // TODO: implement difficulty levels
         this.theme = theme;
         this.initializePuzzle(this.theme);
         SpotTheDifference.puzzles[this.id] = this;
     }
+
+    static get(puzzleId: string): SpotTheDifference {
+        return SpotTheDifference.puzzles[puzzleId]
+    }
+
+    getFoundDifferences() {
+        return this.differences.filter((diff) => diff.found);
+    }
+
     initializePuzzle(theme: string) {
         const themePuzzles = spotTheDifferenceData[theme];
         if (!themePuzzles || themePuzzles.length === 0) {
@@ -76,95 +74,84 @@ export class SpotTheDifference implements Observable, Observer {
         }));
     }
 
-
-    static get(puzzleId: string): SpotTheDifference {
-        return SpotTheDifference.puzzles[puzzleId]
-    }
-
-    checkSelection(x: number, y: number): {res: boolean, difference?: Difference} {
-        const tolerance = this.width / 100; // Define the tolerance
-
-        let difference = this.differences.find((difference) => (
-            x >= Math.min(difference.x1, difference.x2, difference.x3, difference.x4) - tolerance &&
-            x <= Math.max(difference.x1, difference.x2, difference.x3, difference.x4) + tolerance &&
-            y >= Math.min(difference.y1, difference.y2, difference.y3, difference.y4) - tolerance &&
-            y <= Math.max(difference.y1, difference.y2, difference.y3, difference.y4) + tolerance
-        ));
-
-        if (difference && !this.isSolved) {
-            difference.found = true;
-            this.checkAnswer();
-            return {res: true, difference}; // Difference found
-        }
-        return {res: false}; // No difference found
-    }
-
-    checkAnswer(): void {
-        this.isSolved = this.differences.every(difference => difference.found);
-    }
-
-    getHint(): {hint: string, difference?: Difference} {
-        const unfoundDifferences = this.differences.filter(difference => !difference.found);
-
-        if (unfoundDifferences.length === 0) {
-            return {hint: "You've found all the differences!"};
-        }
-
-        // Randomly select one of the unfound differences
-        const randomIndex = Math.floor(Math.random() * unfoundDifferences.length);
-        const randomDifference = unfoundDifferences[randomIndex];
-
-        // Mark the randomly selected difference as found
-        randomDifference.found = true;
-
-        const number = unfoundDifferences.length - 1; // Subtract 1 because one difference has been found
-        const hint = `I found a difference! that should make it ${number} left to find!`;
-        this.hints.push(hint);
-        this.checkAnswer();
-
-        return {hint, difference: randomDifference};
-    }
-
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-
-    notifyObservers(): string[] {
-        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    notifyObservers(): void {
+        this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-
-    async applyTheme(theme: Theme): Promise<void> {
-       this.theme = theme;
-    }
-
-    increaseCounter(): void {
-        SpotTheDifference.objectCounter++;
-    }
-
-    update(id: string): string {
+    update(id: string): void {
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
-            return this.id;
         }
-        return '';
+    }   
+    
+    async applyTheme(theme: Theme): Promise<void> {
+        this.theme = theme;
+    }
+
+    checkSolved(): boolean {
+        if (this.isSolved || this.isLocked) return false;
+
+        
+        if (this.differences.every(difference => difference.found)) {
+            this.isSolved = true;
+            this.notifyObservers();
+        }
+
+        return this.isSolved
+    }
+
+    getHint(): boolean {
+        if (this.isSolved || this.isLocked) return false;
+
+        const unfoundDifferences = this.differences.filter(difference => !difference.found);
+
+        if (unfoundDifferences.length === 0) return false;
+
+        choice(unfoundDifferences).found = true;
+
+        this.hintLevel++;
+        this.checkSolved();
+
+        return true;
+    }
+
+    checkSelection(x: number, y: number): boolean {
+        if (this.isSolved || this.isLocked) return false;
+
+        const tolerance = this.width / 100; // Define the tolerance
+
+        let difference = this.differences.find((difference) => (
+            x >= difference.x1 - tolerance && x <= difference.x2 + tolerance &&
+            y >= difference.y1 - tolerance && y <= difference.y2 + tolerance
+        ));
+
+        if (difference) {
+            difference.found = true;
+            this.checkSolved();
+            return true; // Difference found
+        }
+        return false; // No difference found
     }
 
     strip() {
         return {
             type: this.type,
-            differences: this.differences.filter((difference) => difference.found),
             id: this.id,
             isSolved: this.isSolved,
             isLocked: this.isLocked,
-            hints: this.hints,
+            hints: this.hintLevel,
             question: this.question,
             description: this.description,
+
+            differences: this.differences.filter((difference) => difference.found),
             originalImagePath: this.originalImagePath,
             changedImagePath: this.changedImagePath,
             width: this.width,
             height: this.height,
             maximumHints: this.differences.length
-        }
+        };
     }
 }

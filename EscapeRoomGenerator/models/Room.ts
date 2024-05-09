@@ -1,25 +1,27 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Puzzle } from './Puzzles/Puzzle';
+import { Puzzle } from './PuzzleGeneration/Puzzle';
+import { Observable, Observer } from './ObserverPattern';
 
-export class Room {
+export class Room implements Observable, Observer {
     private static rooms : {[Key: string]: Room} = {};
 
-    id: string;
+    private observers: Observer[] = [];
+
+    id: string = uuidv4();
     x: number;
     y: number;
     left: number = -1;
     right: number = -1;
     up: number = -1;
     down: number = -1;
-    isLocked: boolean;
     puzzles: Puzzle[];
+    isSolved: boolean = false;
 
     constructor(x: number, y: number, puzzles: Puzzle[]) {
-        this.id = uuidv4();
         this.x = x;
         this.y = y;
-        this.isLocked = puzzles.every((puzzle) => puzzle.isLocked);
         this.puzzles = puzzles;
+        puzzles.forEach((p) => p.addObserver(this));
         Room.rooms[this.id] = this;
     }
 
@@ -27,23 +29,34 @@ export class Room {
         return Room.rooms[roomId];
     }
 
-    checkForUnlockedPuzzle(): void {
-        if (this.isLocked) {
-            this.isLocked = this.puzzles.every((puzzle) => puzzle.isLocked)
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+    notifyObservers(): void {
+        this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    }
+    update(id: string): void {
+        if (this.isSolved) return;
+        
+        if (this.puzzles.every((p) => p.isSolved)) {
+            this.isSolved = true;
+            this.notifyObservers();
         }
     }
 
     strip() {
         return {
             id: this.id,
-            pos: [this.x, this.y],
+            x: this.x,
+            y: this.y,
             left: this.left,
             right: this.right,
             up: this.up,
             down: this.down,
-            isLocked: this.isLocked,
-            puzzles: this.puzzles.map((puzzle) => puzzle.strip())
-        }
+            isSolved: this.isSolved,
+            puzzles: this.puzzles.filter((p) => !p.isLocked).map((p) => p.strip()),
+            hasLockedPuzzles: this.puzzles.some((p) => p.isLocked)
+        };
     }
 }
 
