@@ -83,7 +83,7 @@ function HomePage() {
         setGameId(e.currentTarget.value);
     }
     const joinGame = () => {
-        window.location.pathname = '/escaperoom/' + gameId;
+        window.location.pathname = '/escaperoom/' + gameId + '/start';
     }
 
 

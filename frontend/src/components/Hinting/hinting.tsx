@@ -30,7 +30,6 @@ function Hinting ({escapeRoom, currentRoom} : HintingProps) {
                 {
                     currentRoom.puzzles.map((puzzle, puzzleI) => {
                         if (puzzle.isLocked || puzzle.isSolved || !puzzle.hints) return null;
-                        // console.log(puzzle.hints)
             
                         if (typeof puzzle.hints === "number"){
                             if (puzzle.hints > 0){

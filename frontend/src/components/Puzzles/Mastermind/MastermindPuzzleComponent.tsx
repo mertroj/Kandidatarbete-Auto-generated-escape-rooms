@@ -31,12 +31,12 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
 
     const guessesDiv = useRef<HTMLDivElement>(null);
 
-    async function handleGuess(guess: string){
+    async function handleGuess(){
         try{
             const response = await axios.post<boolean>(backendURL + '/mastermindPuzzle/checkAnswer', {
                 gameId,
                 puzzleId: puzzle.id, 
-                answer: guess
+                answer: currentInputRef.current
             });
 
             setCurrentInput('');
@@ -58,18 +58,6 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
     }
 
     useEffect(() => {
-        setIsAnimating(true);
-        setTimeout(() => {
-            setIsAnimating(false);
-        }, animationDuration*(length+1));
-    }, [puzzle])
-
-    useEffect(() => {
-        if (!guessesDiv.current) return;
-        guessesDiv.current.scrollTop = guessesDiv.current.scrollHeight;
-    }, [isAnimating, isShowing])
-
-    useEffect(() => {
         const handleKeyUp = (event: KeyboardEvent) => {
             let key = event.key;
             if ((key >= '0' && key <= '9') || (key >= 'Numpad0' && key <= 'Numpad9')) {
@@ -81,7 +69,7 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
                     sessionStorage.setItem(puzzle.id, currentInputRef.current);
                 }
             }else if (key === 'Enter') {
-                handleGuess(currentInputRef.current);
+                handleGuess();
                 sessionStorage.removeItem(puzzle.id);
             }else if (key === 'Backspace') {
                 setCurrentInput(prevInput => prevInput.slice(0, -1));
@@ -91,6 +79,20 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
         if (isShowing) window.addEventListener('keyup', handleKeyUp);
         return () => window.removeEventListener('keyup', handleKeyUp);
     }, [isShowing]);
+
+    useEffect(() => {
+        if (isShowing) {
+            setIsAnimating(true);
+            setTimeout(() => {
+                setIsAnimating(false);
+            }, animationDuration*(length+1));
+        }
+    }, [puzzle])
+
+    useEffect(() => {
+        if (!guessesDiv.current) return;
+        guessesDiv.current.scrollTop = guessesDiv.current.scrollHeight;
+    }, [isAnimating, isShowing])
 
     useEffect(() => {
         currentInputRef.current = currentInput;
@@ -131,7 +133,7 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
 
                     <div 
                         ref={guessesDiv}
-                        className='overflow-y-scroll h-75 mh-75'
+                        className='overflow-y-scroll h-75 mh-75 d-flex flex-column'
                     >
                         {puzzle.previousGuesses.map((guess, guessI) => {
                             return <Guess 
@@ -153,6 +155,8 @@ function MastermindPuzzleComponent ({puzzle, i, incorrectAnswer}: MasterMindPuzz
                             />
                         }
                     </div>
+
+                    <Button onClick={(e) => handleGuess()}>Make Guess</Button>
                 </div>
             }
         />

@@ -39,8 +39,6 @@ function JigsawPuzzleComponent ({puzzle}: JigsawProps) {
                 pieces.current = puzzle.pieces.map(piece => {
                     return {...piece, x: 20, y: 20, prevX: 20, prevY: 20}
                 });
-
-                console.log(pieces)
                 
                 calcNewSize();
                 calcNewCoords();
