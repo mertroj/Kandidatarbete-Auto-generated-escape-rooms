@@ -49,8 +49,8 @@ function EscapeRoomPage() {
     const prevSolved = useRef<number[]>([]);
     const prevUnlocked = useRef<number[]>([]);
     const prevHints = useRef<number[]>([]);
-    const hasInteracted = false;
 
+    const hasInteracted = useRef(false);
 
     async function fetchEscapeRoom() {
         try {
@@ -119,7 +119,7 @@ function EscapeRoomPage() {
         }
     }
     function incorrectAnswer() {
-        if (hasInteracted) {
+        if (hasInteracted.current) {
             incorrectAudio.currentTime = 0;
             incorrectAudio.play();
         }
@@ -127,7 +127,7 @@ function EscapeRoomPage() {
     }
 
     function puzzleSolved(): void {
-        if (hasInteracted) {
+        if (hasInteracted.current) {
             correctAudio.currentTime = 0;
             correctAudio.play();
         }
@@ -249,6 +249,14 @@ function EscapeRoomPage() {
 
         fetchEscapeRoom();
         fetchImage();
+
+        const onInteraction = () => {
+            hasInteracted.current = true;
+            window.removeEventListener("mousedown", onInteraction);
+            window.removeEventListener("keydown", onInteraction);
+        }
+        window.addEventListener("mousedown", onInteraction)
+        window.addEventListener("keydown", onInteraction)
 
         return () => {
             window.onpopstate = null;
