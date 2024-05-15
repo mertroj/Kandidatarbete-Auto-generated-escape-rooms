@@ -36,13 +36,14 @@ function JigsawPuzzleComponent ({puzzle}: JigsawProps) {
 
             image.current.src = URL.createObjectURL(response.data);
             image.current.onload = () => {
-                pieces.current = puzzle.pieces.map(piece => {
-                    return {...piece, x: 20, y: 20, prevX: 20, prevY: 20}
-                });
-                
                 calcNewSize();
                 calcNewCoords();
                 calcNewPiecesCoords();
+                pieces.current = puzzle.pieces.map(piece => {
+                    let x = Math.random() * (canvasRef.current!.width - pieceWidth)
+                    let y = Math.random() * (canvasRef.current!.height - pieceHeight)
+                    return {...piece, x, y, prevX: x, prevY: y}
+                });
                 updateGame();
             };
         } catch (error) {
@@ -150,7 +151,7 @@ function JigsawPuzzleComponent ({puzzle}: JigsawProps) {
             let dist = Math.sqrt((piece.x - c.x)**2 + (piece.y - c.y)**2)
             let occupied = pieces.current.some((p) => p.curRow === c.row && p.curCol === c.col && p.id !== piece!.id);
             
-            return dist < pieceWidth / 3 && !occupied;
+            return dist < pieceWidth / 2 && !occupied;
         });
 
         if (coords) {

@@ -23,12 +23,12 @@ function HomePage() {
         }
     };
     const exclusionOptions = [
-        { value: 'slidePuzzle', label: 'Slide' },
-        { value: 'memoryPuzzle', label: 'Memory' },
         { value: 'anagram', label: 'Anagram' },
-        { value: 'mastermindPuzzle', label: 'Mastermind' },
-        { value: 'lettersMathPuzzle', label: 'Letter Math' },
         { value: 'operatorMathPuzzle', label: 'Operator Math' },
+        { value: 'lettersMathPuzzle', label: 'Letter Math' },
+        { value: 'mastermindPuzzle', label: 'Mastermind' },
+        { value: 'memoryPuzzle', label: 'Memory' },
+        { value: 'spotTheDifference', label: 'Spot the Difference' },
     ];
     const difficultyOptions = [
         { value: '1', label: 'Easy' },
