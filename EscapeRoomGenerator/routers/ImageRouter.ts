@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import path from "path";
-import { EscapeRoom } from "../models/EscapeRoom";
+import { EscapeRoom } from "../Models/EscapeRoom";
 
 export const ImageRouter = express.Router();
-const imagesData = require('../themedImages.json');
+const imagesData = require('../data/themedImages.json');
 
 interface ImageRequest extends Request {
     query: {

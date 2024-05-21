@@ -15,25 +15,25 @@ export type Position =
 export interface PopupProps {
     puzzleNumber?: number;
     navbarRemove: boolean;
-    trigger: JSX.Element; 
+    trigger?: JSX.Element; 
     isOpen: boolean;
-    onOpen: () => void;
-    onClose: () => void;
+    onOpen?: () => void;
+    onClose?: () => void;
     children: React.ReactNode;
 }
 function Popup (popupProps: PopupProps) {
 
     return (
         <div>
-            <div onClick={popupProps.onOpen}>
+            {popupProps.trigger && popupProps.onOpen && <div onClick={popupProps.onOpen}>
                 {popupProps.trigger} {/* check that the position of the trigger in the component that uses popup isn't affected?*/ }
-            </div>
+            </div>}
 
             {popupProps.isOpen && (
                 <div>
                     <div className='overlay-background' onClick={popupProps.onClose}>
                     </div>
-                    <div className='overlay'>
+                    <div className='overlay mh-100'>
                         {!popupProps.navbarRemove &&
                         <div className='bg-light sticky-top'>
                             <Navbar className={`p-0 ${popupProps.puzzleNumber ? 'justify-content-between ms-3' : 'justify-content-end'}`}>                                
@@ -42,7 +42,7 @@ function Popup (popupProps: PopupProps) {
                             </Navbar>
                         </div>
                         }
-                        <div className='m-5'>
+                        <div className='m-5 h-75'>
                             {popupProps.children}
                         </div>
                     </div>

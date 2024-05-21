@@ -16,3 +16,13 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
 }
+
+.copy-game-id {
+    padding: 8px 0;
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+.copy-game-id:hover {
+    color: slateblue;
+}

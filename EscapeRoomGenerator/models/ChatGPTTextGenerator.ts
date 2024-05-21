@@ -4,7 +4,7 @@ import { OpenAI } from 'openai';
 require('dotenv').config();
 const apiKey = process.env.MY_API_KEY;
 console.log('key:', apiKey);
-const openai = new OpenAI({apiKey: apiKey});
+const openai = new OpenAI({apiKey});
 const wordToTokenMultiplier = 1.25;
 
 export async function generateIntroText(theme: Theme): Promise<string> {
@@ -40,7 +40,9 @@ export async function generateIntroText(theme: Theme): Promise<string> {
         }
         return response.choices[0].message.content;
     } catch (error: any) {
-        console.error(error.message);
+        if (apiKey)
+            console.error(error.message);
+
         return "Welcome to the " + theme + " escape room! Try to escape as fast as possible. Don't forget to ask for help when you need it. Good luck!";
     }
 }
@@ -74,7 +76,9 @@ export async function generateEndingText(theme: Theme): Promise<string> {
         }
         return response.choices[0].message.content;
     } catch (error: any) {
-        console.error(error.message);
+        if (apiKey)
+            console.error(error.message);
+
         return "Congratulations! You have successfully escaped the " + theme + " themed escape room. We hope you enjoyed the experience and look forward to seeing you again soon!";
     }
 }
@@ -106,7 +110,9 @@ export async function generateThemedPuzzleText(textToChange: string, theme: Them
         }
         return response.choices[0].message.content;
     } catch (error: any) {
-        console.error(error.message);
+        if (apiKey)
+            console.error(error.message);
+
         return textToChange;
     }
 }

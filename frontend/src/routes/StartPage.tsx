@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { backendURL } from "../interfaces";
 
 function StartPage() {
     const {gameId} = useParams();
@@ -17,7 +18,7 @@ function StartPage() {
 
     async function fetchIntroText(){
         try {
-            const response = await axios.post(`http://localhost:8080/chatGPT/introText`, {gameId: gameId});
+            const response = await axios.post(backendURL + `/chatGPT/introText`, {gameId: gameId});
             setIntroText(response.data.split('\n'));
         } catch (error) {
             console.error('Failed to fetch intro text:', error);

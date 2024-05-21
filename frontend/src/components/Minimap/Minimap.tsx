@@ -9,8 +9,8 @@ type MinimapProps = {
 };
 
 function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
-    let xs = escapeRoom.rooms.map((room) => room.pos[0]);
-    let ys = escapeRoom.rooms.map((room) => room.pos[1]);
+    let xs = escapeRoom.rooms.map((room) => room.x);
+    let ys = escapeRoom.rooms.map((room) => room.y);
     let minX = Math.min(...xs);
     let maxX = Math.max(...xs);
     let minY = Math.min(...ys);
@@ -20,7 +20,7 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
     let cellSize = 40
 
     let nodes: JSX.Element[] = [];
-    let roomI: number;
+    let roomIdx: number;
     let room: Room;
     let key: string;
     let color: string;
@@ -28,20 +28,21 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
     for (let y = maxY; y >= minY; y--) {
         for (let x = minX; x <= maxX; x++) {
             key = `minimap-element-${x}-${y}`;
-            roomI = escapeRoom.rooms.findIndex((room) => room.pos[0] === x && room.pos[1] === y)
-            if (roomI === -1) {
+            roomIdx = escapeRoom.rooms.findIndex((room) => room.x === x && room.y === y)
+            if (roomIdx === -1) {
                 nodes.push(<div key={key}></div>)
                 continue
             }
-            room = escapeRoom.rooms[roomI];
-            color = currentRoom.id === room.id ? "red" : "rgb(150,150,150)"
+            room = escapeRoom.rooms[roomIdx];
+            color = currentRoom.id === room.id ? "red" : "rgb(170,170,170)"
             nodes.push(<div key={key} className='minimap-element'>
                 <div 
                     className='minimap-element-square w-75 h-75 m-auto'
                     style={{backgroundColor: color}}
                 >
-                    {roomStatus[roomI].solved   && <div className='puzzle-solved-status   blinking'></div>}
-                    {roomStatus[roomI].unlocked && <div className='puzzle-unlocked-status blinking'></div>}
+                    {roomStatus[roomIdx].solved   && <div className='puzzle-solved-status   notification-dot'></div>}
+                    {roomStatus[roomIdx].unlocked && <div className='puzzle-unlocked-status notification-dot'></div>}
+                    {roomStatus[roomIdx].hint     && <div className='puzzle-hint-status     notification-dot'></div>}
                 </div>
                 {room.left  !== -1 && <div className='minimap-line' style={{left: 0}}  ></div>}
                 {room.right !== -1 && <div className='minimap-line' style={{right: 0}} ></div>}
@@ -52,10 +53,10 @@ function Minimap ({escapeRoom, currentRoom, roomStatus}: MinimapProps) {
     }
 
     useEffect(() => {
-        document.querySelectorAll('.blinking').forEach((element) => {
-            element.classList.remove('blinking');
+        document.querySelectorAll('.notification-dot').forEach((element) => {
+            element.classList.remove('notification-dot');
             void element.clientWidth;
-            element.classList.add('blinking');
+            element.classList.add('notification-dot');
         });
     }, [roomStatus]);
 

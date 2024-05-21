@@ -2,7 +2,7 @@ import { Row, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {EscapeRoom, Puzzle, Room} from "../interfaces";
+import {EscapeRoom, Puzzle, Room, backendURL} from "../interfaces";
 import {useParams, Link} from 'react-router-dom';
 
 function ResultScreenPage() {
@@ -12,15 +12,17 @@ function ResultScreenPage() {
 
     const fetchEscapeRoom = async () => {
         try {
-            const response = await axios.get<EscapeRoom>('http://localhost:8080/escaperoom/?gameId=' + gameId);
+            const response = await axios.get<EscapeRoom>(backendURL + '/escaperoom/?gameId=' + gameId);
             const escapeRoom = response.data;
             const rooms: Room[] = escapeRoom.rooms;
             setHintUsed(rooms.reduce((acc, room) => acc + room.puzzles.reduce((acc, puzzle) => {
+                if (!puzzle.hints)
+                    return acc
                 if (typeof puzzle.hints === "number") 
                     return acc + puzzle.hints
                 return acc + puzzle.hints.length
             }, 0), 0));
-            const time: string = formatMilliseconds(escapeRoom.timer.elapsedTime);
+            const time: string = formatMilliseconds(Date.now() - escapeRoom.startTime);
             setFormattedTimeTaken(time);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -41,7 +43,7 @@ function ResultScreenPage() {
     }
 
     useEffect(() => {
-        const unblock = window.history.pushState(null, "", window.location.href);
+        window.history.pushState(null, "", window.location.href);
 
         window.onpopstate = function () {
             window.history.pushState(null, "", window.location.href);

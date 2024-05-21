@@ -1,402 +1,371 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {JigsawPuzzle, JigsawPiece} from "../../interfaces";
-import correctSound from '../../assets/sounds/correct-answer.wav';
+import { useEffect, useRef } from 'react';
+import {JigsawPuzzle, JigsawPiece, backendURL} from "../../interfaces";
 import {useParams} from "react-router-dom";
 import axios from "axios";
-import { VolumeContext } from "../../utils/volumeContext";
 
-const correctAudio = new Audio(correctSound);
-function JigsawPuzzleComponent ({puzzle, onSolve}: {puzzle: JigsawPuzzle, onSolve: Function}) {
-    const {volume} = React.useContext(VolumeContext);
+type Coords = {row: number, col: number, x: number, y: number}
+
+interface JigsawProps {
+    puzzle: JigsawPuzzle;
+}
+
+function JigsawPuzzleComponent ({puzzle}: JigsawProps) {
     const {gameId} = useParams();
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    let IMAGE: HTMLImageElement;
     let CONTEXT: any = null;
     let SCALAR: number = 0.6;
+    let pieceWidth = 0;
+    let pieceHeight = 0;
+    
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const image = useRef(new Image());
+    const SIZE = useRef({ x: 0, y: 0, width: 0, height: 0 });
+    const pieces = useRef<JigsawPiece[]>([]);
+    const selectedPiece = useRef<JigsawPiece | undefined>();
+    const possibleCoords = useRef<Coords[]>([]);
 
-
-    let [SIZE] = useState({ x: 0, y: 0, width: 0, height: 0, rows: 0, columns: 0 });
-    let PIECES: FrontEndPiece[] = [];
-    let SELECTED_PIECE: any = null;
-
-
-    let CANVAS: HTMLCanvasElement | null    = canvasRef.current;
-
-    async function jigsawImage() {
+    async function fetchImage() {
+        if (!canvasRef.current) return;
         try {
-            const response = await fetch('http://localhost:8080/jigsaw/image/?gameId=' + gameId);
-            if (response.ok) {
+            const response = await axios.get(backendURL + `/jigsaw/image/`, { 
+                responseType: 'blob',
+                params: {
+                    gameId,
+                    puzzleId: puzzle.id
+                }
+            });
 
-                const blob = await response.blob();
-                const imageUrl = URL.createObjectURL(blob);
-
-                IMAGE = new Image();
-                IMAGE.src = imageUrl;
-
-                IMAGE.onload = function () {
-                    CANVAS = canvasRef.current;
-                    handleResize(); // Resize canvas after image load
-                    addEventListeners();
-                    updateGame();
-                    initializeGame();
-                    randomizePiecesLocation();
-                };
-            }
-
+            image.current.src = URL.createObjectURL(response.data);
+            image.current.onload = () => {
+                calcNewSize();
+                calcNewCoords();
+                calcNewPiecesCoords();
+                pieces.current = puzzle.pieces.map(piece => {
+                    let x = Math.random() * (canvasRef.current!.width - pieceWidth)
+                    let y = Math.random() * (canvasRef.current!.height - pieceHeight)
+                    return {...piece, x, y, prevX: x, prevY: y}
+                });
+                updateGame();
+            };
         } catch (error) {
             console.error('Error fetching image:', error);
         }
     }
-    async function checkAnswer() {
+    async function movePiece(piece: JigsawPiece, coords?: Coords) {
         try {
-            const response = await axios.post(`http://localhost:8080/jigsaw/checkAnswer`, {puzzleId: puzzle.id});
-            if (response.data) {
-                correctAudio.currentTime = 0;
-                correctAudio.play();
-                onSolve();
-            }
-        } catch (error) {
-            console.error('Error checking answer :', error);
-        }
-    }
-    async function patchCorrect(id: string, isCorrect: boolean) {
-        try {
-            const response = await axios.patch(`http://localhost:8080/jigsaw/setCorrect`, {pieceId: id, puzzleId: puzzle.id, isCorrect: isCorrect});
+            const response = await axios.patch(backendURL + `/jigsaw/move`, {
+                gameId,
+                puzzleId: puzzle.id,
+                pieceId: piece.id, 
+                row: coords ? coords.row : null, 
+                column: coords ? coords.col : null
+            });
 
         } catch (error) {
             console.error('Error setting correct :', error);
         }
     }
 
-    useEffect(() => {
-        jigsawImage();
-    }, []);
+    function snapToCoords(piece: JigsawPiece, coords: Coords) {
+        piece.x = coords.x;
+        piece.y = coords.y;
+    }
 
-    useEffect(() => {
-        correctAudio.volume = volume;
-    }, [volume]);
+    function calcNewSize() {
+        if (!canvasRef.current || !image.current) return;
 
-    useEffect(() => {
-        // Call handleResize on window resize to resize canvas dynamically
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
-
-    function handleResize() {
-
-        // @ts-ignore
-        CANVAS.width = window.innerWidth;
-        // @ts-ignore
-        CANVAS.height = window.innerHeight;
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
 
         let resizer = SCALAR *
             Math.min(
-                window.innerWidth / IMAGE.width,
-                window.innerHeight / IMAGE.height
+                window.innerWidth / image.current.width,
+                window.innerHeight / image.current.height
             );
-        SIZE.width = IMAGE.width * resizer;
-        SIZE.height = IMAGE.height * resizer;
-        SIZE.x = window.innerWidth / 2 - SIZE.width / 2;
-        SIZE.y = window.innerHeight / 2 - SIZE.height / 2;
 
-        // @ts-ignore
-        CONTEXT = CANVAS.getContext("2d");
+        SIZE.current.width = image.current.width * resizer;
+        SIZE.current.height = image.current.height * resizer;
+        SIZE.current.x = window.innerWidth / 2 - SIZE.current.width / 2;
+        SIZE.current.y = window.innerHeight / 2 - SIZE.current.height / 2;
+
+        pieceWidth = SIZE.current.width / puzzle.columns;
+        pieceHeight = SIZE.current.height / puzzle.rows;
     }
-
-    function addEventListeners() {
-        // @ts-ignore
-        CANVAS.addEventListener("mousedown", onMouseDown);
-        // @ts-ignore
-        CANVAS.addEventListener("mousemove", onMouseMove);
-        // @ts-ignore
-        CANVAS.addEventListener("mouseup", onMouseUp);
-    }
-
-    function onMouseDown(event: MouseEvent) {
-        SELECTED_PIECE = getPressedPiece(event);
-
-        if (SELECTED_PIECE != null) {
-            const index = PIECES.indexOf(SELECTED_PIECE);
-            if (index > -1) {
-                PIECES.splice(index, 1);
-                PIECES.push(SELECTED_PIECE);
+    function calcNewCoords() {
+        possibleCoords.current = [];
+        let x: number, y: number;
+        for (let row = 0; row < puzzle.rows; row++) {
+            for (let col = 0; col < puzzle.columns; col++) {
+                x = SIZE.current.x + col * pieceWidth;
+                y = SIZE.current.y + row * pieceHeight;
+                possibleCoords.current.push({row, col, x, y});
             }
-            SELECTED_PIECE.offset = {
-                x: event.x - SELECTED_PIECE.x,
-                y: event.y - SELECTED_PIECE.y
-            }
-            patchCorrect(SELECTED_PIECE.id, false);
         }
     }
-
-    function onMouseMove(event: MouseEvent) {
-        if (SELECTED_PIECE != null) {
-            SELECTED_PIECE.x = event.x - SELECTED_PIECE.offset.x;
-            SELECTED_PIECE.y = event.y - SELECTED_PIECE.offset.y;
-        }
+    function calcNewPiecesCoords() {
+        pieces.current.forEach((p) => {
+            p.x = Math.min(p.x, window.innerWidth-pieceWidth);
+            p.y = Math.min(p.y, window.innerHeight-pieceHeight);
+        });
+    }
+    function handleResize() {
+        calcNewSize();
+        calcNewCoords();
+        calcNewPiecesCoords();
     }
 
-    async function onMouseUp() {
-        if (SELECTED_PIECE && SELECTED_PIECE.isClose()){
-            SELECTED_PIECE.snap();
-            await checkAnswer();
+    function onMouseDown(e: MouseEvent) {
+        selectedPiece.current = pieces.current.slice().reverse().find((p) => {
+            let coords = possibleCoords.current.find((c) => c.row === p.curRow && c.col === p.curCol);
+            let x = coords ? coords.x : p.x;
+            let y = coords ? coords.y : p.y;
+            return e.x > x && e.x < x + pieceWidth && e.y > y && e.y < y + pieceHeight
+        });
+
+        if (!selectedPiece.current) return; 
+
+        let piece = selectedPiece.current;
+
+        const index = pieces.current.indexOf(piece);
+        if (index !== -1) {
+            pieces.current.splice(index, 1);
+            pieces.current.push(piece);
         }
-        SELECTED_PIECE = null;
+        let coords = possibleCoords.current.find((c) => piece.curRow === c.row && piece.curCol === c.col)
+        if (coords) {
+            piece.x = coords.x;
+            piece.y = coords.y;
+        }
     }
-
-    function getPressedPiece(loc: Coordinates) {
-        for ( let i=PIECES.length-1 ; i>=0 ; i--) {
-            if (loc.x > PIECES[i].x && loc.x < PIECES[i].x + PIECES[i].width &&
-                loc.y > PIECES[i].y && loc.y < PIECES[i].y + PIECES[i].height) {
-                return PIECES[i];
-            }
-
+    function onMouseMove(e: MouseEvent) {
+        if (selectedPiece.current) {
+            selectedPiece.current.x += e.movementX;
+            selectedPiece.current.y += e.movementY;
         }
+    }
+    function onMouseUp() {
+        if (!selectedPiece.current) return;
+
+        let piece = selectedPiece.current;
+
+        let coords: Coords | undefined = possibleCoords.current.find((c) => {
+            let dist = Math.sqrt((piece.x - c.x)**2 + (piece.y - c.y)**2)
+            let occupied = pieces.current.some((p) => p.curRow === c.row && p.curCol === c.col && p.id !== piece!.id);
+            
+            return dist < pieceWidth / 2 && !occupied;
+        });
+
+        if (coords) {
+            snapToCoords(piece, coords);
+            movePiece(piece, coords);
+        } else  {
+            if (piece.curRow !== null || piece.curCol !== null)
+                movePiece(piece);
+            piece.prevX = piece.x;
+            piece.prevY = piece.y;
+        }
+        
+        selectedPiece.current = undefined;
     }
 
     function updateGame() { // previously named updateCanvas
+        if (!CONTEXT) return;
         CONTEXT.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
         CONTEXT.strokeStyle = 'black'; // Set the stroke color to black
         CONTEXT.lineWidth = 2; // Set the line width to 2 pixels
 
         // Draw the puzzle area outline
-        CONTEXT.strokeRect(SIZE.x, SIZE.y, SIZE.width, SIZE.height);
-        for (let piece of PIECES) {
-            piece.draw(CONTEXT);
+        CONTEXT.strokeRect(SIZE.current.x, SIZE.current.y, SIZE.current.width, SIZE.current.height);
+        for (let piece of pieces.current) {
+            drawPiece(piece, CONTEXT);
         }
         window.requestAnimationFrame(updateGame);
     }
+    function drawPiece(piece: JigsawPiece, context: { 
+        beginPath: () => void; 
+        moveTo: (arg0: number, arg1: number) => void; 
+        lineTo: (arg0: number, arg1: number) => void; 
+        bezierCurveTo: (arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number) => void; 
+        save: () => void; 
+        clip: () => void; 
+        drawImage: (arg0: HTMLImageElement, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number) => void; 
+        restore: () => void; 
+        stroke: () => void; 
+    })  {
+        context.beginPath();
+
+        const sz = Math.min(pieceWidth, pieceHeight);  // Hard coded values for the aesthetics
+        const neck = 0.08*sz;
+        const tabSize = 0.2*sz;
+
+        let x = piece.x;
+        let y = piece.y;
+
+        if (piece.curRow !== null && piece.curCol !== null && selectedPiece.current?.id !== piece.id) {
+            let coords = possibleCoords.current.find((c) => c.row === piece.curRow && c.col === piece.curCol);
+            x = coords!.x;
+            y = coords!.y;
+        }
+
+        // from top left
+        context.moveTo(x, y);
+        // to top right
+        if (piece.top) {
+            context.lineTo(x + pieceWidth * Math.abs(piece.top) - neck,
+            y);
+            context.bezierCurveTo(
+                x + pieceWidth*Math.abs(piece.top) - neck,
+                y - tabSize*Math.sign(piece.top)*0.2,
+
+                x + pieceWidth*Math.abs(piece.top) - tabSize,
+                y - tabSize*Math.sign(piece.top),
+
+                x + pieceWidth*Math.abs(piece.top),
+                y - tabSize*Math.sign(piece.top)
+            )
+
+            context.bezierCurveTo(
+                x + pieceWidth*Math.abs(piece.top) + tabSize,
+                y - tabSize*Math.sign(piece.top),
+
+                x + pieceWidth*Math.abs(piece.top) + neck,
+                y - tabSize*Math.sign(piece.top)*0.2,
+
+                x + pieceWidth*Math.abs(piece.top) + neck,
+                y
+            )
+        }
+        context.lineTo(x + pieceWidth, y);
+
+        // to bottom right
+        if (piece.right) {
+            context.lineTo(x + pieceWidth, y + pieceHeight * Math.abs(piece.right) - neck);
+            context.bezierCurveTo(
+                x + pieceWidth + tabSize*Math.sign(piece.right)*0.2,
+                y + pieceHeight*Math.abs(piece.right) - neck,
+
+                x + pieceWidth + tabSize*Math.sign(piece.right),
+                y + pieceHeight*Math.abs(piece.right) - tabSize,
+
+                x + pieceWidth + tabSize*Math.sign(piece.right),
+                y + pieceHeight*Math.abs(piece.right)
+            )
+            context.bezierCurveTo(
+                x + pieceWidth + tabSize*Math.sign(piece.right),
+                y + pieceHeight*Math.abs(piece.right) + tabSize,
+
+                x + pieceWidth + tabSize*Math.sign(piece.right)*0.2,
+                y + pieceHeight*Math.abs(piece.right) + neck,
+
+                x + pieceWidth,
+                y + pieceHeight*Math.abs(piece.right) + neck
+            )
+        }
+        context.lineTo(x + pieceWidth, y + pieceHeight);
+
+        // to bottom left
+        if (piece.bottom) {
+            context.lineTo(x + pieceWidth * Math.abs(piece.bottom) + neck, y + pieceHeight);
+            context.bezierCurveTo(
+                x + pieceWidth*Math.abs(piece.bottom) + neck,
+                y + pieceHeight + tabSize*Math.sign(piece.bottom)*0.2,
+
+                x + pieceWidth*Math.abs(piece.bottom) + tabSize,
+                y + pieceHeight + tabSize*Math.sign(piece.bottom),
+
+                x + pieceWidth*Math.abs(piece.bottom),
+                y + pieceHeight + tabSize*Math.sign(piece.bottom)
+            )
+            context.bezierCurveTo(
+                x + pieceWidth*Math.abs(piece.bottom) - tabSize,
+                y + pieceHeight + tabSize*Math.sign(piece.bottom),
+
+                x + pieceWidth*Math.abs(piece.bottom) - neck,
+                y + pieceHeight + tabSize*Math.sign(piece.bottom)*0.2,
+
+                x + pieceWidth*Math.abs(piece.bottom) - neck,
+                y + pieceHeight
+            )
+        }
+        context.lineTo(x, y + pieceHeight);
+
+        //to top left
+        if(piece.left){
+            context.lineTo(x, y + pieceHeight * Math.abs(piece.left) + neck);
+            context.bezierCurveTo(
+                x - tabSize*Math.sign(piece.left)*0.2,
+                y + pieceHeight*Math.abs(piece.left) + neck,
+
+                x - tabSize*Math.sign(piece.left),
+                y + pieceHeight*Math.abs(piece.left) + tabSize,
+
+                x - tabSize*Math.sign(piece.left),
+                y + pieceHeight*Math.abs(piece.left)
+            )
+            context.bezierCurveTo(
+                x - tabSize*Math.sign(piece.left),
+                y + pieceHeight*Math.abs(piece.left) - tabSize,
+
+                x - tabSize*Math.sign(piece.left)*0.2,
+                y + pieceHeight*Math.abs(piece.left) - neck,
+
+                x,
+                y + pieceHeight*Math.abs(piece.left) - neck
+            )
+        }
+        context.lineTo(x, y);
 
 
-    function initializeGame(){
-        const newPieces: any[] = [];
-        let backendPuzzle: JigsawPuzzle = puzzle;
-        backendPuzzle.pieces.forEach(piece =>{
-            newPieces.push(new FrontEndPiece(piece));
+        const scaledTabHeight: number =
+            Math.min(image.current.width/puzzle.columns,
+            image.current.height/puzzle.rows)*tabSize/sz;
+
+        context.save();
+        context.clip();
+
+        context.drawImage(image.current,
+            piece.col*image.current.width/puzzle.columns - scaledTabHeight,
+            piece.row*image.current.height/puzzle.rows - scaledTabHeight,
+            image.current.width/puzzle.columns + scaledTabHeight*2,
+            image.current.height/puzzle.rows + scaledTabHeight*2,
+            x-tabSize,
+            y-tabSize,
+            pieceWidth+tabSize*2,
+            pieceHeight+tabSize*2);
+
+        context.restore();
+        context.stroke();
+    }
+
+    useEffect(() => {
+        if (!pieces.current.length) return;
+
+        pieces.current.forEach((p) => {
+            let newP = puzzle.pieces.find((p2) => p2.id === p.id);
+            if (!newP) return;
+
+            if (newP.curRow === null && newP.curCol === null) {
+                p.x = p.prevX;
+                p.y = p.prevY;
+            }
+            p.curRow = newP.curRow;
+            p.curCol = newP.curCol;
         });
-        PIECES = newPieces;
+    }, [puzzle])
+    
+    useEffect(() => {
+        fetchImage();
 
-        SIZE.rows = backendPuzzle.size.rows;
-        SIZE.columns = backendPuzzle.size.columns;
-    }
-
-
-    interface Coordinates {
-        x: number;
-        y: number;
-    }
-    function randomizePiecesLocation() {
-
-        for (let i = 0; i < PIECES.length; i++) {
-            let location: Coordinates = {
-                // @ts-ignore
-                x: Math.random() * (CANVAS.width - PIECES[i].width),
-                // @ts-ignore
-                y: Math.random() * (CANVAS.height - PIECES[i].height)
-            }
-            PIECES[i].x = location.x;
-            PIECES[i].y = location.y;
-            PIECES[i].setCorrect(false);
-        }
-    }
-
-    class FrontEndPiece implements JigsawPiece{
-        id: string;
-        rowIndex: number;
-        colIndex: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        xCorrect: number;
-        yCorrect: number;
-        correct: boolean;
-        bottom: any;
-        right: any;
-        left: any;
-        top: any;
-
-        private backendPiece: JigsawPiece;
-        constructor(backendPiece: JigsawPiece) {
-            this.id = backendPiece.id;
-            this.backendPiece = backendPiece;
-
-            this.rowIndex = backendPiece.rowIndex;
-            this.colIndex = backendPiece.colIndex;
-            this.bottom = backendPiece.bottom;
-            this.right = backendPiece.right;
-            this.left = backendPiece.left;
-            this.top = backendPiece.top;
-
-            this.x = SIZE.x + SIZE.width * this.colIndex / SIZE.columns;
-            this.y = SIZE.y + SIZE.height * this.rowIndex / SIZE.rows;
-            this.width = SIZE.width / SIZE.columns;
-            this.height = SIZE.height / SIZE.rows;
-            this.xCorrect = this.x;
-            this.yCorrect = this.y;
-            this.correct = backendPiece.correct;
-        }
-
-        draw(context: { beginPath: () => void; moveTo: (arg0: number, arg1: number) => void; lineTo: (arg0: number, arg1: number) => void; bezierCurveTo: (arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number) => void; save: () => void; clip: () => void; drawImage: (arg0: HTMLImageElement, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, arg6: number, arg7: number, arg8: number) => void; restore: () => void; stroke: () => void; }) {
-            context.beginPath();
-
-            const sz = Math.min(this.width, this.height);  // Hard coded values for the aesthetics
-            const neck = 0.08*sz;
-            const tabWidth = 0.2*sz;
-            const tabHeight = 0.2*sz;
-
-
-            // from top left
-            context.moveTo(this.x, this.y);
-            // to top right
-            if (this.top) {
-                context.lineTo(this.x + this.width * Math.abs(this.top) - neck,
-                    this.y);
-                context.bezierCurveTo(
-                    this.x + this.width*Math.abs(this.top) - neck,
-                    this.y - tabHeight*Math.sign(this.top)*0.2,
-
-                    this.x + this.width*Math.abs(this.top) - tabWidth,
-                    this.y - tabHeight*Math.sign(this.top),
-
-                    this.x + this.width*Math.abs(this.top),
-                    this.y - tabHeight*Math.sign(this.top)
-                )
-
-                context.bezierCurveTo(
-                    this.x + this.width*Math.abs(this.top) + tabWidth,
-                    this.y - tabHeight*Math.sign(this.top),
-
-                    this.x + this.width*Math.abs(this.top) + neck,
-                    this.y - tabHeight*Math.sign(this.top)*0.2,
-
-                    this.x + this.width*Math.abs(this.top) + neck,
-                    this.y
-                )
-            }
-            context.lineTo(this.x + this.width, this.y);
-
-            // to bottom right
-            if (this.right) {
-                context.lineTo(this.x + this.width, this.y + this.height * Math.abs(this.right) - neck);
-                context.bezierCurveTo(
-                    this.x + this.width + tabHeight*Math.sign(this.right)*0.2,
-                    this.y + this.height*Math.abs(this.right) - neck,
-
-                    this.x + this.width + tabHeight*Math.sign(this.right),
-                    this.y + this.height*Math.abs(this.right) - tabWidth,
-
-                    this.x + this.width + tabHeight*Math.sign(this.right),
-                    this.y + this.height*Math.abs(this.right)
-                )
-                context.bezierCurveTo(
-                    this.x + this.width + tabHeight*Math.sign(this.right),
-                    this.y + this.height*Math.abs(this.right) + tabWidth,
-
-                    this.x + this.width + tabHeight*Math.sign(this.right)*0.2,
-                    this.y + this.height*Math.abs(this.right) + neck,
-
-                    this.x + this.width,
-                    this.y + this.height*Math.abs(this.right) + neck
-                )
-            }
-            context.lineTo(this.x + this.width, this.y + this.height);
-
-            // to bottom left
-            if (this.bottom) {
-                context.lineTo(this.x + this.width * Math.abs(this.bottom) + neck, this.y + this.height);
-                context.bezierCurveTo(
-                    this.x + this.width*Math.abs(this.bottom) + neck,
-                    this.y + this.height + tabHeight*Math.sign(this.bottom)*0.2,
-
-                    this.x + this.width*Math.abs(this.bottom) + tabWidth,
-                    this.y + this.height + tabHeight*Math.sign(this.bottom),
-
-                    this.x + this.width*Math.abs(this.bottom),
-                    this.y + this.height + tabHeight*Math.sign(this.bottom)
-                )
-                context.bezierCurveTo(
-                    this.x + this.width*Math.abs(this.bottom) - tabWidth,
-                    this.y + this.height + tabHeight*Math.sign(this.bottom),
-
-                    this.x + this.width*Math.abs(this.bottom) - neck,
-                    this.y + this.height + tabHeight*Math.sign(this.bottom)*0.2,
-
-                    this.x + this.width*Math.abs(this.bottom) - neck,
-                    this.y + this.height
-                )
-            }
-            context.lineTo(this.x, this.y + this.height);
-
-            //to top left
-            if(this.left){
-                context.lineTo(this.x, this.y + this.height * Math.abs(this.left) + neck);
-                context.bezierCurveTo(
-                    this.x - tabHeight*Math.sign(this.left)*0.2,
-                    this.y + this.height*Math.abs(this.left) + neck,
-
-                    this.x - tabHeight*Math.sign(this.left),
-                    this.y + this.height*Math.abs(this.left) + tabWidth,
-
-                    this.x - tabHeight*Math.sign(this.left),
-                    this.y + this.height*Math.abs(this.left)
-                )
-                context.bezierCurveTo(
-                    this.x - tabHeight*Math.sign(this.left),
-                    this.y + this.height*Math.abs(this.left) - tabWidth,
-
-                    this.x - tabHeight*Math.sign(this.left)*0.2,
-                    this.y + this.height*Math.abs(this.left) - neck,
-
-                    this.x,
-                    this.y + this.height*Math.abs(this.left) - neck
-                )
-            }
-            context.lineTo(this.x, this.y);
-
-
-            const scaledTabHeight: number =
-                Math.min(IMAGE.width/SIZE.columns,
-                IMAGE.height/SIZE.rows)*tabHeight/sz;
-
-            context.save();
-            context.clip();
-
-            context.drawImage(IMAGE,
-                this.colIndex*IMAGE.width/SIZE.columns - scaledTabHeight,
-                this.rowIndex*IMAGE.height/SIZE.rows - scaledTabHeight,
-                IMAGE.width/SIZE.columns + scaledTabHeight*2,
-                IMAGE.height/SIZE.rows + scaledTabHeight*2,
-                this.x-tabHeight,
-                this.y-tabHeight,
-                this.width+tabHeight*2,
-                this.height+tabHeight*2);
-
-            context.restore();
-            context.stroke();
-        }
-        isClose() {
-            return distance({x: this.x, y: this.y},
-                {x: this.xCorrect, y: this.yCorrect}) < this.width / 3;
-        }
-        snap() {
-            this.x = this.xCorrect;
-            this.y = this.yCorrect;
-            this.setCorrect(true);
-        }
-
-        setCorrect(correct: boolean): void {
-            patchCorrect(this.id, correct);
-            this.correct = this.backendPiece.correct;
-        }
-    }
-    function distance(piece1: Coordinates, piece2: Coordinates){
-        return Math.sqrt((piece1.x - piece2.x)**2 + (piece1.y - piece2.y)**2);
-
-    }
+        canvasRef.current!.addEventListener("mousedown", onMouseDown);
+        canvasRef.current!.addEventListener("mousemove", onMouseMove);
+        canvasRef.current!.addEventListener("mouseup", onMouseUp);
+        CONTEXT = canvasRef.current!.getContext("2d");
+        // Call handleResize on window resize to resize canvas dynamically
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     return (
         <div>

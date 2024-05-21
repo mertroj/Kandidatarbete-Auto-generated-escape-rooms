@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { randomIntRange, removeDuplicates } from '../Helpers';
-import { Observable, Observer } from './ObserverPattern';
+import { Observable, Observer } from '../ObserverPattern';
 import { shuffleArray } from '../Helpers';
 import { Theme } from '../Theme';
 import { generateThemedPuzzleText } from '../ChatGPTTextGenerator';
@@ -8,9 +8,8 @@ import { generateThemedPuzzleText } from '../ChatGPTTextGenerator';
 const allLetters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class LettersMathPuzzle implements Observable, Observer {
-    private static puzzles: {[key: string]: LettersMathPuzzle} = {}
+    private static puzzles: {[key: string]: LettersMathPuzzle} = {};
     static type = 'lettersMathPuzzle';
-    static objectCounter: number = 0;
 
     private observers: Observer[] = [];
     private dependentPuzzles: string[];
@@ -47,7 +46,7 @@ export class LettersMathPuzzle implements Observable, Observer {
     }
 
     static get(puzzleId: string): LettersMathPuzzle {
-        return LettersMathPuzzle.puzzles[puzzleId]
+        return LettersMathPuzzle.puzzles[puzzleId];
     }
 
     private init(): [string, string, number, number] {
@@ -71,49 +70,43 @@ export class LettersMathPuzzle implements Observable, Observer {
         firstTermLetters = firstTermLetters.slice(0, -1) + (firstTerm%10).toString();
 
         //TODO: Randomize the operation as well
-        let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`
-        return [question, letters, firstTerm-remainder, firstTerm]
+        let question = `${firstTermLetters} - ${remainder} = ${answerLetters}`;
+        return [question, letters, firstTerm-remainder, firstTerm];
     }
 
-
-    increaseCounter(){
-        LettersMathPuzzle.objectCounter++;
-    }
     addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
-    notifyObservers(): string[] {
-        return this.observers.map(observer => observer.update(this.id)).filter((id) => id);
+    notifyObservers(): void {
+        this.observers.map(observer => observer.update(this.id)).filter((id) => id);
     }
-    update(id: string): string{
+    update(id: string): void {
         this.dependentPuzzles = this.dependentPuzzles.filter(puzzleId => puzzleId !== id);
         if (this.dependentPuzzles.length === 0) {
             this.isLocked = false;
-            return this.id;
         }
-        return '';
     }
 
-    getHint(): string{
-        if (this.hints.length === 3)
-            return 'No more hints.';
+    getHint(): string | null {
+        if (this.isSolved || this.isLocked || this.hints.length === 3) return null;
 
         const number: string = this.mainAnswer.toString()[this.hints.length];
         const letter: string = this.letters.charAt(Number(number));
         let hint = 'The letter ' + letter + ' is ' + number;
-        this.hints.push(hint)
-        return hint
+        this.hints.push(hint);
+        return hint;
     }
 
-    checkAnswer(answer: string): {result: boolean, unlockedPuzzles: string[]} {
+    checkAnswer(answer: string): boolean {
+        if (this.isSolved || this.isLocked) return false;
+        
         let result = this.possibleAnswers.includes(answer);
 
         if (result && !this.isSolved) {
             this.isSolved = result;
-            let unlockedPuzzles = this.notifyObservers();
-            return {result, unlockedPuzzles}
+            this.notifyObservers();
         }
-        return {result, unlockedPuzzles: []};
+        return result;
     }
     async applyTheme(theme: Theme): Promise<void> {
         this.description = await generateThemedPuzzleText(this.description, theme);
@@ -129,7 +122,7 @@ export class LettersMathPuzzle implements Observable, Observer {
 
             question: this.question,
             description: this.description,
-        }
+        };
     }
 }
 

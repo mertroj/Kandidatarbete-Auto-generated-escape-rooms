@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { VolumeContext } from '../utils/volumeContext';
+import { VolumeContext } from '../utils/VolumeContext';
 import defaultClick from '../assets/sounds/navigation-click.wav';
 
 //we create a higher order component here (HOC)

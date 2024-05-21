@@ -1,56 +1,63 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Room } from './Room';
-import { Timer } from "./Timer";
 import { Theme } from './Theme';
 import { point, randomIntRange, around } from './Helpers';
-import { puzzleTreePopulator } from './Puzzles/PuzzleTreePopulator';
-import { Puzzle } from './Puzzles/Puzzle';
 import { generateEndingText, generateIntroText } from './ChatGPTTextGenerator';
+import { PuzzleTreePopulator } from './PuzzleGeneration/PuzzleTreePopulator';
+import { Puzzle } from './PuzzleGeneration/Puzzle';
 import { Jigsaw } from './Puzzles/Jigsaw';
+import { Observer } from './ObserverPattern';
 
 
-export class EscapeRoom {
+export class EscapeRoom implements Observer {
     private static escapeRooms: {[key: string]: EscapeRoom} = {};
 
     id: string = uuidv4();
     rooms!: Room[];
-    timer: Timer = new Timer();
+    allRoomsSolved: boolean = false;
+    isSolved: boolean = false;
+    startTime: number = Date.now();
     endPuzzle!: Puzzle;
     theme: Theme;
     startText!: string;
     endText!: string;
-    currentRoom!: Room;
 
     private constructor(theme: Theme) { //for synchronous creation operations
         this.theme = theme;
-        //let totalTime: number = (difficulty + 19) * Math.log2(players);
-        this.timer.start();
         EscapeRoom.escapeRooms[this.id] = this;
     }
     static async create(players: number, difficulty: number, theme: Theme, exclusions: string[]): Promise<EscapeRoom> {
-        let instance = new EscapeRoom(theme);
+        let er = new EscapeRoom(theme);
         let totalTime: number = players * 20; //one room of 20 min per player for now. TODO: improve this
 
-        instance.startText = await generateIntroText(theme);
-        instance.endText = await generateEndingText(theme);
+        er.startText = await generateIntroText(theme);
+        er.endText = await generateEndingText(theme);
 
-        [instance.rooms, instance.endPuzzle] = await EscapeRoom.createRooms(totalTime, difficulty, theme, exclusions);
-        EscapeRoom.connectRooms(instance.rooms);
-        instance.rooms[0].isLocked = false;
-        instance.currentRoom = instance.rooms[0];
-        return instance;
+        [er.rooms, er.endPuzzle] = await EscapeRoom.createRooms(totalTime, difficulty, theme, exclusions);
+
+        er.rooms.forEach((r) => r.addObserver(er));
+        er.endPuzzle.addObserver(er);
+
+        return er;
     }
 
-    static get(gameId: string) : EscapeRoom | null {
-        if (EscapeRoom.escapeRooms[gameId] === undefined) {
-            return null;
-        }
-
-        EscapeRoom.escapeRooms[gameId].rooms.forEach((room) => {
-            room.checkForUnlockedPuzzle();
-        });
-        
+    static get(gameId: string) : EscapeRoom {
         return EscapeRoom.escapeRooms[gameId];
+    }
+
+    getPuzzle(puzzleId: string): Puzzle | undefined {
+        let room = this.getRoom(puzzleId);
+        return room ? room.puzzles.find((p) => p.id === puzzleId) : undefined;
+    }
+
+    getRoom(puzzleId: string): Room | undefined {
+        return this.rooms.find((r) => r.puzzles.some((p) => p.id === puzzleId));
+    }
+
+    update(id: string): void {
+        if (this.isSolved) return;
+        this.allRoomsSolved = this.rooms.every((r) => r.isSolved);
+        this.isSolved = this.allRoomsSolved && this.endPuzzle.isSolved;
     }
     
     static async createRooms(totalTime: number, difficulty: number, theme: Theme, exclusions: string[]): Promise<[Room[], Puzzle]> {
@@ -58,7 +65,8 @@ export class EscapeRoom {
         let possible_locations: point[] = [[0,0]];
         let rooms: Room[] = [];
         let nrOfRooms: number = Math.floor(totalTime / 20) + 1; //1 player: 2 rooms, 2 players: 3 rooms, 3 players: 4 rooms, 4 players: 5 rooms
-        let graph = await puzzleTreePopulator(totalTime, difficulty, theme, exclusions);
+        let populator = new PuzzleTreePopulator(exclusions);
+        let graph = await populator.populate(totalTime, difficulty, theme);
         let nodes = graph.nodes();
 
         let promises = nodes.map(async nodeId => { //change the text for all puzzles into themed text using OPENAI
@@ -90,6 +98,7 @@ export class EscapeRoom {
                 possible_locations.push(pos);
             })
         }
+        this.connectRooms(rooms);
         return [rooms, endPuzzle];
     }
     
@@ -107,9 +116,10 @@ export class EscapeRoom {
             id: this.id, 
             rooms: this.rooms.map((room) => room.strip()),
             endPuzzle: this.endPuzzle.strip(),
-            currentRoom: this.currentRoom.strip(),
-            timer: this.timer,
+            startTime: this.startTime,
+            allRoomsSolved: this.allRoomsSolved,
+            isSolved: this.isSolved,
             theme: this.theme
-        }
+        };
     }
 }

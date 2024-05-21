@@ -6,7 +6,6 @@ import {
     AnagramPuzzle,
     LettersMathPuzzle,
     OperatorsMathPuzzle,
-    Puzzle,
     MastermindPuzzle,
     MemoryPuzzle,
     SpotTheDifferencePuzzle
@@ -23,12 +22,10 @@ import MemoryPuzzleComponent from '../Puzzles/MemoryPuzzleComponent';
 
 interface RoomComponentProps {
     room: Room;
-    updateRoom: () => void;
-    notifyIncorrectAnswer: () => void;
-    puzzleSolved: (puzzleId: string, unlockedPuzzles: string[]) => void;
+    incorrectAnswer: () => void;
 }
 
-function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}: RoomComponentProps) {
+function RoomComponent ({room, incorrectAnswer}: RoomComponentProps) {
 
     return (
         <div className='justify-content-center puzzle-grid overflow-y-scroll'>
@@ -41,9 +38,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id} 
                             puzzle={puzzle as AnagramPuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
+                            incorrectAnswer={incorrectAnswer}
                         />
                         
                     if (puzzle.type === 'lettersMathPuzzle')
@@ -51,9 +46,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id} 
                             puzzle={puzzle as LettersMathPuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
+                            incorrectAnswer={incorrectAnswer}
                         />
         
                     if (puzzle.type === 'operatorMathPuzzle') 
@@ -61,9 +54,7 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id} 
                             puzzle={puzzle as OperatorsMathPuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
+                            incorrectAnswer={incorrectAnswer}
                         />
                                 
                     if (puzzle.type === 'slidePuzzle') 
@@ -71,9 +62,6 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id} 
                             puzzle={puzzle as SlidePuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
                         />
         
                     if (puzzle.type === 'mastermindPuzzle')
@@ -81,18 +69,13 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id}
                             puzzle={puzzle as MastermindPuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
+                            incorrectAnswer={incorrectAnswer}
                         />
                     if (puzzle.type === 'spotTheDifference')
                         return <SpotTheDifferenceComponent
                             key={puzzle.id}
                             puzzle={puzzle as SpotTheDifferencePuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
                         />
 
                     if (puzzle.type === 'memoryPuzzle')
@@ -100,21 +83,19 @@ function RoomComponent ({room, updateRoom, notifyIncorrectAnswer, puzzleSolved}:
                             key={puzzle.id}
                             puzzle={puzzle as MemoryPuzzle}
                             i={i+1}
-                            updateRoom={updateRoom}
-                            notifyIncorrectAnswer={notifyIncorrectAnswer}
-                            puzzleSolved={puzzleSolved}
+                            incorrectAnswer={incorrectAnswer}
                         />
 
                     else return <p>Invalid puzzle</p>
                 })
             }
-            {room.puzzles.some((puzzle) => puzzle.isLocked) && <LockedPuzzleComponent key={"lockedIn"+room.id} />}
+            {room.hasLockedPuzzles && <LockedPuzzleComponent key={"lockedIn"+room.id} />}
             {room.puzzles.some((puzzle) => puzzle.isSolved) && 
                 <div className="solved-puzzles-container">
                     {
                         room.puzzles.filter((puzzle) => puzzle.isSolved).map((puzzle, i) => {
                             return <SolvedPuzzleComponent
-                                    key={puzzle.id}
+                                    key={`solved-${puzzle.id}`}
                                     style={{
                                         position: 'absolute',
                                         top: `${i * 10}px`,

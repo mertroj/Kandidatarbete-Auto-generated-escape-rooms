@@ -3,6 +3,7 @@ import './puzzles.css'
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { backendURL } from '../../interfaces';
 
 function LockedPuzzleComponent () {
     const {gameId} = useParams();
@@ -10,7 +11,7 @@ function LockedPuzzleComponent () {
 
     async function fetchDescription() {
         try {
-            const response = await axios.get('http://localhost:8080/lockedPuzzle/description/?gameId=' + gameId);
+            const response = await axios.get(backendURL + `/lockedPuzzle/description/?gameId=${gameId}`);
             setDescription(response.data);
         } catch (error) {
             console.error(error);

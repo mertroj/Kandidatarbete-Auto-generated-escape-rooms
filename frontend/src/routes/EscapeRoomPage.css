@@ -16,21 +16,3 @@
     height: auto;
     z-index: -1;
 }
-
-.volume-slider-container{
-    position: absolute;
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    top: 0%;
-    right: 21.5%;
-    z-index: 101;
-}
-.volume-icon{
-    font-size: 25px;
-}
-.volume-slider-container input[type=range] {
-    transform: rotate(270deg);
-    transform-origin: 17% 100%;
-}
